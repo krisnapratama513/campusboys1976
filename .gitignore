@@ -1,0 +1,12 @@
+# Folder Dependencies
+client/node_modules
+server/node_modules
+
+# Folder hasil build
+client/dist
+server/dist
+
+# File Environment (SANGAT PENTING)
+client/.env
+server/.env
+.env
