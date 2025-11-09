@@ -1,4 +1,4 @@
-// client/src/components/InfiniteCarousel/InfiniteCarouselChapters.tsx
+// client/src/Pages/Home/InfiniteCarouselChapters.tsx
 
 // 1. Impor HANYA hooks yang kita perlukan dari React
 import { useState, useEffect, useMemo } from 'react';
@@ -37,7 +37,7 @@ const InfiniteCarouselChapters = () => {
          */
         const fetchChapters = async () => {
             try {
-                const response = await fetch('http://localhost:8000/api/chapters');
+                const response = await fetch('http://localhost:8000/api/chapters/list');
                 
                 // Tambahkan pengecekan jika respons API tidak sukses
                 if (!response.ok) {
