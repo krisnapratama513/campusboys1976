@@ -11,7 +11,7 @@ const HomePage = () => {
             <Hero></Hero>
             <InfiniteCarouselChapters />
             
-            <div style={{ height: "300px" }}>
+            <div style={{ height: "300px", width: "100px", backgroundColor: "crimson" }}>
             </div>
         </>
     )

@@ -1,20 +1,8 @@
 // client/src/Pages/Home/InfiniteCarouselChapters.tsx
 
-// 1. Impor HANYA hooks yang kita perlukan dari React
 import { useState, useEffect, useMemo } from 'react';
-// import InfiniteCarousel from "./InfiniteCarousel";
 import InfiniteCarousel from '../../components/InfiniteCarousel/InfiniteCarousel';
-
-/**
- * Tipe data ini mendefinisikan struktur data Chapter
- * yang kita harapkan dari API.
- */
-type ApiChapter = {
-    id: number;
-    name: string;
-    description: string;
-    img: string;
-};
+import type { ApiChapter } from '../../types/chapter.types';
 
 /**
  * Komponen 'container' pintar (smart component) yang:

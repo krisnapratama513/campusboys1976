@@ -1,24 +1,39 @@
 /* InfiniteCarousel.module.css */
 
-/* 'logo-carousel-container' diubah menjadi 'container' */
+/*
+ * ========================================
+ * Layout Kontainer Utama
+ * ========================================
+ */
 .container {
     width: 100%;
-    overflow: hidden; 
+    /* 'overflow: hidden' adalah kunci untuk 'memotong' gambar
+       saat mereka bergerak di luar batas */
+    overflow: hidden;
     position: relative;
-    padding: 1.5rem 0; 
+    padding: 1.5rem 0;
     background-color: lightslategray;
     background-color: black;
 }
 
-/* Efek fade (tetap sama, tapi selector induknya '.container') */
+/*
+ * ========================================
+ * Efek Fade (Gradien) di Tepi
+ * ========================================
+ */
+
+/* * Pseudo-elemen ini menciptakan efek 'fade-out' di tepi kiri dan kanan
+ * container, sehingga item tampak muncul dan menghilang dengan mulus.
+ */
 .container::before,
 .container::after {
     content: '';
     position: absolute;
     top: 0;
     bottom: 0;
-    width: 10%; 
+    width: 10%;
     max-width: 150px;
+    /* Pastikan gradien berada di atas item */
     z-index: 2;
 }
 
@@ -32,27 +47,62 @@
     background: linear-gradient(to left, #0F0F0F 0%, transparent 100%);
 }
 
+/*
+ * ========================================
+ * Track dan Item Carousel
+ * ========================================
+ */
+
+/* * .itemTrack adalah kontainer flex yang bergerak.
+ * Lebarnya 200% dari set gambar asli (karena duplikasi).
+ * Properti 'animation' *tidak* didefinisikan di sini, 
+ * tetapi di kelas modifier di bawah.
+ */
 .itemTrack {
     display: flex;
     align-items: center;
-    animation: scrollRight 40s linear infinite;
 }
 
 .item {
-    flex-shrink: 0; 
-    padding: 0 1.5rem; 
+    flex-shrink: 0;
+    padding: 0 1.5rem;
 }
 
 .item img {
-    width: auto; 
-    height: 120px; 
+    width: auto;
+    height: 120px;
     background-color: black;
     border: 5px solid white;
-    object-fit: contain; 
+    object-fit: contain;
     transition: filter 0.3s ease, transform 0.3s ease;
 }
 
-/* --- Interaktivitas (selector di-update) --- */
+/*
+ * ========================================
+ * Kontrol Animasi (Dinamis)
+ * ========================================
+ */
+
+/* * Kelas-kelas ini diterapkan secara dinamis oleh komponen React
+ * berdasarkan prop 'direction'.
+ */
+.scrollRight {
+    animation: scrollRight 35s linear infinite;
+}
+
+.scrollLeft {
+    animation: scrollLeft 35s linear infinite;
+}
+
+
+
+/*
+ * ========================================
+ * Interaktivitas (Hover)
+ * ========================================
+ */
+
+/* Jeda animasi saat pengguna mengarahkan kursor ke carousel */
 .container:hover .itemTrack {
     animation-play-state: paused;
 }
@@ -61,33 +111,120 @@
     transform: scale(1.1);
 }
 
-/* --- Animasi Scroll (tetap) --- */
+/*
+ * ========================================
+ * Definisi Animasi Keyframes
+ * ========================================
+ */
+
+/*
+ * Variabel '--scroll-start-width' sangat penting.
+ * Variabel ini diatur oleh JavaScript (di useEffect) dan mewakili
+ * lebar dari *satu* set gambar (setara dengan -50% dari total track).
+ *
+ * Nilai default (-50%) adalah fallback jika JS gagal memuat.
+ */
 @keyframes scrollRight {
     from {
         transform: translateX(var(--scroll-start-width, -50%));
     }
+
     to {
         transform: translateX(0);
     }
 }
 
-/* --- Desain Responsif (selector di-update) --- */
-@media (max-width: 768px) {
-    .itemTrack {
-        animation-duration: 35s; 
+@keyframes scrollLeft {
+    from {
+        transform: translateX(0);
+    }
+
+    to {
+        transform: translateX(var(--scroll-start-width, -50%));
+    }
+}
+
+/*
+ * ========================================
+ * Desain Responsif
+ * ========================================
+ */
+
+/* * Tablet (z.B. iPad Landscape)
+ * Aturan ini berlaku untuk layar 1024px ke bawah.
+ */
+@media (max-width: 1024px) {
+
+    .scrollLeft,
+    .scrollRight {
+        animation-duration: 33s;
     }
 
     .item {
-        padding: 0 1rem; 
+        padding: 0 1.25rem;
     }
 
     .item img {
-        height: 60px;
-        border: 3px solid white;
+        height: 90px;
+        border-width: 4px;
     }
 
     .container::before,
     .container::after {
-        width: 15%; 
+        width: 12%;
+    }
+}
+
+/* * Tablet kecil / Ponsel landscape (z.B. iPad Portrait)
+ * Aturan ini menimpa aturan 1024px jika layar 768px ke bawah.
+ */
+@media (max-width: 768px) {
+
+    .scrollLeft,
+    .scrollRight {
+        animation-duration: 30s;
+    }
+
+    .item {
+        padding: 0 1rem;
+    }
+
+    .item img {
+        height: 75px;
+        border-width: 3px;
+    }
+
+    .container::before,
+    .container::after {
+        width: 15%;
+    }
+}
+
+/* * Ponsel (z.B. iPhone Portrait)
+ * Aturan ini menimpa aturan 768px jika layar 480px ke bawah.
+ */
+@media (max-width: 480px) {
+
+    .scrollLeft,
+    .scrollRight {
+        animation-duration: 25s;
+        /* Buat lebih cepat di layar kecil */
+    }
+
+    .item {
+        padding: 0 0.75rem;
+        /* Lebih sedikit padding */
+    }
+
+    .item img {
+        height: 60px;
+        /* Lebih kecil lagi */
+        border-width: 2px;
+    }
+
+    .container::before,
+    .container::after {
+        width: 18%;
+        /* Fade lebih lebar agar pas */
     }
 }
