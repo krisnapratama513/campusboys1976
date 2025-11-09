@@ -1,0 +1,93 @@
+/* InfiniteCarousel.module.css */
+
+/* 'logo-carousel-container' diubah menjadi 'container' */
+.container {
+    width: 100%;
+    overflow: hidden; 
+    position: relative;
+    padding: 1.5rem 0; 
+    background-color: lightslategray;
+    background-color: black;
+}
+
+/* Efek fade (tetap sama, tapi selector induknya '.container') */
+.container::before,
+.container::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 10%; 
+    max-width: 150px;
+    z-index: 2;
+}
+
+.container::before {
+    left: 0;
+    background: linear-gradient(to right, #0F0F0F 0%, transparent 100%);
+}
+
+.container::after {
+    right: 0;
+    background: linear-gradient(to left, #0F0F0F 0%, transparent 100%);
+}
+
+.itemTrack {
+    display: flex;
+    align-items: center;
+    animation: scrollRight 40s linear infinite;
+}
+
+.item {
+    flex-shrink: 0; 
+    padding: 0 1.5rem; 
+}
+
+.item img {
+    width: auto; 
+    height: 120px; 
+    background-color: black;
+    border: 5px solid white;
+    object-fit: contain; 
+    transition: filter 0.3s ease, transform 0.3s ease;
+}
+
+/* --- Interaktivitas (selector di-update) --- */
+.container:hover .itemTrack {
+    animation-play-state: paused;
+}
+
+.item:hover img {
+    transform: scale(1.1);
+}
+
+/* --- Animasi Scroll (tetap) --- */
+@keyframes scrollRight {
+    from {
+        transform: translateX(var(--scroll-start-width, -50%));
+    }
+    to {
+        transform: translateX(0);
+    }
+}
+
+/* --- Desain Responsif (selector di-update) --- */
+@media (max-width: 768px) {
+    .itemTrack {
+        animation-duration: 35s; 
+    }
+
+    .item {
+        padding: 0 1rem; 
+    }
+
+    .item img {
+        height: 60px;
+        border: 3px solid white;
+    }
+
+    .container::before,
+    .container::after {
+        width: 15%; 
+    }
+}
