@@ -1,0 +1,190 @@
+.container {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    padding: 100px 0;
+    color: #ccc;
+    transition: opacity 0.8s ease;
+    /* background-color: crimson; */
+    /* Tambahkan ini - hidden dulu */
+    opacity: 0;
+}
+
+.container.visible .sectionTitle {
+    animation: slideUp 1s ease forwards;
+}
+
+.container.visible .text {
+    animation: slideUp 1s ease 0.2s forwards;
+    opacity: 0;
+}
+
+.container.visible .link {
+    animation: slideUp 1s ease 0.4s forwards;
+    opacity: 0;
+}
+
+.container.visible {
+    opacity: 1;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(40px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+
+.sectionTitle {
+    font-family: 'Oswald', sans-serif;
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 50px;
+    position: relative;
+    color: #ccc;
+}
+
+.sectionTitle::after {
+    content: '';
+    display: block;
+    width: 90px;
+    height: 6px;
+    background-color: #00d9ff;
+    background-color: rgb(32, 201, 151);
+    margin: 10px auto 0;
+}
+
+.container.visible .sectionTitle::after {
+    width: 90px;
+}
+
+.text,
+.link {
+    font-size: 1.6rem;
+    margin-bottom: 20px;
+    line-height: 1.7;
+}
+
+/* .link {
+    font-weight: bold;
+    text-decoration: none;
+    color: #00ff85;
+} */
+.link {
+    font-weight: bold;
+    text-decoration: none;
+    color: rgb(32, 201, 151);
+    display: inline-block;
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.link:hover {
+    color: #00ffaa;
+    transform: translateX(10px);
+}
+
+.link::before {
+    content: '';
+    position: absolute;
+    bottom: -5px;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background-color: #00ff85;
+    transition: width 0.3s ease;
+}
+
+.link:hover::before {
+    width: 100%;
+}
+
+
+
+
+
+/*
+ * ========================================
+ * Desain Responsif
+ * ========================================
+ */
+
+/* * Tablet (z.B. iPad Landscape)
+ * Aturan ini berlaku untuk layar 1024px ke bawah.
+ */
+@media (max-width: 1024px) {
+    .container {
+        padding: 85px 0;
+    }
+
+    .sectionTitle {
+        font-size: 2.6rem;
+        margin-bottom: 40px;
+    }
+
+    .text,
+    .link {
+        font-size: 1.5rem;
+    }
+}
+
+/* * Tablet kecil / Ponsel landscape (z.B. iPad Portrait)
+ * Aturan ini menimpa aturan 1024px jika layar 768px ke bawah.
+ */
+@media (max-width: 768px) {
+    .container {
+        padding: 70px 0;
+    }
+
+    .sectionTitle {
+        font-size: 2.2rem;
+        margin-bottom: 35px;
+    }
+
+    .sectionTitle::after {
+        width: 70px;
+        height: 5px;
+    }
+
+    .container.visible .sectionTitle::after {
+        width: 70px;
+    }
+
+    .text,
+    .link {
+        font-size: 1.4rem;
+    }
+}
+
+/* * Ponsel (z.B. iPhone Portrait)
+ * Aturan ini menimpa aturan 768px jika layar 480px ke bawah.
+ */
+@media (max-width: 480px) {
+    .container {
+        padding: 50px 0;
+    }
+
+    .sectionTitle {
+        font-size: 1.8rem;
+        margin-bottom: 30px;
+    }
+
+    .sectionTitle::after {
+        width: 60px;
+        height: 4px;
+    }
+
+    .container.visible .sectionTitle::after {
+        width: 60px;
+    }
+
+    .text,
+    .link {
+        font-size: 1.2rem;
+    }
+}
