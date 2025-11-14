@@ -5,14 +5,24 @@ import { Link } from 'react-router-dom'; // Gunakan Link untuk routing
 // Import komponen kustom (Card dan Tombol)
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
 import ButtonCarousel from '../../components/ButtonCarousel/ButtonCarousel';
-// import ButtonCarousel from './ButtonCarousel/ButtonCarousel';
-
-// Import file CSS (misalnya untuk font kustom)
-// import '../assets/css/fontCaptureIt.css';
 
 
-import { mockArticles } from '../../data/mockArticles';
+
+
+// import { mockArticles } from '../../data/mockArticles';
 // import { type Article } from '../types/article';
+// ========================================================================
+// TIPE DATA BARU (Sesuai JSON dari API)
+// ========================================================================
+type ApiArticleCard = {
+    id: number;
+    slug: string;
+    img: string;
+    title: string;
+    created_at: string; // Ini akan jadi string (ISO Date)
+    description: string;
+    author_name: string;
+};
 
 // ========================================================================
 // DEFINISI STYLE (CSS-in-JS)
@@ -49,13 +59,7 @@ const carouselNavigation: CSSProperties = {
     marginTop: '30px'
 };
 
-// ========================================================================
-// DATA DUMMY (MOCK DATA)
-// Di aplikasi nyata, data ini kemungkinan besar akan datang dari
-// API (backend) atau di-pass sebagai props.
-// ========================================================================
 
-const latestArticles = mockArticles.slice(0, 5);
 
 
 /**
@@ -63,10 +67,37 @@ const latestArticles = mockArticles.slice(0, 5);
  * Menampilkan beberapa artikel terbaru dalam format carousel yang responsif.
  */
 function RecentArticlesCarousel() {
+    const [articles, setArticles] = useState<ApiArticleCard[]>([]);
+    const [loading, setLoading] = useState(true);
+
     // State untuk melacak jumlah kartu yang akan ditampilkan (berubah sesuai lebar layar)
     const [cardsToShow, setCardsToShow] = useState(3);
     // State untuk melacak indeks artikel pertama yang sedang ditampilkan di carousel
     const [currentIndex, setCurrentIndex] = useState(0);
+
+    // ========================================================================
+    // EFEK (EFFECTS)
+    // ========================================================================
+
+    // Efek untuk mengambil (fetch) data artikel dari API
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/articles/recent');
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data artikel');
+                }
+                const data: ApiArticleCard[] = await response.json();
+                setArticles(data); // Simpan data ke state
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false); // Selesai loading
+            }
+        };
+
+        fetchArticles();
+    }, []); // [] = Jalankan sekali saat komponen di-mount
 
     // useEffect untuk menangani responsivitas carousel
     useEffect(() => {
@@ -108,7 +139,7 @@ function RecentArticlesCarousel() {
         setCurrentIndex((prev) => {
             // Jika indeks saat ini adalah 0, putar kembali ke akhir array (panjang array - 1)
             // Jika tidak, cukup kurangi 1
-            return prev - 1 < 0 ? latestArticles.length - 1 : prev - 1;
+            return prev - 1 < 0 ? articles.length - 1 : prev - 1;
         });
     };
 
@@ -118,7 +149,7 @@ function RecentArticlesCarousel() {
             // Gunakan operasi modulo (%) untuk 'looping'
             // (prev + 1) % articlesData.length
             // Contoh: Jika prev = 4 dan panjang = 5, (4 + 1) % 5 = 0 (kembali ke awal)
-            return (prev + 1) % latestArticles.length;
+            return (prev + 1) % articles.length;
         });
     };
 
@@ -131,9 +162,30 @@ function RecentArticlesCarousel() {
         // i=0 -> (4 + 0) % 5 = 4 (artikel ke-4)
         // i=1 -> (4 + 1) % 5 = 0 (artikel ke-0)
         // i=2 -> (4 + 2) % 5 = 1 (artikel ke-1)
-        const index = (currentIndex + i) % latestArticles.length;
-        visibleArticles.push(latestArticles[index]);
+        const index = (currentIndex + i) % articles.length;
+        visibleArticles.push(articles[index]);
     }
+
+    // ========================================================================
+    // RENDER
+    // ========================================================================
+
+    // Tampilkan pesan loading jika data belum siap
+    if (loading) {
+        return (
+            <article style={{ backgroundColor: 'rgb(15, 25, 35)', height: '400px' }}>
+                <main className="container" style={{paddingTop: '50px', paddingBottom: '50px'}}>
+                    <div style={header}>
+                        <h2 style={h2}>ARTIKEL TERBARU</h2>
+                    </div>
+                    <div style={{color: 'white', textAlign: 'center', marginTop: '50px'}}>
+                        Memuat artikel...
+                    </div>
+                </main>
+            </article>
+        );
+    }
+
 
     // Render JSX
     return (
@@ -156,18 +208,16 @@ function RecentArticlesCarousel() {
                 <div style={slidesWrapper}>
                     {/* Container yang berisi kartu-kartu (menggunakan grid dinamis) */}
                     <div style={slidesContainer}>
-                        {/* Melakukan iterasi (mapping) pada array 'visibleArticles'
-                            dan merender komponen 'ArticleCard' untuk setiap item.
+                        {/* Transformasi data dari API ke PROPS ArticleCard
+                            dilakukan langsung di dalam map
                         */}
                         {visibleArticles.map((article) => (
                             <ArticleCard
                                 key={article.id} // 'key' adalah prop wajib di React untuk list, harus unik
-                                // href={article.href}
                                 href={`/article/${article.slug}`}
-                                imgFilename={article.imgFilename}
-                                // imgAlt={article.title}
-                                author={article.author}
-                                date={article.date}
+                                imgFilename={article.img}
+                                author={article.author_name}
+                                date={article.created_at}
                                 title={article.title}
                                 description={article.description}
                             />

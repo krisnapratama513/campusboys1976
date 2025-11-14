@@ -1,0 +1,123 @@
+.footerContainer {
+    background-color: #1C1C1C;
+    margin-top: 100px;
+    color: #a0a0a0;
+    padding: 40px 5%;
+    /* Padding 5% di kiri-kanan */
+    /* margin-top: 60px; */
+    border-top: 1px solid #333;
+
+    /* Layout Grid: 
+    Kolom 1 (kiri) ambil sisa ruang. 
+    Kolom 2 (kanan) sesuaikan lebar konten.
+  */
+    display: grid;
+    grid-template-columns: 1fr auto;
+    align-items: center;
+    gap: 20px 40px;
+    /* Jarak baris 20px, Jarak kolom 40px */
+}
+
+/* --- Kolom Kiri (Logo & Slogan) --- */
+.footerColumnLeft {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    /* Rata kiri */
+}
+
+.footerLogo {
+    height: 50px;
+    /* Atur tinggi logo Anda */
+    width: auto;
+    margin-bottom: 15px;
+}
+
+.footerSlogan {
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #fff;
+    /* Slogan dibuat lebih terang */
+    margin: 0;
+    line-height: 1.4;
+    text-transform: uppercase;
+}
+
+/* --- Kolom Kanan (Sosmed) --- */
+.footerColumnRight {
+    display: flex;
+    gap: 20px;
+    /* Jarak antar ikon */
+    justify-content: flex-end;
+    /* Rata kanan */
+}
+
+.iconLink {
+    color: #a0a0a0;
+    font-size: 1.5rem;
+    /* Ukuran ikon */
+    transition: color 0.3s ease, transform 0.3s ease;
+}
+
+.iconLink:hover {
+    color: #fff;
+    /* Efek hover warna putih */
+    transform: scale(1.1);
+}
+
+/* --- Baris Copyright --- */
+.footerCopyright {
+    /* Rentangkan di semua kolom (1 sampai akhir) */
+    grid-column: 1 / -1;
+
+    /* Garis pemisah dari konten di atasnya */
+    border-top: 1px solid #333;
+    padding-top: 30px;
+    margin-top: 30px;
+
+    text-align: center;
+    /* Teks copyright di tengah */
+    font-size: 0.9rem;
+}
+
+.footerCopyright p {
+    margin: 0;
+}
+
+/* --- Media Query untuk Responsif --- */
+@media (max-width: 768px) {
+    .footerContainer {
+        display: flex;
+        /* Ubah ke flex tumpukan vertikal */
+        flex-direction: column;
+        align-items: center;
+        /* Pusatkan semua */
+        text-align: center;
+        padding: 30px 20px;
+        gap: 30px;
+        /* Jarak antar blok */
+    }
+
+    .footerColumnLeft {
+        align-items: center;
+        /* Pusatkan logo & slogan */
+        order: 2;
+        /* Urutan: Sosmed (1), Logo (2), Copyright (3) */
+    }
+
+    .footerColumnRight {
+        justify-content: center;
+        /* Pusatkan ikon */
+        order: 1;
+    }
+
+    .footerCopyright {
+        order: 3;
+        width: 100%;
+        /* Pastikan garis pemisah penuh */
+        margin-top: 0;
+        /* Hapus margin (sudah diatur oleh 'gap') */
+        padding-top: 30px;
+    }
+}

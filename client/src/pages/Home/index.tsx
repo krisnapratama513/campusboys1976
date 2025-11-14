@@ -16,12 +16,12 @@ const HomePage = () => {
                 <AboutSection />
             </main>
             <RecentArticlesCarousel />
-            <main>
-                <InfiniteCarouselChapters />
+            <main style={{ paddingTop: '30px', paddingBottom: '30px' }}>
                 <InfiniteCarouselMagazine />
+                <InfiniteCarouselChapters />
             </main>
-            <div style={{ height: "300px", width: "100px", backgroundColor: "crimson" }}>
-            </div>
+            {/* <div style={{ height: "300px", width: "100px", backgroundColor: "crimson" }}>
+            </div> */}
         </>
     )
 }

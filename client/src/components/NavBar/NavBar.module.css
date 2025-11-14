@@ -1,0 +1,166 @@
+.navBar {
+    width: 100%;
+    background-color: rgba(18, 18, 18, 0.8);
+    /* background-color: cadetblue; */
+    backdrop-filter: blur(10px);
+    padding: 17px 5%;
+    position: fixed;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logoLink {
+    display: flex;
+    align-items: center;
+}
+
+.logoImg {
+    height: 60px;
+    width: auto;
+}
+
+.navLink {
+    display: flex;
+    gap: 20px;
+}
+
+li {
+    list-style: none;
+}
+
+.navItem {
+    font-size: 1.1rem;
+    font-family: 'Roboto', sans-serif;
+    text-decoration: none;
+    font-weight: bold;
+    color: whitesmoke;
+    background: none;
+    border: none;
+    /* Reset padding default button */
+    padding: 0;
+    cursor: pointer;
+    transition: color 0.3s ease;
+}
+
+/* 2. HOVER TERPUSAT: 
+  Style hover berlaku untuk 'a' dan 'button'
+*/
+.navItem:hover {
+    color: crimson;
+}
+
+.dropdown {
+    position: relative;
+}
+
+.dropdownMenu {
+    position: absolute;
+    background-color: #1e1e1e;
+    min-width: 140px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    z-index: 1001;
+
+    opacity: 0;
+    visibility: hidden;
+
+    /* 3. LOGIKA POSISI DIPERBAIKI: Tambah 'left: 50%' */
+    top: 120%;
+    /* Beri jarak sedikit lebih jauh untuk animasi */
+    left: 50%;
+    transform: translate(-50%, 10px);
+    /* Mulai dari bawah */
+    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, top 0.3s ease;
+}
+
+
+/* 4. LOGIKA HOVER DITAMBAHKAN:
+    Ini adalah "kecacatan logika" utama yang Anda tanyakan.
+*/
+.dropdown:hover .dropdownMenu {
+    opacity: 1;
+    visibility: visible;
+    top: 100%;
+    /* Naik ke posisi normal */
+    transform: translate(-50%, 0);
+}
+
+/* PENTING: 
+    Styling untuk link DI DALAM dropdown menu 
+    (Kita tidak lagi pakai style 'a' global)
+*/
+.dropdownMenu li a {
+    font-family: 'Roboto', sans-serif;
+    display: block;
+    padding: 8px 12px;
+    color: whitesmoke;
+    text-decoration: none;
+    font-weight: normal;
+    /* Dibuat beda agar tidak bold */
+    font-size: 0.95rem;
+    transition: background-color 0.2s ease;
+}
+
+.dropdownMenu li a:hover {
+    background-color: crimson;
+    color: white;
+}
+
+
+
+/*
+ * ========================================
+ * Desain Responsif
+ * ========================================
+ */
+
+/* * Tablet (z.B. iPad Landscape)
+ * Aturan ini berlaku untuk layar 1024px ke bawah.
+ */
+@media (max-width: 1024px) {
+    .navBar {
+        padding: 14px 4%;
+    }
+
+    .logoImg {
+        height: 55px;
+    }
+
+    .navItem {
+        font-size: 1rem;
+    }
+
+    .navLink {
+        gap: 15px;
+    }
+
+}
+
+/* * Tablet kecil / Ponsel landscape (z.B. iPad Portrait)
+ * Aturan ini menimpa aturan 1024px jika layar 768px ke bawah.
+ */
+@media (max-width: 768px) {
+    .navBar {
+        padding: 11px 3%;
+    }
+
+    .logoImg {
+        height: 50px;
+    }
+}
+
+/* * Ponsel (z.B. iPhone Portrait)
+ * Aturan ini menimpa aturan 768px jika layar 480px ke bawah.
+ */
+@media (max-width: 480px) {
+    .navBar {
+        padding: 8px 2%;
+    }
+
+    .logoImg {
+        height: 45px;
+    }
+}

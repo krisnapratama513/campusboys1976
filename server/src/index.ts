@@ -7,6 +7,7 @@ import mysql from 'mysql2/promise';
 
 // 1. Impor router, pastikan TANPA '.js'
 import chapterRoutes from './routes/chapter.routes'; 
+import articleRoutes from './routes/article.routes'
 
 // Membuat variable dari file .env
 dotenv.config();
@@ -42,6 +43,7 @@ app.get('/', (req, res) => {
 // Memberitahu Express: "Untuk semua URL yang diawali '/api/chapters',
 // serahkan penanganannya ke file 'chapterRoutes'"
 app.use('/api/chapters', chapterRoutes);
+app.use('/api/articles', articleRoutes);
 
 
 // Jalankan server

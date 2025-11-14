@@ -1,0 +1,58 @@
+.pageWrapper {
+    /* Mendorong konten ke bawah navbar (sesuaikan 60px jika perlu) */
+    padding-top: 60px;
+    animation: fadeIn 1s ease-out forwards;
+}
+
+@keyframes fadeIn {
+    to {
+        opacity: 1;
+    }
+}
+
+.heroSection {
+    /* Latar belakang hero/judul */
+    background-color: #312F2C;
+    padding: 40px 0;
+    margin-bottom: 60px;
+}
+
+.heroSection h1 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+    text-align: center;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* Grid untuk kartu */
+.gridContainer {
+    display: grid;
+
+    /* Grid Responsif */
+    grid-template-columns: 1fr;
+    /* 1 kolom di mobile */
+    gap: 30px;
+
+    /* Kontainer standar */
+    max-width: 950px;
+    margin: 0 auto;
+    padding: 0 20px 60px;
+    /* Padding bawah */
+}
+
+/* 2 kolom di tablet */
+@media (min-width: 600px) {
+    .gridContainer {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* 3 kolom di desktop */
+@media (min-width: 900px) {
+    .gridContainer {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}

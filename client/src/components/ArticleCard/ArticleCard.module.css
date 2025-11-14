@@ -39,3 +39,16 @@
     color: rgb(255, 70, 85);
     font-weight: bold;
 }
+
+.cardTitle{
+    margin-bottom: 4px;
+    color: rgb(32, 201, 151);;
+    font-size: 1.1rem;
+    line-height: 1.3rem;
+    font-weight: bold;
+}
+
+.cardDescription{
+    font-size: 0.9rem;
+    line-height: 22px;
+}
