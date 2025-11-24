@@ -1,0 +1,68 @@
+.container {
+    width: 100%;
+    padding-bottom: 40px;
+    background-color: #222526;
+    color: white;
+}
+
+.heroSection {
+    height: 50vh;
+    margin-bottom: 40px;
+    background-color: rgb(15, 25, 35);
+    clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 90% 100%, 0% 100%);
+
+    /* Ubah nilai drop-shadow agar lebih terlihat */
+    filter: drop-shadow(5px 15px 20px rgba(0, 0, 0, 0.6));
+    /* Lebih besar, lebih blur, lebih gelap */
+
+    will-change: filter;
+}
+
+.heroContentWrapper {
+    width: 80%;
+    height: 100%;
+    padding-bottom: 70px;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-direction: column-reverse;
+
+}
+
+.pageTitle {
+    color: white;
+    font-family: 'Capture It', sans-serif;
+    font-size: 42px;
+}
+
+.videoGridContainer {
+    width: 80%;
+    margin: auto;
+    max-width: 1200px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.videoItem {
+    padding: 20px;
+    border-radius: 40px;
+    /* box-shadow: 3px 3px 7px #0e0e0e,
+        -3px -3px 7px #383838; */
+    box-shadow: 2px 2px 5px #0e0f0f,
+        -1px -1px 3px #363b3d;
+}
+
+.videoWrapper {
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    border-radius: 20px;
+}
+
+.videoTitle {
+    padding: 20px 0;
+}
+
+.description {
+    font-size: 24px;
+}

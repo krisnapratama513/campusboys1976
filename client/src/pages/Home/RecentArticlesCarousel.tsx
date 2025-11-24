@@ -1,28 +1,12 @@
 // Import dependensi React dan Tipe
 import { useState, useEffect, type CSSProperties } from 'react';
-import { Link } from 'react-router-dom'; // Gunakan Link untuk routing
+import { Link } from 'react-router-dom';
+import type { ApiArticleCard } from '../../types/article.types';
 
 // Import komponen kustom (Card dan Tombol)
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
 import ButtonCarousel from '../../components/ButtonCarousel/ButtonCarousel';
 
-
-
-
-// import { mockArticles } from '../../data/mockArticles';
-// import { type Article } from '../types/article';
-// ========================================================================
-// TIPE DATA BARU (Sesuai JSON dari API)
-// ========================================================================
-type ApiArticleCard = {
-    id: number;
-    slug: string;
-    img: string;
-    title: string;
-    created_at: string; // Ini akan jadi string (ISO Date)
-    description: string;
-    author_name: string;
-};
 
 // ========================================================================
 // DEFINISI STYLE (CSS-in-JS)

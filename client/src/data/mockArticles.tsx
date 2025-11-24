@@ -1,4 +1,4 @@
-import type { Article } from '../types/article';
+import type { Article } from '../types/article.types';
 
 // Kita gunakan 'Article[]' untuk memastikan data kita sesuai dengan Tipe
 export const mockArticles: Article[] = [

@@ -8,6 +8,7 @@ import mysql from 'mysql2/promise';
 // 1. Impor router, pastikan TANPA '.js'
 import chapterRoutes from './routes/chapter.routes'; 
 import articleRoutes from './routes/article.routes'
+import videosRoutes from './routes/videos.routes'
 
 // Membuat variable dari file .env
 dotenv.config();
@@ -28,7 +29,8 @@ export const pool = mysql.createPool({
     database: process.env.DB_NAME as string,
     waitForConnections: true,
     connectionLimit: 10,
-    queueLimit: 0
+    queueLimit: 0,
+    timezone: 'UTC'
 });
 
 console.log("Mencoba terhubung ke MySQL...");
@@ -44,6 +46,7 @@ app.get('/', (req, res) => {
 // serahkan penanganannya ke file 'chapterRoutes'"
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/articles', articleRoutes);
+app.use('/api/videos', videosRoutes);
 
 
 // Jalankan server
