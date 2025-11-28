@@ -1,12 +1,21 @@
 /* client/src/components/NavBar/NavBar.module.css */
 
+/*
+* ========================================
+* STYLING GLOBAL NAVIGASI (DESKTOP)
+* ========================================
+*/
+
 .navBar {
+    /* Penentuan Posisi dan Layout */
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+    /* Ukuran dan Posisi */
     width: 100%;
-    /* menyesuaikan lebar #root agar tidak keluar */
+    /* Batasan lebar agar tidak melebihi desain utama */
     max-width: 1500px;
-    background-color: rgba(18, 18, 18, 0.8);
-    backdrop-filter: blur(10px);
-    padding: 17px 5%;
     position: fixed;
     top: 0;
     left: 0;
@@ -14,10 +23,18 @@
     margin-left: auto;
     margin-right: auto;
     z-index: 1000;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+
+    /* Estetika dan Background */
+    background-color: rgba(18, 18, 18, 0.8);
+    backdrop-filter: blur(10px);
+    padding: 17px 5%;
 }
+
+/*
+* ----------------------------------------
+* LOGO
+* ----------------------------------------
+*/
 
 .logoLink {
     display: flex;
@@ -29,6 +46,12 @@
     width: auto;
 }
 
+/*
+* ----------------------------------------
+* DAFTAR TAUTAN UTAMA
+* ----------------------------------------
+*/
+
 .navLink {
     display: flex;
     gap: 20px;
@@ -38,16 +61,28 @@ li {
     list-style: none;
 }
 
+/* Styling umum untuk item navigasi (tautan statis & tombol dropdown) */
 .navItem {
+    /* Tipografi */
     font-size: 1.1rem;
     font-family: 'Roboto', sans-serif;
-    text-decoration: none;
     font-weight: bold;
+    text-decoration: none;
     color: whitesmoke;
+
+    /* Reset Button Style */
     background: none;
     border: none;
     padding: 0;
     cursor: pointer;
+
+    /* Layout (untuk mensejajarkan teks dan ikon panah) */
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+
+    /* Transisi */
     transition: color 0.3s ease;
 }
 
@@ -55,27 +90,49 @@ li {
     color: #027a56;
 }
 
+/*
+* ----------------------------------------
+* DROPDOWN MENU (DESKTOP)
+* ----------------------------------------
+*/
+
 .dropdown {
+    /* Penentuan posisi relatif agar menu dropdown diposisikan di dalamnya */
     position: relative;
 }
 
+.dropdownArrow {
+    font-size: 0.8em;
+    color: whitesmoke;
+    transition: transform 0.3s ease;
+}
+
 .dropdownMenu {
+    /* Penentuan Posisi */
     position: absolute;
-    background-color: #1e1e1e;
     min-width: 140px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
-    padding: 10px;
-    z-index: 1001;
-    opacity: 0;
-    visibility: hidden;
+    z-index: 999;
+    /* Posisi awal di bawah trigger */
     top: 120%;
     left: 50%;
     transform: translate(-50%, 10px);
-    transition: opacity 0.3s ease, transform 0.3s ease, visibility 0.3s ease, top 0.3s ease;
+
+    /* Estetika */
+    background-color: #1e1e1e;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+    padding: 10px;
+
+    /* Animasi Default (Tersembunyi) */
+    opacity: 0;
+    visibility: hidden;
+    transition:
+        opacity 0.3s ease,
+        transform 0.3s ease,
+        visibility 0.3s ease,
+        top 0.3s ease;
 }
 
-
-
+/* State HOVER: Menampilkan dropdown menu pada desktop */
 .dropdown:hover .dropdownMenu {
     opacity: 1;
     visibility: visible;
@@ -83,19 +140,19 @@ li {
     transform: translate(-50%, 0);
 }
 
-/* PENTING:
-Styling untuk link DI DALAM dropdown menu
-(Kita tidak lagi pakai style 'a' global)
-*/
+/* Styling tautan di dalam dropdown menu */
 .dropdownMenu li a {
-    font-family: 'Roboto', sans-serif;
+    /* Tampilan dan Ukuran */
     display: block;
     padding: 8px 12px;
-    color: whitesmoke;
-    text-decoration: none;
-    font-weight: normal;
-    /* Dibuat beda agar tidak bold */
     font-size: 0.95rem;
+    font-family: 'Roboto', sans-serif;
+    text-decoration: none;
+    /* Override font-weight 'navItem' */
+    font-weight: normal;
+    color: whitesmoke;
+
+    /* Transisi */
     transition: background-color 0.2s ease;
 }
 
@@ -104,11 +161,17 @@ Styling untuk link DI DALAM dropdown menu
     color: white;
 }
 
+/*
+* ----------------------------------------
+* TOMBOL HAMBURGER (MOBILE)
+* ----------------------------------------
+*/
 
-/* Styling Tombol Hamburger */
 .hamburgerButton {
+    /* Sembunyikan secara default pada desktop */
     display: none;
-    /* Sembunyikan secara default untuk desktop */
+
+    /* Ukuran dan Estetika */
     width: 30px;
     height: 30px;
     background: none;
@@ -118,35 +181,34 @@ Styling untuk link DI DALAM dropdown menu
     position: relative;
     z-index: 1010;
     color: whitesmoke;
-    /* Atur warna ikon default */
 }
 
 .iconX,
 .iconBars {
-    display: block;
-    transition: color 0.3s ease;
-    /* Ini akan memastikan ikon mengisi ruang yang sama */
+    /* Posisi absolut di tengah tombol */
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+
+    display: block;
+    transition: color 0.3s ease;
 }
 
 .hamburgerButton:hover {
     color: #027a56;
-    /* Warna ikon berubah saat hover */
 }
-
 
 
 /*
 * ========================================
-* Desain Responsif
+* DESAIN RESPONSIVE
 * ========================================
 */
 
-/* * Tablet (z.B. iPad Landscape)
-* Aturan ini berlaku untuk layar 1024px ke bawah.
+/* * ----------------------------------------
+* MEDIA QUERY: Tablet (Maks. 1024px)
+* ----------------------------------------
 */
 @media (max-width: 1024px) {
     .navBar {
@@ -157,22 +219,23 @@ Styling untuk link DI DALAM dropdown menu
         height: 55px;
     }
 
-    .navItem {
-        font-size: 1rem;
-    }
-
     .navLink {
         gap: 15px;
     }
 
+    .navItem {
+        font-size: 1rem;
+    }
 }
 
-/* * Tablet kecil / Ponsel landscape (z.B. iPad Portrait)
-* Aturan ini menimpa aturan 1024px jika layar 768px ke bawah.
+/* * ----------------------------------------
+* MEDIA QUERY: Mobile (Maks. 768px)
+* ----------------------------------------
 */
 @media (max-width: 768px) {
     .navBar {
         padding: 11px 3%;
+        /* Batalkan pembatasan lebar dan margin auto */
         max-width: 100%;
         margin-left: 0;
         margin-right: 0;
@@ -184,93 +247,117 @@ Styling untuk link DI DALAM dropdown menu
         height: 50px;
     }
 
+    /* Tampilkan tombol hamburger pada mobile */
     .hamburgerButton {
         display: block;
     }
 
+    /* Container tautan utama (menu mobile) */
     .navLink {
-        padding-top: 10px;
+        /* Layout Vertikal */
         display: flex;
         flex-direction: column;
+        width: 100%;
+        padding-top: 10px;
+
+        /* Posisi dan Estetika */
         position: absolute;
         top: 100%;
         right: 0;
-        transform: translateX(100%);
-        width: 100%;
+        z-index: 999;
         background-color: #1e1e1e;
         opacity: 0.99;
         box-shadow: 0 5px 10px rgba(0, 0, 0, 0.5);
-        transition: transform 0.3s ease-out;
-        z-index: 999;
         border-bottom: #027a56 solid 2px;
+
+        /* Default: Sembunyikan dengan translasi ke kanan */
+        transform: translateX(100%);
+        transition: transform 0.3s ease-out;
     }
 
-    /* 🔑 Kelas yang ditambahkan oleh React State untuk menampilkan menu */
+    /* State OPEN: Kelas yang ditambahkan via React untuk menampilkan menu mobile */
     .navLink.open {
         transform: translateX(0);
     }
 
-    /* Styling item di menu seluler */
-    .navLink  > li {
+    /* Menyesuaikan item utama di menu seluler */
+    .navLink>li {
+        position: relative;
         padding: 0 20px;
     }
 
     .navItem {
-        display: block;
+        /* Jadikan item mengisi seluruh lebar kontainer */
         padding: 15px 20px;
         width: 100%;
         text-align: left;
+        /* Tambahkan gap agar panah tetap di kanan */
+        justify-content: space-between;
     }
 
+    /* Perubahan warna teks saat hover */
     .navItem:hover {
         background-color: lightslategray;
+        color: white;
     }
 
-    /* Atur ulang posisi dropdown agar tidak mengganggu tata letak vertikal */
+    /* Rotasi panah saat dropdown terbuka di mobile */
+    .dropdownArrow.arrowUp {
+        transform: rotate(180deg);
+    }
+
+    /* Penyesuaian ikon panah */
+    .dropdownArrow {
+        font-size: 1rem;
+    }
+
+    /* Mengatur ulang styling dropdown untuk mode mobile/vertikal */
     .dropdownMenu {
+        /* Batalkan posisi absolut agar mengalir secara normal (vertikal) */
         position: static;
-        /* Buat dropdown mengalir secara normal */
         top: auto;
         left: auto;
         transform: none;
+
+        /* Tampilan */
         width: 100%;
-        box-shadow: none;
-        background-color: #111;
         padding: 0;
+        background-color: #111;
+        box-shadow: none;
+
+        /* Kontrol Tampilan */
+        /* Sembunyikan secara default */
         display: none;
+        /* Nonaktifkan efek opacity/visibility */
         opacity: 1;
         visibility: visible;
         transition: none;
-
     }
 
+    /* Batalkan efek hover desktop */
     .dropdown:hover .dropdownMenu {
         opacity: 1;
-        /* Biarkan tetap 1 */
         visibility: visible;
-        /* Biarkan tetap visible */
         top: auto;
-        /* Kembalikan ke nilai non-absolute */
         transform: none;
-        /* **INI KUNCI UTAMANYA: Batalkan transformasi -50%** */
     }
 
+    /* State OPEN: Kelas yang ditambahkan oleh React untuk menampilkan dropdown di mobile */
     .dropdownMenu.mobileOpen {
         display: block;
     }
 
-    /* 🔑 Pastikan item sub-menu juga seragam */
+    /* Styling tautan sub-menu di dalam dropdown mobile */
     .dropdownMenu li a {
-        /* Samakan padding atau sesuaikan agar terlihat seragam */
+        /* Indentasi untuk membedakan dari item utama */
         padding: 10px 40px;
-        /* Indentasi 40px agar terlihat sebagai sub-item */
         font-size: 1rem;
-        /* Hapus font-weight: normal; jika Anda ingin font-nya bold seperti item utama */
     }
 }
 
-/* * Ponsel (z.B. iPhone Portrait)
-* Aturan ini menimpa aturan 768px jika layar 480px ke bawah.
+/* * ----------------------------------------
+* MEDIA QUERY: Ponsel Kecil (Maks. 480px)
+* ----------------------------------------
 */
 @media (max-width: 480px) {
     .navBar {

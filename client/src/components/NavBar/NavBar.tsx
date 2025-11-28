@@ -1,42 +1,57 @@
 // client/src/components/NavBar/NavBar.tsx
 
-import { useState } from "react";
 import { Link } from "react-router-dom";
 import styles from './NavBar.module.css';
+import useNavMenu from "../../hooks/useNavMenu";
+import NavDropdown from "./NavDropdown";
 
 import logoSrc from '../../assets/logo/logo.png';
 import { FaBars, FaXmark } from 'react-icons/fa6';
 
+
+/**
+ * @component Navbar
+ * @description Komponen utama bilah navigasi (Navigation Bar).
+ * Mengelola tampilan logo, tautan utama, dropdown menu, dan tombol hamburger.
+ */
 const Navbar = () => {
-    // State untuk melacak status menu seluler
-    const [isMenuOpen, setIsMenuOpen] = useState(false); // Status menu hamburger
-    const [isMediaOpen, setIsMediaOpen] = useState(false); // Status dropdown Media
-    const [isPostOpen, setIsPostOpen] = useState(false); // Status dropdown Post
+    /**
+     * @hook useNavMenu
+     * Mengambil state dan fungsi toggle untuk mengelola menu navigasi.
+     * Termasuk menu utama (mobile) dan kedua dropdown (Media, Post).
+     */
+    const {
+        isMenuOpen,     // State: Apakah menu navigasi utama (mobile) terbuka?
+        isMediaOpen,    // State: Apakah dropdown Media terbuka?
+        isPostOpen,     // State: Apakah dropdown Post terbuka?
+        toggleMenu,     // Handler: Mengubah state isMenuOpen
+        toggleMedia,    // Handler: Mengubah state isMediaOpen
+        togglePost,     // Handler: Mengubah state isPostOpen
+        closeAllMenus   // Handler: Menutup semua menu dan dropdown
+    } = useNavMenu();
 
-    // Fungsi untuk mengubah status menu
-    const toggleMenu = () => {
-        setIsMenuOpen(prev => {
-            // Jika menu akan DITUTUP (prev=true), maka tutup sub-menu
-            if (prev) {
-                setIsMediaOpen(false);
-                setIsPostOpen(false);
-            }
-            return !prev; // Kembalikan status toggle baru
-        });
-    };
+    /**
+     * @constant mediaLinks
+     * Data tautan yang akan dilewatkan ke komponen NavDropdown untuk 'Media'.
+     */
+    const mediaLinks = [
+        { to: '/photo', label: 'Photo' },
+        { to: '/video', label: 'Video' },
+    ];
 
-    const toggleMedia = () => {
-        setIsMediaOpen(!isMediaOpen);
-        setIsPostOpen(false);
-    };
+    /**
+     * @constant postLinks
+     * Data tautan yang akan dilewatkan ke komponen NavDropdown untuk 'Post'.
+     */
+    const postLinks = [
+        { to: '/article', label: 'Article' },
+        { to: '/magazine', label: 'Magazine' },
+    ];
 
-    const togglePost = () => {
-        setIsPostOpen(!isPostOpen);
-        setIsMediaOpen(false);
-    };
     return (
+        // Navigasi utama dengan gaya CSS module
         <nav className={styles.navBar}>
-            {/* Logo */}
+            {/* Logo - Tautan ke Beranda */}
             <Link to={'/'} className={styles.logoLink}>
                 <img
                     src={logoSrc}
@@ -45,7 +60,7 @@ const Navbar = () => {
                 />
             </Link>
 
-            {/* Tombol Hamburger */}
+            {/* Tombol Hamburger (Hanya terlihat di Mobile) */}
             <button
                 id="menu-toggle"
                 className={`${styles.hamburgerButton}`}
@@ -53,6 +68,7 @@ const Navbar = () => {
                 aria-controls="nav-links"
                 aria-expanded={isMenuOpen}
             >
+                {/* Menampilkan ikon 'X' saat terbuka, atau ikon 3 garis saat tertutup */}
                 {isMenuOpen ? (
                     <FaXmark size={24} className={styles.iconX} /> // Tampilkan 'X' saat terbuka
                 ) : (
@@ -60,42 +76,43 @@ const Navbar = () => {
                 )}
             </button>
 
-            {/* Navigasi Link */}
+            {/* Daftar Tautan Navigasi */}
             <ul
                 id="nav-links"
+                // Menambahkan class 'open' jika isMenuOpen true (untuk transisi mobile)
                 className={`${styles.navLink} ${isMenuOpen ? styles.open : ''}`}
             >
+                {/* Tautan Statis: Home */}
                 <li>
-                    <Link to={'/'} className={styles.navItem}>Home</Link>
+                    <Link to={'/'} className={styles.navItem} onClick={closeAllMenus}>Home</Link>
                 </li>
 
-                <li className={styles.dropdown}>
-                    <button
-                        type="button"
-                        className={styles.navItem}
-                        onClick={toggleMedia}
-                    >
-                        Media
-                    </button>
-                    <ul className={`${styles.dropdownMenu} ${isMediaOpen ? styles.mobileOpen : ''}`}>
-                        <li><Link to={'/photo'}>Photo</Link></li>
-                        <li><Link to={'/video'}>Video</Link></li>
-                    </ul>
-                </li>
-                <li className={styles.dropdown}>
-                    <button type="button" className={styles.navItem} onClick={togglePost}>
-                        Post
-                    </button>
-                    <ul className={`${styles.dropdownMenu} ${isPostOpen ? styles.mobileOpen : ''}`}>
-                        <li><Link to={'/article'}>Article</Link></li>
-                        <li><Link to={'/magazine'}>Magazine</Link></li>
-                    </ul>
-                </li>
+                {/* Dropdown Media */}
+                <NavDropdown
+                    title="Media"
+                    links={mediaLinks}
+                    isOpen={isMediaOpen}
+                    onToggle={toggleMedia}
+                    onLinkClick={closeAllMenus}
+                />
+
+                {/* Dropdown Post */}
+                <NavDropdown
+                    title="Post"
+                    links={postLinks}
+                    isOpen={isPostOpen}
+                    onToggle={togglePost}
+                    onLinkClick={closeAllMenus}
+                />
+
+                {/* Tautan Statis: About */}
                 <li>
-                    <Link to={'/about'} className={styles.navItem}>About</Link>
+                    <Link to={'/about'} className={styles.navItem} onClick={closeAllMenus}>About</Link>
                 </li>
+
+                {/* Tautan Statis: Member */}
                 <li>
-                    <Link to={'/member'} className={styles.navItem}>Member</Link>
+                    <Link to={'/member'} className={styles.navItem} onClick={closeAllMenus}>Member</Link>
                 </li>
             </ul>
         </nav>
