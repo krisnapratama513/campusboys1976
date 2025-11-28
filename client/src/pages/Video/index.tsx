@@ -3,6 +3,7 @@
 import styles from './VideoPage.module.css';
 import { useState, useEffect } from 'react';
 import type { ApiVideo } from '../../types/video.types';
+import HeroSection from './HeroSection';
 
 const VideoPage = () => {
 
@@ -43,13 +44,10 @@ const VideoPage = () => {
 
     return (
         <div className={styles.container}>
-            <header className={styles.heroSection}>
-                <div className={styles.heroContentWrapper}>
-                    <h1 className={styles.pageTitle}>Our Video</h1>
-                </div>
-            </header>
+            <HeroSection />
 
             {/* Kontainer untuk semua video */}
+            {/* abaikan dibawah ini fokus ke header saja */}
             <div className={styles.videoGridContainer}>
                 {/* Looping (Perulangan) data videos */}
                 {videos.map(video => ( // Pastikan tidak ada ** di sini

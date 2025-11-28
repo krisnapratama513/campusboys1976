@@ -1,11 +1,32 @@
 // client/src/pages/article/index.tsx
 import styles from './ArticlePage.module.css';
-
-// 1. Impor semua data artikel
-import { mockArticles } from '../../data/mockArticles';
+import { useState, useEffect } from 'react';
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
+import type { ApiArticleCard } from '../../types/article.types';
 
 const ArticlePage = () => {
+    const [articles, setArticles] = useState<ApiArticleCard[]>([]);
+    // State untuk melacak status loading
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchArticles = async () => {
+            try {
+                const response = await fetch('http://localhost:8000/api/articles/');
+                if (!response.ok) {
+                    throw new Error('Gagal mengambil data artikel');
+
+                }
+                const data: ApiArticleCard[] = await response.json();
+                setArticles(data);
+            } catch (error) {
+                console.error(error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchArticles();
+    }, []);
     return (
         <div className={styles.pageWrapper}>
 
@@ -13,16 +34,15 @@ const ArticlePage = () => {
             <header className={styles.heroSection}>
                 <h1>Artikel</h1>
             </header>
-
-            {/* 3. Grid untuk menampilkan semua kartu artikel */}
+            {/* loading nanti menunggu component */}
             <main className={styles.gridContainer}>
-                {mockArticles.map((article) => (
+                {articles.map((article) => (
                     <ArticleCard
                         key={article.id}
                         href={`/article/${article.slug}`} // Path ke halaman detail
-                        imgFilename={article.imgFilename}
-                        author={article.author}
-                        date={article.date}
+                        imgFilename={article.img}
+                        author={article.author_name}
+                        date={article.created_at}
                         title={article.title}
                         description={article.description}
                     />

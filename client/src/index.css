@@ -5,14 +5,13 @@
 }
 
 body {
-  background-color: #1a1a1a;
+  background: linear-gradient(to right, #0f2027, #203a43, #2c5364);
 }
 
 #root {
   max-width: 1500px;
   margin: 0 auto;
   background-color: black;
-
 }
 
 main {
@@ -24,6 +23,5 @@ main {
 @media (max-width: 768px) {
   main {
     width: 90%;
-
   }
 }

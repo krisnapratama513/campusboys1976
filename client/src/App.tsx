@@ -6,6 +6,7 @@ import Navbar from './components/NavBar/NavBar';
 import Footer from './components/Footer/Footer';
 import ArticlePage from './pages/Article';
 import VideoPage from './pages/Video';
+import ArticleDetailPage from './pages/Article/ArticleDetailPage';
 function App() {
   return (
     <>
@@ -14,6 +15,8 @@ function App() {
         <Route path='/' element={<HomePage />} />
         <Route path='/video' element={<VideoPage />} />
         <Route path='/article' element={<ArticlePage />} />
+        <Route path="/article/:slug" element={<ArticleDetailPage />} />
+
 
       </Routes>
       <Footer />

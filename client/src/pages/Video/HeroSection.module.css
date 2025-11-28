@@ -1,0 +1,26 @@
+.heroSection {
+    height: 50vh;
+    margin-bottom: 40px;
+    background-color: rgb(15, 25, 35);
+    
+    /* Variabel dinamis harus ada di file ini */
+    clip-path: polygon(0% 0%, 100% 0%, 100% var(--dynamic-clip-y), 90% 100%, 0% 100%);
+    
+    filter: drop-shadow(5px 15px 20px rgba(0, 0, 0, 0.6));
+}
+
+.heroContentWrapper {
+    width: 80%;
+    height: 100%;
+    padding-bottom: 70px;
+    max-width: 1200px;
+    margin: auto;
+    display: flex;
+    flex-direction: column-reverse;
+}
+
+.pageTitle {
+    color: white;
+    font-family: 'Capture It', sans-serif;
+    font-size: 42px;
+}

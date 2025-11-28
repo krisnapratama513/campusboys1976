@@ -1,0 +1,121 @@
+/* 
+--first-color: hsl(228, 66%, 62%);
+--second-color: hsl(25, 57%, 42%);
+--title-color: hsl(228, 8%, 95%);
+--text-color: hsl(228, 8%, 70%);
+--border-color: hsl(228, 16%, 14%);
+--body-color: hsl(228, 12%, 8%);
+--container-color: hsl(228, 16%, 12%);
+ */
+
+.fullContainer {
+    width: 100%;
+    background-color: hsl(228, 12%, 8%);
+    /* background-color: crimson; */
+
+}
+
+.hero{
+    width: 90%;
+    margin: auto;
+    height: 100px;
+    background-color: hsl(228, 16%, 12%);
+
+}
+
+.articleDetailPageContainer {
+
+    animation: fadeIn 1s ease-out forwards;
+    background-color: transparent;
+    width: 90%;
+    margin: 10px auto 0;
+    display: flex;
+    flex-direction: row;
+    gap: 30px;
+}
+
+.articleContainer {
+    flex-basis: 65%;
+    /* background-color: #312F2C; */
+    background-color: hsl(228, 16%, 12%);
+    padding: 15px;
+    color: hsl(228, 8%, 70%);
+}
+
+
+.rencetArticle {
+    flex-basis: 35%;
+    background-color: #333;
+    height: 600px;
+    padding: 15px;
+}
+
+.rencetArticle>h2 {
+    color: #ABD1C6;
+    color:  hsl(228, 8%, 95%);
+    line-height: 1.9rem;
+    font-size: 1.7rem;
+
+}
+
+.heroImage {
+    width: 100%;
+}
+
+.articleTitle {
+    font-size: 1.7rem;
+    line-height: 1.9rem;
+    color: #ABD1C6;
+    color:  hsl(228, 8%, 95%);
+}
+
+.wrapApaYa {
+    display: flex;
+    /* gap: 10px; */
+    justify-content: space-between;
+}
+
+.metaInfo {
+    font-size: 0.75em;
+    color: #ABD1C6;
+    display: flex;
+    flex-direction: column;
+}
+
+.sliderFontSize {
+    background-color: transparent;
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    padding: 0 10px;
+    border: 1px solid white;
+
+}
+
+.articleContent {
+    display: grid;
+    row-gap: 1.25rem;
+    text-align: justify;
+}
+
+
+
+
+
+@media (max-width: 768px) {
+    .articleDetailPageContainer {
+        /* Ubah arah flex menjadi kolom (vertikal) */
+        flex-direction: column;
+
+        /* Sedikit penyesuaian margin & width untuk mobile */
+        margin-top: 90px;
+        width: 92%;
+    }
+
+    .articleContainer,
+    .rencetArticle {
+        /* Reset flex-basis agar lebarnya 100% dan tingginya otomatis sesuai konten*/
+        flex-basis: auto;
+
+    }
+}

@@ -1,5 +1,4 @@
 // client/src/types/article.types.ts
-// import type { ReactNode } from 'react';
 
 /**
  * Tipe data mentah (raw) yang datang dari API

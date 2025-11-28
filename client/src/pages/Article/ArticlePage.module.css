@@ -37,7 +37,8 @@
     gap: 30px;
 
     /* Kontainer standar */
-    max-width: 950px;
+    /* max-width: 950px; */
+    max-width: 1450px;
     margin: 0 auto;
     padding: 0 20px 60px;
     /* Padding bawah */
@@ -51,7 +52,7 @@
 }
 
 /* 3 kolom di desktop */
-@media (min-width: 900px) {
+@media (min-width: 1000px) {
     .gridContainer {
         grid-template-columns: repeat(3, 1fr);
     }

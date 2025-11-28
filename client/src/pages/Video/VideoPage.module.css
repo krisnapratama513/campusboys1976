@@ -5,35 +5,6 @@
     color: white;
 }
 
-.heroSection {
-    height: 50vh;
-    margin-bottom: 40px;
-    background-color: rgb(15, 25, 35);
-    clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 90% 100%, 0% 100%);
-
-    /* Ubah nilai drop-shadow agar lebih terlihat */
-    filter: drop-shadow(5px 15px 20px rgba(0, 0, 0, 0.6));
-    /* Lebih besar, lebih blur, lebih gelap */
-
-    will-change: filter;
-}
-
-.heroContentWrapper {
-    width: 80%;
-    height: 100%;
-    padding-bottom: 70px;
-    max-width: 1200px;
-    margin: auto;
-    display: flex;
-    flex-direction: column-reverse;
-
-}
-
-.pageTitle {
-    color: white;
-    font-family: 'Capture It', sans-serif;
-    font-size: 42px;
-}
 
 .videoGridContainer {
     width: 80%;
