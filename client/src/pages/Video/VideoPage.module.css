@@ -37,3 +37,27 @@
 .description {
     font-size: 24px;
 }
+
+@media (max-width: 768px) {
+    .videoGridContainer {
+        width: 90%;
+    }
+
+    .videoItem {
+        padding: 10px;
+        border-radius: 20px;
+    }
+
+    .videoWrapper {
+        border-radius: 10px;
+    }
+
+    .videoTitle {
+        padding: 15px 0;
+        font-size: 20px;
+    }
+
+    .description {
+        font-size: 16px;
+    }
+}

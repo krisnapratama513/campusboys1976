@@ -1,3 +1,5 @@
+// client/src/pages/Video/HeroSection.tsx
+
 import React, { useRef, useState, useEffect } from 'react';
 import styles from './HeroSection.module.css'; // Sesuaikan nama file module CSS Anda
 

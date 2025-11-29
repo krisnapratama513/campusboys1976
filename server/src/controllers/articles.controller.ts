@@ -30,6 +30,24 @@ export const getRecentArticlesCard = async (req: Request, res: Response) => {
     }
 };
 
+export const get3RecentArticlesCard = async (req: Request, res: Response) => {
+    try {
+        const connection = await pool.getConnection();
+        const [rows] = await connection.execute(
+            `SELECT id, slug, img, title, created_at
+            FROM articles
+            ORDER BY id DESC
+            LIMIT 3`
+        );
+
+        connection.release();
+        res.json(rows);
+    } catch (error) {
+        console.error("Error saat query  get3RecentArticlesCard: ", error);
+        res.status(500).json({ message: "gagal mengambil data get3RecentArticlesCard" });
+    }
+};
+
 
 
 export const getAllArticlesCard = async (req: Request, res: Response) => {

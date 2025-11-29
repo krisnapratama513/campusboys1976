@@ -38,7 +38,7 @@ export default function SliderFontSize({ value, onChange }: SliderFontSizeProps)
                 shiftStep={1}
                 step={1} // Titik-titik
                 marks          // Menampilkan titik-titik (marks)
-                min={12}
+                min={14}
                 max={18}
                 color="primary"
             />

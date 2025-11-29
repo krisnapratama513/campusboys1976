@@ -26,3 +26,14 @@ export type ArticleCardProps = {
     title: string;
     description: string;
 };
+
+
+export type FullArticleDetail = {
+    id: number;
+    slug: string;
+    img: string;
+    title: string;
+    created_at: string;
+    content: string; // Konten lengkap (HTML/string)
+    author_name: string; // Sesuaikan dengan key 'author_name' dari API
+};
