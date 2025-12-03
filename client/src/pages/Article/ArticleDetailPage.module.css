@@ -8,11 +8,12 @@
 --container-color: hsl(228, 16%, 12%);
  */
 
+/* client/src/pages/Article/ArticleDetailPage.module.css (Perbaikan) */
+
 .fullContainer {
+    --wkwkwk-color: hsl(228, 12%, 8%);
     width: 100%;
     background-color: hsl(228, 12%, 8%);
-    /* background-color: crimson; */
-
 }
 
 .hero {
@@ -20,11 +21,9 @@
     margin: auto;
     height: 100px;
     background-color: hsl(228, 16%, 12%);
-
 }
 
 .articleDetailPageContainer {
-
     animation: fadeIn 1s ease-out forwards;
     background-color: transparent;
     width: 90%;
@@ -36,28 +35,23 @@
 
 .articleContainer {
     flex-basis: 65%;
-    /* background-color: #312F2C; */
     background-color: hsl(228, 16%, 12%);
     padding: 15px;
     color: hsl(228, 8%, 70%);
 }
 
-
 .recentArticle {
     flex-basis: 35%;
     background-color: hsl(228, 16%, 12%);
-
     height: fit-content;
     padding: 15px;
 }
 
 .recentArticle>h2 {
-    color: #ABD1C6;
     color: hsl(228, 8%, 95%);
     line-height: 1.9rem;
     font-size: 1.7rem;
     margin-bottom: 10px;
-
 }
 
 .heroImage {
@@ -67,14 +61,12 @@
 .articleTitle {
     font-size: 1.7rem;
     line-height: 1.9rem;
-    color: #ABD1C6;
     color: hsl(228, 8%, 95%);
 }
 
 .wrapApaYa {
     display: flex;
     margin-top: 10px;
-    /* gap: 10px; */
     justify-content: space-between;
 }
 
@@ -86,67 +78,69 @@
     flex-direction: column;
 }
 
-.sliderFontSize {
-    background-color: transparent;
-    width: 150px;
-    display: flex;
-    flex-direction: column;
-    padding: 0 10px;
-    /* border: 1px solid white; */
-
-}
-
 .articleContent {
     display: grid;
     row-gap: 1.25rem;
     text-align: justify;
 }
 
+/* --- PERBAIKAN RECENT POST --- */
 .recentItem {
     display: flex;
-    /* background-color: #ABD1C6; */
     gap: 10px;
     color: hsl(228, 8%, 95%);
+    /* 1. Hapus garis bawah link */
+    text-decoration: none; 
 }
 
 .recentItem>.recentImg {
-    /* width: 200px; */
-    /* flex-basis: 20%; */
-    /* width: 100%; */
-    width: 150px;
-    height: auto;
+    /* 2. Ubah width tetap (150px) ke persentase (misal: 30%) */
+    flex-basis: 30%; 
+    
+    /* Tambahkan rasio aspek untuk konsistensi bentuk kotak */
+    aspect-ratio: 1 / 1; 
+    
+    /* Pastikan gambar mengisi kotak dan tidak terdistorsi */
+    overflow: hidden; 
 }
 
 .recentImg>img {
     width: 100%;
+    height: 100%;
+    /* Pastikan gambar memenuhi kotak tanpa distorsi (cropping) */
+    object-fit: cover; 
 }
 
 .recentItem>.recentBody {
-    /* flex-basis: 80%; */
+    flex-basis: 70%;
     display: flex;
     flex-direction: column;
     justify-content: space-evenly;
-    /* gap: 10px; */
-
 }
-
+/* --- AKHIR PERBAIKAN RECENT POST --- */
 
 
 @media (max-width: 868px) {
     .articleDetailPageContainer {
-        /* Ubah arah flex menjadi kolom (vertikal) */
         flex-direction: column;
-
-        /* Sedikit penyesuaian margin & width untuk mobile */
-        /* margin-top: 90px; */
         width: 90%;
     }
 
     .articleContainer,
     .recentArticle {
-        /* Reset flex-basis agar lebarnya 100% dan tingginya otomatis sesuai konten*/
         flex-basis: auto;
+    }
 
+    /* Pada mobile, gunakan layout vertikal 100% untuk recent item */
+    .recentItem {
+        flex-direction: row; /* Pertahankan horizontal untuk tampilan tablet/mobile */
+        gap: 15px;
+    }
+
+    .recentItem>.recentImg {
+         /* Sesuaikan lebar gambar pada tampilan mobile, misal: 100px */
+        flex-basis: 100px;
+        flex-shrink: 0; /* Pastikan tidak menyusut saat ada teks panjang */
     }
 }
 
@@ -162,5 +156,4 @@
     .metaInfo {
         font-size: 0.9rem;
     }
-
 }

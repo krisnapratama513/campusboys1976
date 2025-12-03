@@ -1,4 +1,4 @@
-:root {
+.btnCstm {
     --main-color: #ff4655;
     --shadow-color: #dde6ed;
 
@@ -19,9 +19,8 @@
 
     /* (Logika panah: 2px adalah 1/30 dari 60px) */
     --arrow-offset: calc(var(--btn-size) / 30);
-}
 
-.btnCstm {
+
     all: unset;
     position: relative;
     cursor: pointer;
@@ -144,4 +143,11 @@
 .rightArrow {
     border-left: var(--arrow-size) solid black;
     left: var(--arrow-offset);
+}
+
+
+@media (max-width: 768px) {
+    .btnCstm {
+        --btn-size: 34px; /* Override hanya untuk mobile */
+    }
 }

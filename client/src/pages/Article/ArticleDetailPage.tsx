@@ -7,8 +7,6 @@ import styles from './ArticleDetailPage.module.css';
 import { formatWIBDate } from '../../utils/formatDate';
 
 import type { ApiArticleCard, FullArticleDetail } from '../../types/article.types';
-// Komponen ArticleCard tidak digunakan di sini, jadi dihapus
-// import ArticleCard from '../../components/ArticleCard/ArticleCard'; 
 
 
 const ArticleDetailPage = () => {
@@ -26,9 +24,6 @@ const ArticleDetailPage = () => {
     // Asumsi endpoint /recent mengembalikan data yang cukup untuk di-filter menjadi 3
     const [recentArticles, setRecentArticles] = useState<ApiArticleCard[]>([]);
 
-    // Kode tidak terpakai dihapus:
-    // const [fontSize, setFontSize] = useState(16);
-    // const handleSliderChange = (newValue: number) => { setFontSize(newValue); };
 
 
     /**
