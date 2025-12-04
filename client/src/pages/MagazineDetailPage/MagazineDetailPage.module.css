@@ -1,0 +1,68 @@
+/* client/src/pages/MagazineDetailPage/MagazineDetailPage.module.css */
+
+.pageWrapper {
+    background-color: #111827; /* KEMBALI KE DARK (Gray-900) */
+    background-color: rgb(15, 25, 35);
+    /* background-color: crimson; */
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.heroSpacer {
+    height: 80px;
+    width: 100%;
+    flex-shrink: 0;
+}
+
+.contentContainer {
+    /* Tetap mempertahankan logika lebar yang baru */
+    width: 80%; 
+    max-width: 1000px;
+    margin: 0 auto; 
+    
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+/* Header styling */
+.header {
+    padding: 1.5rem 0;
+    text-align: center;
+    /* Border kembali ke warna gelap/samar */
+    border-bottom: 1px solid #374151; 
+}
+
+.title {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+    color: white; /* Teks kembali Putih */
+}
+
+.meta {
+    font-size: 0.875rem;
+    color: #9ca3af; /* Teks kembali Abu terang */
+}
+
+.flipbookWrapper {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding-top: 2rem;
+    padding-bottom: 2.5rem;
+}
+
+/* Responsif Mobile */
+@media (max-width: 768px) {
+    .contentContainer {
+        width: 90%; /* Lebar di HP tetap 90% */
+    }
+    
+    .title {
+        font-size: 1.25rem;
+    }
+}

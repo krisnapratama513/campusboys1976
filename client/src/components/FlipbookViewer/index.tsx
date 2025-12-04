@@ -1,0 +1,71 @@
+// client/src/components/FlipbookViewer/index.tsx
+
+import React, { useCallback, useRef, useState } from "react";
+import { Document, pdfjs } from 'react-pdf';
+import 'react-pdf/dist/Page/AnnotationLayer.css';
+import 'react-pdf/dist/Page/TextLayer.css';
+
+// Import komponen Flipbook logika kita
+import Flipbook from "./flipbook/Flipbook";
+import styles from './FlipbookViewer.module.css';
+
+// Worker Stabil (Tetap pakai ini agar tidak loading stuck)
+pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.296/build/pdf.worker.min.mjs`;
+
+interface FlipbookViewerProps {
+    pdfUrl: string;
+    className?: string;
+}
+
+const FlipbookViewer: React.FC<FlipbookViewerProps> = ({ pdfUrl, className }) => {
+    const [pdfLoading, setPdfLoading] = useState(true);
+    const [pdfDetails, setPdfDetails] = useState<any>(null);
+
+    // State standar (tanpa zoomScale yang aneh-aneh)
+    const [viewerStates, setViewerStates] = useState({
+        currentPageIndex: 0,
+        zoomScale: 1, 
+    });
+
+    const onDocumentLoadSuccess = useCallback(async (document: any) => {
+        try {
+            const pageDetails = await document.getPage(1);
+            setPdfDetails({
+                totalPages: document.numPages,
+                width: pageDetails.view[2],
+                height: pageDetails.view[3],
+            });
+            setPdfLoading(false);
+        } catch (error) {
+            console.error('Error loading document:', error);
+        }
+    }, []);
+
+    return (
+        <div className={`${styles.container} ${className || ''}`} style={{ height: 'auto', minHeight: '500px' }}>
+            {pdfLoading && <div className="text-white p-10 text-center">Loading Majalah...</div>}
+
+            <Document 
+                file={pdfUrl} 
+                onLoadSuccess={onDocumentLoadSuccess} 
+                loading={null}
+                onLoadError={(error) => console.error("Error Load PDF:", error)}
+                className="flex justify-center items-start w-full h-full"
+            >
+                {(pdfDetails && !pdfLoading) && (
+                    <div className={styles.contentWrapper}>
+                        {/* Panggil Flipbook Langsung */}
+                        <Flipbook
+                            viewerStates={viewerStates}
+                            setViewerStates={setViewerStates}
+                            flipbookRef={null}
+                            pdfDetails={pdfDetails}
+                        />
+                    </div>
+                )}
+            </Document>
+        </div>
+    );
+}
+
+export default FlipbookViewer;

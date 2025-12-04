@@ -15,13 +15,12 @@ const MagazinePage = () => {
                 {dummyMagazineData.map((magazine, index) => (
                     <MagazineCard 
                         key={index} // Selalu wajib ada
-                        href={magazine.href}
+                        href={`/magazine/${magazine.slug}`}
                         imgFilename={magazine.imgFilename}
                         author={magazine.author}
                         date={magazine.date}
                         isoDate={magazine.isoDate}
                         title={magazine.title}
-                        // width={'30%'}
                     />
                 ))}
             </div>

@@ -8,6 +8,8 @@ import ArticlePage from './pages/Article';
 import VideoPage from './pages/Video';
 import ArticleDetailPage from './pages/Article/ArticleDetailPage';
 import MagazinePage from './pages/Magazine';
+
+import MagazineDetailPage from './pages/MagazineDetailPage';
 function App() {
   return (
     <>
@@ -18,6 +20,7 @@ function App() {
         <Route path='/article' element={<ArticlePage />} />
         <Route path="/article/:slug" element={<ArticleDetailPage />} />
         <Route path="/magazine" element={<MagazinePage />} />
+        <Route path="/magazine/:slug" element={<MagazineDetailPage />} />
 
 
       </Routes>
