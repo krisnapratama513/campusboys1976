@@ -1,0 +1,58 @@
+/* client/src/pages/About/HeroSection.module.css */
+
+.header {
+    /* Variabel lokal agar mandiri */
+    --primary-color: #027a56; 
+    
+    text-align: center;
+    /* Pastikan path gambar sesuai struktur folder Anda */
+    background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
+        url('../../assets/background/hero_about.png');
+    background-size: cover;
+    background-position: center;
+    padding: 160px 0;
+    border-bottom: 3px solid var(--primary-color);
+    
+    /* Animasi Container */
+    opacity: 0;
+    animation: fadeIn 1.5s ease-out forwards;
+}
+
+.title {
+    font-family: 'Montserrat', sans-serif;
+    font-family: 'Oswald', sans-serif;
+    font-size: 3.5rem;
+    font-weight: 900;
+    letter-spacing: 3px;
+    color: #027a56;
+    text-transform: uppercase;
+    text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+    margin: 0;
+    
+    /* Animasi Teks */
+    opacity: 0;
+    animation: fadeInDown 1s ease-out 0.5s forwards;
+}
+/* Keyframes (Wajib dicopy agar animasi jalan) */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fadeInDown {
+    from { opacity: 0; transform: translateY(-20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Responsif */
+@media (max-width: 768px) {
+    .header {
+        padding: 80px 20px;
+    }
+    .title {
+        font-size: 2.5rem;
+    }
+    .subtitle {
+        font-size: 1.2rem;
+    }
+}

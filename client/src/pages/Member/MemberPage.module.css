@@ -1,0 +1,86 @@
+/* MemberPage.module.css */
+
+.page {
+    background: radial-gradient(circle at center, #101c2c 0%, #020617 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: sans-serif;
+}
+
+.container {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 20px;
+}
+
+.card {
+    background: #09090b;
+    border: 1px solid #27272a;
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.header h1 {
+    color: white;
+    font-size: 1.5rem;
+    font-weight: 600;
+}
+
+.form {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.inputGroup label {
+    color: #e2e8f0;
+    font-size: 0.9rem;
+}
+
+.inputGroup input {
+    background: #020617;
+    border: 1px solid #27272a;
+    border-radius: 6px;
+    padding: 12px;
+    color: white;
+    transition: border 0.2s;
+}
+
+.inputGroup input:focus {
+    outline: none;
+    border-color: #3b82f6;
+}
+
+.btnPrimary {
+    width: 100%;
+    padding: 12px;
+    background: #f8fafc;
+    color: #020617;
+    border: none;
+    border-radius: 6px;
+    font-weight: 600;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: opacity 0.2s;
+}
+
+.btnPrimary:hover {
+    opacity: 0.9;
+}

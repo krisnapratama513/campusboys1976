@@ -1,26 +1,33 @@
+// client/src/components/FlipbookViewer/flipbook/PDFPage.tsx
+
 import React, { forwardRef, memo } from 'react';
 import { Page } from 'react-pdf';
 import styles from '../FlipbookViewer.module.css';
 
 interface PdfPageProps {
     page: number;
-    width: number; // Tambahkan Width
+    width: number;
     height: number;
     zoomScale: number;
-    isPageInView: boolean;
+    // HAPUS: isPageInView: boolean;
     isPageInViewRange: boolean;
 }
 
 const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({ 
     page, 
-    width, // Terima width
+    width, 
     height,
     zoomScale, 
-    isPageInView, 
+    // HAPUS: isPageInView (tidak dipakai lagi)
     isPageInViewRange 
 }, ref) => {
     
     const alignStyle = page % 2 === 0 ? 'flex-end' : 'flex-start';
+
+    // Optimasi Kualitas Gambar:
+    // Kita gunakan resolusi tinggi (2x) secara default agar tidak burik.
+    // Tidak lagi bergantung pada status 'isPageInView'.
+    const pixelRatio = Math.min(Math.max(window.devicePixelRatio * 2, zoomScale * 2), 4);
 
     return (
         <div 
@@ -28,13 +35,11 @@ const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({
             className={`${styles.pageBase} ${styles.pageBackground}`}
             style={{ justifyContent: alignStyle }}
         >
+            {/* Hanya render jika masuk range lazy loading */}
             {isPageInViewRange && (
                 <Page
-                    devicePixelRatio={Math.min(Math.max(window.devicePixelRatio * 2, zoomScale * 2), 4)}
-                    
-                    // KUNCI PERBAIKAN: Gunakan width, jangan height
+                    devicePixelRatio={pixelRatio}
                     width={width} 
-                    
                     pageNumber={page}
                     loading={<div className="w-full h-full bg-white/5 animate-pulse" />} 
                     renderAnnotationLayer={false} 
@@ -47,4 +52,7 @@ const PdfPage = forwardRef<HTMLDivElement, PdfPageProps>(({
 });
 
 PdfPage.displayName = "PdfPage";
+// Memo sangat penting di sini! 
+// Karena kita menghapus isPageInView, props lain (width, page, zoomScale) tidak berubah saat flip.
+// Jadi React akan SKIP render ulang = TIDAK FLICKER.
 export default memo(PdfPage);

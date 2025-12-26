@@ -1,0 +1,238 @@
+/* client/src/pages/About/AboutPage.module.css */
+
+/* ======================================= */
+/* 1. VARIABEL & WRAPPER UTAMA */
+/* ======================================= */
+.aboutPageWrapper {
+    --primary-color: #027a56;
+    --dark-bg: #121212;
+    --card-bg: #1e1e1e;
+    --text-color: #e0e0e0;
+    --heading-color: #ffffff;
+    --border-color: #333333;
+    --surface-color: var(--card-bg);
+    --primary-text-color: var(--text-color);
+    --secondary-text-color: #a0a0a0;
+
+    /* Style Dasar Halaman */
+    font-family: 'Lora', serif;
+    line-height: 1.8;
+    font-size: 18px;
+    overflow-x: hidden;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    background-color: var(--dark-bg);
+    color: var(--primary-text-color);
+}
+
+/* ======================================= */
+/* 2. TYPOGRAPHY RESET (SCOPED) */
+/* ======================================= */
+/* Mengatur h1-h3 hanya di dalam wrapper ini */
+.aboutPageWrapper h2,
+.aboutPageWrapper h3 {
+    font-family: 'Oswald', sans-serif;
+    color: var(--heading-color);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+/* ======================================= */
+/* 3. KEYFRAMES ANIMASI */
+/* ======================================= */
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* ======================================= */
+/* 4. LAYOUT CONTAINER */
+/* ======================================= */
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 60px 20px 40px;
+}
+
+/* ======================================= */
+/* 5. SECTION FILOSOFI */
+/* ======================================= */
+.philosophy {
+    border-left: 3px solid var(--primary-color);
+    padding-left: 30px;
+    margin-bottom: 80px;
+    opacity: 0;
+    /* Animasi muncul saat load */
+    animation: fadeInUp 1s ease-out 0.5s forwards; 
+}
+
+.philosophy h2 {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 2rem;
+    margin-bottom: 20px;
+    color: #fff;
+}
+
+.philosophy p {
+    margin-bottom: 25px;
+    color: var(--secondary-text-color);
+    text-align: justify;
+}
+
+.philosophy p:last-child {
+    margin-bottom: 0;
+}
+
+/* ======================================= */
+/* 6. SECTION CHAPTERS */
+/* ======================================= */
+.chaptersSection {
+    padding-top: 40px;
+}
+
+.chaptersSection h2 {
+    font-family: 'Montserrat', sans-serif;
+    text-align: center;
+    font-size: 2.5rem;
+    margin-bottom: 80px;
+    color: #fff;
+}
+
+.chapterItem {
+    display: flex;
+    align-items: center;
+    gap: 50px;
+    margin-bottom: 80px;
+}
+
+/* Pola Zig-Zag (Genap dibalik) */
+.chapterItem:nth-child(even) {
+    flex-direction: row-reverse;
+}
+
+/* Logo Chapter */
+.chapterLogo {
+    flex: 0 0 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chapterLogo img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    background-color: var(--surface-color);
+    padding: 20px;
+    border: 1px solid var(--border-color);
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+}
+
+.chapterItem:hover .chapterLogo img {
+    transform: scale(1.05);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Konten Text Chapter */
+.chapterContent {
+    flex: 1;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+/* Watermark Angka di Belakang Text */
+.chapterContent::before {
+    content: attr(data-chapter);
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 8rem;
+    font-weight: 900;
+    color: rgba(255, 255, 255, 0.04);
+    z-index: -1;
+    line-height: 1;
+}
+
+.chapterItem:nth-child(odd) .chapterContent::before {
+    left: -30px;
+}
+
+.chapterItem:nth-child(even) .chapterContent::before {
+    right: -30px;
+}
+
+.chapterContent h3 {
+    font-family: 'Montserrat', sans-serif;
+    color: var(--primary-color);
+    font-size: 2rem;
+    margin-bottom: 15px;
+}
+
+.chapterContent p {
+    color: var(--secondary-text-color);
+    font-size: 1.1rem;
+    line-height: 1.8;
+}
+
+/* ======================================= */
+/* 7. ANIMASI SCROLL (INTERSECTION OBSERVER) */
+/* ======================================= */
+.reveal {
+    position: relative;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
+}
+
+.reveal.active {
+    transform: translateY(0);
+    opacity: 1;
+}
+
+/* ======================================= */
+/* 8. RESPONSIF (MEDIA QUERY) */
+/* ======================================= */
+@media (max-width: 768px) {
+    .aboutPageWrapper {
+        font-size: 16px;
+    }
+
+    .container {
+        padding: 40px 20px 40px;
+    }
+
+    .philosophy {
+        padding-left: 20px;
+    }
+
+    .philosophy h2,
+    .chaptersSection h2 {
+        font-size: 1.8rem;
+    }
+
+    /* Stack column di mobile */
+    .chapterItem,
+    .chapterItem:nth-child(even) {
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .chapterLogo {
+        flex-basis: auto;
+        width: 200px;
+        margin-bottom: 20px;
+    }
+
+    .chapterContent {
+        text-align: center;
+    }
+
+    /* Hilangkan watermark di mobile agar bersih */
+    .chapterItem .chapterContent::before {
+        display: none;
+    }
+}

@@ -1,3 +1,5 @@
+// client/src/components/FlipbookViewer/flipbook/FlipbookLoader.tsx
+
 import React, { forwardRef, memo, useCallback, useEffect, useState, useRef, useImperativeHandle } from 'react';
 import HTMLFlipBook from 'react-pageflip';
 import { useWindowSize } from 'react-use';
@@ -24,10 +26,10 @@ interface FlipbookLoaderProps {
     setViewRange: (range: number[]) => void;
 }
 
-// Definisikan tipe fungsi yang bisa dipanggil parent
 export interface FlipbookHandle {
     next: () => void;
     prev: () => void;
+    turnToPage: (index: number) => void;
 }
 
 const FlipbookLoader = forwardRef<FlipbookHandle, FlipbookLoaderProps>(({ 
@@ -36,20 +38,22 @@ const FlipbookLoader = forwardRef<FlipbookHandle, FlipbookLoaderProps>(({
     
     const { width } = useWindowSize();
     const debouncedZoom = useDebounce(viewerStates.zoomScale, 500);
-
-    // 1. Ref Internal (Langsung ke Library)
     const bookRef = useRef<any>(null);
 
-    // 2. EXPOSE Method ke Parent (Remote Control)
+    const startPageRef = useRef(viewerStates.currentPageIndex);
+    const prevScaleRef = useRef(scale);
+
+    if (prevScaleRef.current !== scale) {
+        startPageRef.current = viewerStates.currentPageIndex;
+        prevScaleRef.current = scale;
+    }
+
     useImperativeHandle(ref, () => ({
-        next: () => {
+        next: () => { bookRef.current?.pageFlip()?.flipNext(); },
+        prev: () => { bookRef.current?.pageFlip()?.flipPrev(); },
+        turnToPage: (index: number) => {
             if (bookRef.current && bookRef.current.pageFlip()) {
-                bookRef.current.pageFlip().flipNext();
-            }
-        },
-        prev: () => {
-            if (bookRef.current && bookRef.current.pageFlip()) {
-                bookRef.current.pageFlip().flipPrev();
+                bookRef.current.pageFlip().flip(index); 
             }
         }
     }));
@@ -58,7 +62,8 @@ const FlipbookLoader = forwardRef<FlipbookHandle, FlipbookLoaderProps>(({
     const boxHeight = pdfDetails.height * scale;
 
     const isPageInViewRange = (index: number) => index >= viewRange[0] && index <= viewRange[1];
-    const isPageInView = (index: number) => viewerStates.currentPageIndex === index || viewerStates.currentPageIndex + 1 === index;
+    
+    // HAPUS: const isPageInView = ... (Tidak perlu lagi)
 
     const onFlip = useCallback((e: any) => {
         let newViewRange;
@@ -77,9 +82,9 @@ const FlipbookLoader = forwardRef<FlipbookHandle, FlipbookLoaderProps>(({
         <div className={styles.relativeWrapper}>
             {/* @ts-ignore */}
             <HTMLFlipBook
-                ref={bookRef} // Sambungkan ke Ref Internal
+                ref={bookRef}
                 key={scale}
-                startPage={viewerStates.currentPageIndex}
+                startPage={startPageRef.current} 
                 width={boxWidth} 
                 height={boxHeight}
                 size="fixed"
@@ -101,7 +106,8 @@ const FlipbookLoader = forwardRef<FlipbookHandle, FlipbookLoaderProps>(({
                         zoomScale={debouncedZoom}
                         page={index + 1}
                         isPageInViewRange={isPageInViewRange(index)}
-                        isPageInView={isPageInView(index)}
+                        // HAPUS PROP: isPageInView={...}
+                        // Kita hentikan pengiriman prop ini agar Memo bekerja maksimal
                     />
                 ))}
             </HTMLFlipBook>

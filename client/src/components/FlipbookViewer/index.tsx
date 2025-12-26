@@ -1,15 +1,11 @@
-// client/src/components/FlipbookViewer/index.tsx
-
-import React, { useCallback, useRef, useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Document, pdfjs } from 'react-pdf';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Import komponen Flipbook logika kita
 import Flipbook from "./flipbook/Flipbook";
 import styles from './FlipbookViewer.module.css';
 
-// Worker Stabil (Tetap pakai ini agar tidak loading stuck)
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@5.4.296/build/pdf.worker.min.mjs`;
 
 interface FlipbookViewerProps {
@@ -21,7 +17,6 @@ const FlipbookViewer: React.FC<FlipbookViewerProps> = ({ pdfUrl, className }) =>
     const [pdfLoading, setPdfLoading] = useState(true);
     const [pdfDetails, setPdfDetails] = useState<any>(null);
 
-    // State standar (tanpa zoomScale yang aneh-aneh)
     const [viewerStates, setViewerStates] = useState({
         currentPageIndex: 0,
         zoomScale: 1, 
@@ -54,12 +49,13 @@ const FlipbookViewer: React.FC<FlipbookViewerProps> = ({ pdfUrl, className }) =>
             >
                 {(pdfDetails && !pdfLoading) && (
                     <div className={styles.contentWrapper}>
-                        {/* Panggil Flipbook Langsung */}
                         <Flipbook
                             viewerStates={viewerStates}
                             setViewerStates={setViewerStates}
-                            flipbookRef={null}
+                            // HAPUS flipbookRef=null
                             pdfDetails={pdfDetails}
+                            // ✅ TAMBAH INI: Kirim URL PDF untuk fitur download
+                            pdfUrl={pdfUrl}
                         />
                     </div>
                 )}
