@@ -1,0 +1,75 @@
+/* Container Utama (Melayang di bawah) */
+.toolbarContainer {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 1000;
+
+    /* Glassmorphism Effect */
+    background-color: rgba(17, 24, 39, 0.85);
+    /* Gray-900 transparant */
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    /* Full rounded */
+    padding: 8px 20px;
+
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
+}
+
+/* Grouping (Navigasi / Zoom) */
+.group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Styling Tombol */
+.btn {
+    background: transparent;
+    border: none;
+    color: white;
+    padding: 8px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.btn:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    transform: scale(1.1);
+}
+
+.btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+/* Teks Indikator Halaman */
+.pageIndicator {
+    font-size: 14px;
+    font-weight: 500;
+    color: #e5e7eb;
+    /* Gray-200 */
+    min-width: 70px;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    /* Agar angka tidak goyang */
+}
+
+/* Garis Pemisah Vertical */
+.divider {
+    width: 1px;
+    height: 24px;
+    background-color: rgba(255, 255, 255, 0.2);
+}

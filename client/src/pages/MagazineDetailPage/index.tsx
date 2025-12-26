@@ -1,9 +1,10 @@
 // client/src/pages/MagazineDetailPage/index.tsx
 
-import React, { useMemo } from 'react';
+import  { useMemo } from 'react';
 import { useParams } from 'react-router-dom';
 // import MyFlipbook from '../../components/pdf-viewer/MyFlipbook'; 
 
+// import FlipbookViewer from '../../components/FlipbookViewer';
 import FlipbookViewer from '../../components/FlipbookViewer';
 import { dummyMagazineData } from '../Magazine/dummy';
 

@@ -3,86 +3,87 @@
 .container {
     position: relative;
     width: 100%;
-    /* Gunakan transparent agar menyatu dengan background aplikasi */
-    background-color: transparent; 
-    overflow-x: hidden; /* Mencegah scrollbar horizontal */
-}
+    /* Gunakan min-height atau height: 100vh sesuai kebutuhan layout */
+    min-height: 100vh;
+    background-color: transparent;
 
-/* Responsif Tinggi Container */
-@media (max-width: 640px) {
-    .container { height: 25rem; }
-}
-
-.contentWrapper {
-    width: 100%;
-    height: 100%; 
+    /* Flexbox Centering Mutlak */
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-}
-
-.flipbookContainer {
-    width: 100%;
-    display: flex;
+    /* Gunakan flex-start + padding top jika ingin buku agak ke atas, 
+     tapi center paling aman untuk zoom */
     justify-content: center;
-    align-items: center;
-}
 
-/* Responsif Tinggi Flipbook */
-@media (min-width: 1024px) {
-    .flipbookContainer { height: 28rem; }
-}
-@media (min-width: 1280px) {
-    .flipbookContainer { height: 30rem; }
-}
-
-.relativeWrapper {
-    position: relative;
-    width: 100%;
-    height: 100%;
-}
-
-.innerContent {
+    /* PENTING: Overflow auto/hidden */
+    /* Auto: agar muncul scrollbar jika di-zoom sangat besar sampai lewat layar */
+    /* Hidden: jika ingin clean look (tapi hati-hati konten terpotong) */
     overflow: hidden;
+}
+
+/* Responsif tinggi container */
+@media (max-width: 640px) {
+    .container {
+        height: 25rem;
+    }
+}
+
+/* Wrapper untuk area buku */
+/* Wrapper Buku (Div yang kena transform scale) */
+.bookWrapper {
+    /* Pastikan wrapper tidak punya dimensi fix yang mengganggu */
     display: flex;
-    justify-content: center;
     align-items: center;
-    height: 100%;
-    width: 100%;
+    justify-content: center;
+
+    /* Memberi ruang nafas agar bayangan buku tidak terpotong */
+    padding: 40px;
+    z-index: 10;
 }
 
-/* --- LOGIKA UTAMA PERBAIKAN --- */
+/* Area spesifik HTMLFlipBook */
+.flipBookContainer {
+    margin: 0 auto;
+}
 
+/* Style halaman kertas */
 .pageBase {
-    width: 100%;
-    height: 100%;
-    position: relative;
-    /* Flexbox untuk mengatur posisi kertas (kiri/kanan) */
-    display: flex; 
-    align-items: center; 
-    
-    /* Hapus shadow dari container karena transparan */
-    box-shadow: none; 
+    background-color: transparent !important;
+    display: flex;
+    /* Untuk alignment konten page */
+    box-shadow: none;
 }
 
-/* Background Transparan (Hapus Crimson/Putih) */
-.pageBackground { 
-    background-color: transparent !important; 
-}
-.pageMuted { 
-    background-color: transparent !important; 
-}
-
-/* Bayangan Kertas (Hanya di Canvas PDF) */
+/* Shadow hanya pada canvas PDF agar terlihat 3D */
 .pdfCanvas {
-    /* Shadow halus agar terlihat seperti kertas nyata */
-    box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.4); 
+    box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.4);
+    background-color: white;
 }
 
-/* Utilitas Lain */
-.disablePointer { pointer-events: none; }
-.fullscreenHeight { height: calc(100vh - 5rem) !important; }
+/* Utility classes */
+.disablePointer {
+    pointer-events: none;
+}
 
-@media (min-width: 768px) {
-    .mdDisablePointer { pointer-events: none; }
+/* Loading state */
+.loadingContainer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    height: 100%;
+    width: 100%;
+}
+
+/* Update: Responsif */
+@media (max-width: 640px) {
+    .container {
+        height: auto;
+        min-height: 500px;
+    }
+
+    /* Saat mobile, mungkin transform origin lebih baik di center center */
+    .bookWrapper {
+        transform-origin: center center !important;
+    }
 }
