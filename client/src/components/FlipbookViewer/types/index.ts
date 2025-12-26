@@ -7,9 +7,12 @@ export interface PDFDetails {
 }
 
 export interface ViewerState {
-    currentPage: number; // Index halaman (0, 1, 2...)
-    zoomScale: number;
-    isFullscreen: boolean;
+  currentPage: number;
+  zoomScale: number;
+  isFullscreen: boolean;
+  // TAMBAHAN: Melacak sisi mana yang sedang dilihat di HP
+  // 'center' = Cover, 'left' = Halaman Kiri (Genap), 'right' = Halaman Kanan (Ganjil)
+  mobileView: 'center' | 'left' | 'right'; 
 }
 
 // Interface untuk Ref agar bisa diakses parent

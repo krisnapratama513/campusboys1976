@@ -4,7 +4,9 @@
     position: relative;
     width: 100%;
     /* Gunakan min-height atau height: 100vh sesuai kebutuhan layout */
-    min-height: 100vh;
+    height: auto;
+    min-height: 600px;
+    /* Minimal tinggi agar tidak gepeng saat loading */
     background-color: transparent;
 
     /* Flexbox Centering Mutlak */
@@ -19,6 +21,11 @@
     /* Auto: agar muncul scrollbar jika di-zoom sangat besar sampai lewat layar */
     /* Hidden: jika ingin clean look (tapi hati-hati konten terpotong) */
     overflow: hidden;
+
+    /* Tambahkan padding agar buku memiliki ruang napas */
+    padding-top: 40px;
+    padding-bottom: 100px;
+    /* Lebih besar di bawah untuk toolbar */
 }
 
 /* Responsif tinggi container */
@@ -37,7 +44,8 @@
     justify-content: center;
 
     /* Memberi ruang nafas agar bayangan buku tidak terpotong */
-    padding: 40px;
+    /* padding: 40px; */
+    position: relative;
     z-index: 10;
 }
 

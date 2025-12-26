@@ -9,6 +9,7 @@ export const useFlipbookState = () => {
         currentPage: 0,
         zoomScale: 1,
         isFullscreen: false,
+        mobileView: 'center', // Default awal (Cover)
     });
 
     // Handler saat PDF berhasil dimuat oleh react-pdf
@@ -35,9 +36,15 @@ export const useFlipbookState = () => {
         });
     }, []);
 
-    // Handler update halaman (dipanggil saat flip selesai)
     const handlePageUpdate = useCallback((pageIndex: number) => {
-        setViewerState(prev => ({ ...prev, currentPage: pageIndex }));
+        setViewerState(prev => ({
+            ...prev,
+            currentPage: pageIndex,
+            // PENTING: Setiap kali kertas terbalik (flip), 
+            // kembalikan view mobile ke sisi Kiri (awal baca)
+            // Kecuali jika balik ke Cover (0), maka 'center'
+            mobileView: pageIndex === 0 ? 'center' : 'left'
+        }));
     }, []);
 
     return {
