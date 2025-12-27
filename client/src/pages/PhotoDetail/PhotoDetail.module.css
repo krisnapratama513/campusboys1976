@@ -1,0 +1,209 @@
+/* Container Utama */
+.container {
+    max-width: 1000px;
+    margin: 0 auto;
+    /* UPDATE: Padding top ditambah agar aman dari navbar */
+    padding: 140px 1.5rem 2rem 1.5rem;
+    min-height: 100vh;
+    color: #e0e0e0;
+}
+
+.centerText {
+    text-align: center;
+    padding-top: 150px;
+    /* Update juga biar loading text gak ketutup */
+    color: #888;
+    font-size: 1.2rem;
+}
+
+/* ... (Style navbar, header, dll biarkan sama seperti sebelumnya) ... */
+.navBar {
+    margin-bottom: 2rem;
+}
+
+.backButton {
+    text-decoration: none;
+    color: #a0a0a0;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.backButton:hover {
+    color: #fff;
+}
+
+.header {
+    margin-bottom: 2rem;
+}
+
+.date {
+    display: block;
+    font-size: 0.9rem;
+    color: #4caf50;
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.title {
+    font-size: 2.5rem;
+    margin: 0 0 1rem 0;
+    line-height: 1.2;
+    font-weight: 800;
+    color: #fff;
+}
+
+.description {
+    font-size: 1.1rem;
+    line-height: 1.6;
+    color: #cccccc;
+    max-width: 800px;
+}
+
+.divider {
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin: 2rem 0;
+}
+
+/* Photo Grid */
+.photoGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+}
+
+.photoItem {
+    position: relative;
+    border-radius: 8px;
+    overflow: hidden;
+    background-color: #1e1e1e;
+    aspect-ratio: 4 / 3;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    /* Cursor pointer menandakan bisa diklik */
+}
+
+.photoItem:hover {
+    transform: scale(1.02);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+    z-index: 1;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    transition: filter 0.3s ease;
+}
+
+.photoItem:hover .image {
+    filter: brightness(1.1);
+}
+
+/* --- MODAL / LIGHTBOX STYLES --- */
+
+/* Overlay Background Gelap */
+.modalOverlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.9);
+    /* Hitam transparan 90% */
+    backdrop-filter: blur(5px);
+    /* Efek blur di background belakang */
+    z-index: 9999;
+    /* Pastikan di atas navbar */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 1rem;
+    animation: fadeIn 0.3s ease;
+}
+
+/* Kontainer Gambar Modal */
+.modalContent {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Gambar Modal (Rasio Asli & Responsif) */
+.modalImage {
+    max-width: 95vw;
+    /* Maksimal 95% lebar layar */
+    max-height: 90vh;
+    /* Maksimal 90% tinggi layar */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    /* Menjaga rasio asli gambar */
+    border-radius: 4px;
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.8);
+}
+
+/* Tombol Close (X) */
+.closeButton {
+    position: absolute;
+    top: -40px;
+    /* Letakkan sedikit di atas gambar */
+    right: 0;
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 2rem;
+    cursor: pointer;
+    line-height: 1;
+    padding: 0 10px;
+    transition: color 0.2s;
+    outline: none;
+}
+
+.closeButton:hover {
+    color: #ff5252;
+    /* Merah saat hover */
+    transform: scale(1.1);
+}
+
+/* Animasi Fade In sederhana */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+/* Responsive Mobile */
+@media (max-width: 600px) {
+    .container {
+        padding-top: 120px;
+        /* Sedikit dikurangi untuk mobile jika navbarnya mengecil */
+    }
+
+    .title {
+        font-size: 1.8rem;
+    }
+
+    .photoGrid {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .closeButton {
+        top: -40px;
+        right: 0;
+    }
+}

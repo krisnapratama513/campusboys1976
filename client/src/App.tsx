@@ -10,6 +10,9 @@ import ArticleDetailPage from './pages/Article/ArticleDetailPage';
 import MagazinePage from './pages/Magazine';
 import AboutPage from './pages/About';
 
+import PhotoPage from './pages/Photo';
+import PhotoDetail from './pages/PhotoDetail';
+
 import MagazineDetailPage from './pages/MagazineDetailPage';
 import MemberPage from './pages/Member';
 function App() {
@@ -18,6 +21,9 @@ function App() {
       <Navbar />
       <Routes>
         <Route path='/' element={<HomePage />} />
+
+        <Route path='/photo' element={<PhotoPage />} />
+        <Route path="/photo/:id" element={<PhotoDetail />} />
 
         <Route path='/video' element={<VideoPage />} />
 

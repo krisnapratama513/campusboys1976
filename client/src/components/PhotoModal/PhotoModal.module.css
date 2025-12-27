@@ -1,0 +1,88 @@
+/* Overlay Background Gelap */
+.overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.95); /* Hampir gelap total agar fokus */
+    backdrop-filter: blur(8px);
+    z-index: 10000; /* Paling depan */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    animation: fadeIn 0.3s ease;
+    
+    /* Padding agar gambar tidak pernah nempel ke tepi layar */
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* Wrapper Konten */
+.content {
+    position: relative;
+    max-width: 100%;
+    max-height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Gambar */
+.image {
+    max-width: 100%;
+    max-height: 85vh; /* Menyisakan ruang vertical agar tidak terlalu penuh */
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+    box-shadow: 0 0 30px rgba(0,0,0,0.5);
+}
+
+/* Tombol Close - FIXED POSITION */
+/* Ini kuncinya: Tombol nempel ke layar, bukan ke gambar */
+.closeButton {
+    position: fixed;
+    top: 20px;
+    right: 25px;
+    background: rgba(255, 255, 255, 0.1); /* Background tipis biar terlihat di foto terang */
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    border: none;
+    color: #fff;
+    font-size: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 10001;
+    transition: all 0.2s ease;
+    line-height: 1;
+}
+
+.closeButton:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: rotate(90deg); /* Animasi putar dikit biar keren */
+    color: #ff5252;
+}
+
+/* Animasi Fade In */
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* Responsive Landscape Mobile */
+@media (max-height: 500px) and (orientation: landscape) {
+    .image {
+        max-height: 80vh; /* Perkecil dikit di HP landscape */
+    }
+    .closeButton {
+        top: 10px;
+        right: 15px;
+        width: 35px;
+        height: 35px;
+        font-size: 1.5rem;
+    }
+}

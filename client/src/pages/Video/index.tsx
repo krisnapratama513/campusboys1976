@@ -3,7 +3,8 @@
 import styles from './VideoPage.module.css';
 import { useState, useEffect } from 'react';
 import type { ApiVideo } from '../../types/video.types';
-import HeroSection from './HeroSection';
+import MediaHeroSection from '../../components/MediaHeroSection';
+import { getAllVideos } from '../../services/videoService';
 
 const VideoPage = () => {
 
@@ -11,25 +12,15 @@ const VideoPage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchVideos = async () => {
-            try {
-                // Pastikan URL API sudah benar
-                const response = await fetch('http://localhost:8000/api/videos');
-
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
-
-                const data: ApiVideo[] = await response.json();
+        getAllVideos()
+            .then(data => {
                 setVideos(data);
-            } catch (error) {
-                console.error("Gagal mengambil data video:", error);
-            } finally {
                 setLoading(false);
-            }
-        };
-
-        fetchVideos();
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false)
+            })
     }, []);
 
 
@@ -44,7 +35,7 @@ const VideoPage = () => {
 
     return (
         <div className={styles.container}>
-            <HeroSection />
+            <MediaHeroSection title="Our Video" />
 
             {/* Kontainer untuk semua video */}
             {/* abaikan dibawah ini fokus ke header saja */}

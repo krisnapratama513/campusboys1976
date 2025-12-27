@@ -1,0 +1,146 @@
+/* client/src/pages/Photo/Photo.module.css */
+
+/* Container Utama */
+.pageContainer {
+    background-color: transparent; /* Sesuai request, mengikuti parent */
+    min-height: 100vh;
+    width: 100%;
+}
+
+.contentWrapper {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem;
+}
+
+.loadingText {
+    color: #a0a0a0;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Grid Layout */
+.grid {
+    display: grid;
+    /* Responsive: Otomatis mengisi kolom dengan lebar minimal 300px */
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem; /* Jarak antar kartu */
+}
+
+/* Link Wrapper - Menghilangkan garis bawah default */
+.cardLink {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+/* Card Styling */
+.card {
+    background-color: rgba(30, 30, 30, 0.6); /* Semi transparan gelap */
+    border: 1px solid rgba(255, 255, 255, 0.05); /* Border sangat tipis */
+    border-radius: 12px;
+    overflow: hidden;
+    transition: all 0.3s ease;
+    height: 100%; /* Agar tinggi sama dalam satu baris */
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+}
+
+/* Hover Effect pada Card */
+.card:hover {
+    transform: translateY(-5px); /* Kartu naik sedikit */
+    background-color: rgba(40, 40, 40, 0.8);
+    border-color: rgba(255, 255, 255, 0.2); /* Border lebih terang saat hover */
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.5);
+}
+
+/* Bagian Gambar */
+.imageWrapper {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9; /* Rasio Cinematic */
+    overflow: hidden;
+    background-color: #000;
+}
+
+.image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+}
+
+/* Zoom effect pada gambar saat hover */
+.card:hover .image {
+    transform: scale(1.05);
+}
+
+/* Overlay gradient tipis di atas gambar agar terlihat menyatu */
+.overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50%;
+    background: linear-gradient(to top, rgba(0,0,0,0.5), transparent);
+    pointer-events: none;
+}
+
+/* Bagian Teks */
+.cardBody {
+    padding: 1.25rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.date {
+    font-size: 0.85rem;
+    color: #888; /* Abu-abu terang */
+    font-weight: 500;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
+
+.title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #e0e0e0; /* Putih agak abu agar tidak sakit di mata */
+    margin: 0;
+    line-height: 1.4;
+    
+    /* Membatasi judul max 2 baris */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.card:hover .title {
+    color: #ffffff; /* Jadi putih terang saat hover */
+}
+
+.description {
+    font-size: 0.9rem;
+    color: #a0a0a0;
+    margin: 0;
+    line-height: 1.5;
+    
+    /* Membatasi deskripsi max 3 baris */
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Responsive adjustment untuk Mobile */
+@media (max-width: 600px) {
+    .grid {
+        grid-template-columns: 1fr; /* 1 kolom penuh di HP */
+    }
+    
+    .contentWrapper {
+        padding: 1rem;
+    }
+}

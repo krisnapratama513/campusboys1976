@@ -3,6 +3,7 @@ import styles from './ArticlePage.module.css';
 import { useState, useEffect } from 'react';
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
 import type { ApiArticleCard } from '../../types/article.types';
+import MediaHeroSection from '../../components/MediaHeroSection';
 
 const ArticlePage = () => {
     const [articles, setArticles] = useState<ApiArticleCard[]>([]);
@@ -29,11 +30,8 @@ const ArticlePage = () => {
     }, []);
     return (
         <div className={styles.pageWrapper}>
-
-            {/* Header Halaman */}
-            <header className={styles.heroSection}>
-                <h1>Artikel</h1>
-            </header>
+            <MediaHeroSection title='Article'/>
+            
             {/* loading nanti menunggu component */}
             <main className={styles.gridContainer}>
                 {articles.map((article) => (
