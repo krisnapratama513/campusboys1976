@@ -10,7 +10,6 @@ const MagazineCard = ({
     imgFilename,
     author,
     date,
-    isoDate,
     title,
     // width
 }: MagazineCardProps) => {
@@ -30,7 +29,7 @@ const MagazineCard = ({
                     <footer style={{ display: 'flex', flexWrap: 'wrap' }}>
                         <address>{author}</address>
                         <span style={{ margin: '0 10px' }}><FaCircle size={8} color="blue" /></span>
-                        <time dateTime={isoDate}>{date}</time>
+                        <time dateTime={date}>{date}</time>
                     </footer>
                 </div>
             </div>

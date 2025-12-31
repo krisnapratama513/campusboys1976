@@ -8,6 +8,4 @@ export type MagazineCardProps = {
     author: string;
     date: string;
     title: string;
-    isoDate: string;
-    // width: string;
 };

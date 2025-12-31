@@ -12,6 +12,8 @@ import albumRoutes from './routes/album.routes';
 
 import authRoutes from './routes/auth.routes';
 
+import authorRoutes from './routes/author.routes';
+
 // Import Pool dari config (Hanya untuk cek koneksi saat startup)
 import { pool } from './config/database'; 
 
@@ -45,6 +47,9 @@ app.use('/api/videos', videosRoutes);
 app.use('/api/albums', albumRoutes);
 
 app.use('/api/auth', authRoutes);
+
+app.use('/api/authors', authorRoutes);
+
 
 app.listen(port, () => {
     console.log(`Server berjalan di http://localhost:${port}`);

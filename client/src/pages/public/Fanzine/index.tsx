@@ -1,0 +1,31 @@
+// client/src/pages/Magazine/index.tsx
+
+import styles from './MagazinePage.module.css';
+import MediaHeroSection from '../../../components/MediaHeroSection';
+import MagazineCard from '../../../components/MagazineCard';
+import { dummyMagazineData } from './dummy';
+
+
+const FanzinePage = () => {
+    return (
+        <div className={styles.magazinePage}>
+            <MediaHeroSection title='Fanzine'/>
+            <div className={styles.magazineContainer}>
+                {/* saat ini ada 3 data dummy */}
+                {dummyMagazineData.map((magazine, index) => (
+                    <MagazineCard 
+                        key={index} // Selalu wajib ada
+                        href={`/fanzine/${magazine.slug}`}
+                        imgFilename={magazine.imgFilename}
+                        author={magazine.author}
+                        date={magazine.date}
+                        title={magazine.title}
+                    />
+                ))}
+            </div>
+        </div>
+
+    )
+};
+
+export default FanzinePage;

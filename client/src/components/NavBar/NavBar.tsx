@@ -45,7 +45,7 @@ const Navbar = () => {
      */
     const postLinks = [
         { to: '/article', label: 'Article' },
-        { to: '/magazine', label: 'Magazine' },
+        { to: '/fanzine', label: 'Fanzine' },
     ];
 
     return (
