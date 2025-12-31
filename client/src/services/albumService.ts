@@ -1,3 +1,5 @@
+// client/src/services/albumService.ts
+
 import type { AlbumListItem, AlbumDetail } from '../types/album.types';
 import { API_BASE_URL } from '../config/api';
 

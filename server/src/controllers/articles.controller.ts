@@ -1,114 +1,49 @@
 // server/src/controllers/articles.controller.ts
 
 import type { Request, Response } from 'express';
-// import { RowDataPacket } from 'mysql2/promise';
-import { pool } from '../index';
+import * as articleService from '../services/article.service';
 
 export const getRecentArticlesCard = async (req: Request, res: Response) => {
     try {
-        const connection = await pool.getConnection();
-        const [rows] = await connection.execute(
-            `SELECT
-                a.id,
-                a.slug,
-                a.img,
-                a.title,
-                a.created_at,
-                a.description,
-                b.name AS author_name 
-            FROM articles AS a
-            JOIN authors AS b ON a.id_author = b.id
-            ORDER BY a.id DESC
-            LIMIT 5`
-        );
-
-        connection.release();
-        res.json(rows);
+        const articles = await articleService.fetchRecentArticlesCard();
+        res.json(articles);
     } catch (error) {
-        console.error("Error saat query  getRecentArticlesCard: ", error);
-        res.status(500).json({ message: "gagal mengambil data getRecentArticlesCard" });
+        console.error("Error getRecentArticlesCard: ", error);
+        res.status(500).json({ message: "Gagal mengambil data recent articles" });
     }
 };
-
-export const get3RecentArticlesCard = async (req: Request, res: Response) => {
-    try {
-        const connection = await pool.getConnection();
-        const [rows] = await connection.execute(
-            `SELECT id, slug, img, title, created_at
-            FROM articles
-            ORDER BY id DESC
-            LIMIT 3`
-        );
-
-        connection.release();
-        res.json(rows);
-    } catch (error) {
-        console.error("Error saat query  get3RecentArticlesCard: ", error);
-        res.status(500).json({ message: "gagal mengambil data get3RecentArticlesCard" });
-    }
-};
-
-
 
 export const getAllArticlesCard = async (req: Request, res: Response) => {
     try {
-        const connection = await pool.getConnection();
-        const [rows] = await connection.execute(
-            `SELECT
-                a.id,
-                a.slug,
-                a.img,
-                a.title,
-                a.created_at,
-                a.description,
-                b.name AS author_name 
-            FROM articles AS a
-            JOIN authors AS b ON a.id_author = b.id
-            ORDER BY a.id DESC`
-        );
-
-        connection.release();
-        res.json(rows);
+        const articles = await articleService.fetchAllArticlesCard();
+        res.json(articles);
     } catch (error) {
-        console.error("Error saat query  getAllArticlesCard: ", error);
-        res.status(500).json({ message: "gagal mengambil data getAllArticlesCard" });
+        console.error("Error getAllArticlesCard: ", error);
+        res.status(500).json({ message: "Gagal mengambil data all articles" });
     }
 };
 
-
 export const getArticleBySlug = async (req: Request, res: Response) => {
-    try {
-        // 1. Ambil slug dari request (misalnya dari req.params)
-        const { slug } = req.params; 
+    const { slug } = req.params;
 
-        // Pastikan slug ada
+    try {
+        // Validasi input tetap di controller
         if (!slug) {
-            return res.status(400).json({ message: "Slug tidak ditemukan dalam request." });
+            return res.status(400).json({ message: "Slug tidak ditemukan" });
         }
 
-        const connection = await pool.getConnection();
+        const articles = await articleService.fetchArticleBySlug(slug);
 
-        // 2. Gunakan placeholder (?) untuk nilai slug
-        const [rows] = await connection.execute(
-            `SELECT
-                a.id,
-                a.slug,
-                a.img,
-                a.title,
-                a.created_at,
-                a.content,
-                b.name AS author_name 
-            FROM articles AS a
-            JOIN authors AS b ON a.id_author = b.id
-            WHERE a.slug = ?`, // Placeholder untuk slug
-            [slug] // Nilai yang akan menggantikan placeholder
-        );
-        connection.release();
-        res.json(rows); 
+        // Validasi apakah artikel ditemukan (array kosong atau tidak)
+        // articles adalah RowDataPacket[]
+        if (!articles || articles.length === 0) {
+            return res.status(404).json({ message: "Artikel tidak ditemukan" });
+        }
 
+        res.json(articles); // Mengirim array, frontend biasanya ambil index [0]
     } catch (error) {
-        console.error("Error saat query getArticleBySlug: ", error);
-        res.status(500).json({ message: "Gagal mengambil data artikel." });
+        console.error("Error getArticleBySlug: ", error);
+        res.status(500).json({ message: "Gagal mengambil detail artikel" });
     }
 };
 

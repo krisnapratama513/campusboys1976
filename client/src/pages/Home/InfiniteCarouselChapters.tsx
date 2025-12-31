@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import InfiniteCarousel from '../../components/InfiniteCarousel/InfiniteCarousel';
 import type { ApiChapter } from '../../types/chapter.types';
+import { getChapterList } from '../../services/chapterService';
 
 /**
  * Komponen 'container' pintar (smart component) yang:
@@ -21,28 +22,18 @@ const InfiniteCarouselChapters = () => {
     // useEffect ini berjalan satu kali saat komponen pertama kali di-mount
     useEffect(() => {
         /**
-         * Fungsi async untuk mengambil data dari endpoint API server.
+         * ganti, dipindah di services/chapterService.ts
          */
-        const fetchChapters = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/api/chapters/list');
-                
-                // Tambahkan pengecekan jika respons API tidak sukses
-                if (!response.ok) {
-                    throw new Error(`HTTP error! status: ${response.status}`);
-                }
+        getChapterList()
+        .then(data => {
+            setChapters(data);
+            setLoading(false);
+        })
+        .catch(err => {
+            console.error(err);
+            setLoading(false);
+        });
 
-                const data: ApiChapter[] = await response.json();
-                setChapters(data);
-            } catch (error) {
-                console.error("Gagal mengambil data chapters:", error);
-            } finally {
-                // Set loading menjadi false setelah fetch selesai (baik sukses atau gagal)
-                setLoading(false);
-            }
-        };
-
-        fetchChapters();
     }, []); // Array dependensi kosong berarti 'efek' ini hanya berjalan sekali
 
     /**

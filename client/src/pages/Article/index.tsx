@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
 import type { ApiArticleCard } from '../../types/article.types';
 import MediaHeroSection from '../../components/MediaHeroSection';
+import { getAllArticlesCard } from '../../services/articleService';
 
 const ArticlePage = () => {
     const [articles, setArticles] = useState<ApiArticleCard[]>([]);
@@ -11,27 +12,20 @@ const ArticlePage = () => {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchArticles = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/api/articles/');
-                if (!response.ok) {
-                    throw new Error('Gagal mengambil data artikel');
-
-                }
-                const data: ApiArticleCard[] = await response.json();
+        getAllArticlesCard()
+            .then(data => {
                 setArticles(data);
-            } catch (error) {
-                console.error(error);
-            } finally {
                 setLoading(false);
-            }
-        };
-        fetchArticles();
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
     }, []);
     return (
         <div className={styles.pageWrapper}>
-            <MediaHeroSection title='Article'/>
-            
+            <MediaHeroSection title='Article' />
+
             {/* loading nanti menunggu component */}
             <main className={styles.gridContainer}>
                 {articles.map((article) => (

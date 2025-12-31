@@ -5,8 +5,9 @@ import styles from './AboutPage.module.css';
 import HeroSection from './HeroSection';
 
 import { type AboutContent } from '../../types/about';
-import type{ ApiChapter } from '../../types/chapter.types';
+import type { ApiChapter } from '../../types/chapter.types';
 import { MOCK_aboutData } from '../../data/mockAbout';
+import { getAllChapters } from '../../services/chapterService';
 
 const AboutPage = () => {
     const aboutData: AboutContent = MOCK_aboutData;
@@ -15,18 +16,14 @@ const AboutPage = () => {
 
 
     useEffect(() => {
-        const fetchChapters = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/api/chapters');
-                const data = await response.json();
-                setChapters(data); // Simpan ke state
-            } catch (error) {
-                console.error("Gagal mengambil data chapter:", error);
-            }
-        };
-
-        fetchChapters();
-    },[]);
+        getAllChapters()
+            .then(data => {
+                setChapters(data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+    }, []);
 
 
 

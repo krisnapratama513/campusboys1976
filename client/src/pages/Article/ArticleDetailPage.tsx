@@ -1,173 +1,184 @@
-// client/src/pages/Article/ArticleDetailPage.tsx
-
+import { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { FaCalendarDays, FaRegUser } from 'react-icons/fa6';
-import { useState, useEffect } from 'react';
+
+// Styles & Utils
 import styles from './ArticleDetailPage.module.css';
 import { formatWIBDate } from '../../utils/formatDate';
 
+// Services
+import { getArticleBySlug, getRecentArticlesCard } from '../../services/articleService';
+
+// Types
 import type { ApiArticleCard, FullArticleDetail } from '../../types/article.types';
 
-
+/**
+ * ArticleDetailPage Component
+ * * Responsible for displaying the full content of a single article based on the URL slug.
+ * It also fetches and displays a list of recent articles in the sidebar, 
+ * excluding the currently viewed article.
+ */
 const ArticleDetailPage = () => {
-    // Ambil slug dari URL untuk identifikasi artikel
-    const { slug } = useParams<{ slug: string }>(); 
-    
-    // State utama untuk detail artikel yang sedang dilihat
-    const [article, setArticle] = useState<FullArticleDetail | null>(null); 
-    
-    // State untuk status loading dan error
-    const [loading, setLoading] = useState(true); 
-    const [error, setError] = useState<string | null>(null); 
+    // 1. Hooks & State Management
+    const { slug } = useParams<{ slug: string }>();
 
-    // State untuk daftar artikel terbaru
-    // Asumsi endpoint /recent mengembalikan data yang cukup untuk di-filter menjadi 3
+    // Data State
+    const [article, setArticle] = useState<FullArticleDetail | null>(null);
     const [recentArticles, setRecentArticles] = useState<ApiArticleCard[]>([]);
 
-
+    // UI State
+    const [loading, setLoading] = useState(true); // Controls the main page loader
+    const [error, setError] = useState<string | null>(null);
 
     /**
-     * Efek untuk mengambil data artikel utama berdasarkan slug.
+     * Effect 1: Fetch Main Article
+     * Triggered when 'slug' changes.
+     * Handles the primary loading state of the page.
      */
     useEffect(() => {
-        if (!slug) {
-            setLoading(false);
-            setError("Slug tidak valid.");
-            return;
-        }
+        if (!slug) return;
 
-        const fetchArticle = async () => {
-            setLoading(true);
-            setError(null);
-            try {
-                // Fetch detail artikel
-                const response = await fetch(`http://localhost:8000/api/articles/${slug}`);
+        // Reset states on navigation
+        setLoading(true);
+        setError(null);
 
-                if (!response.ok) {
-                    throw new Error('Artikel tidak ditemukan atau gagal mengambil data.');
-                }
-
-                const data: FullArticleDetail[] = await response.json();
-
-                if (data.length > 0) {
+        getArticleBySlug(slug)
+            .then((data) => {
+                // Check if API returns valid data array
+                if (data && data.length > 0) {
                     setArticle(data[0]);
                 } else {
-                    setError("Artikel tidak ditemukan.");
+                    // Handle 404 case logically
                     setArticle(null);
+                    setError("Article not found");
                 }
-            } catch (err) {
-                console.error("Fetch Article Error:", err);
-                setError("Gagal memuat artikel. Coba lagi nanti.");
-            } finally {
+            })
+            .catch((err) => {
+                console.error("[ArticleDetail] Failed to fetch article:", err);
+                setArticle(null);
+                setError("Internal Server Error");
+            })
+            .finally(() => {
+                // Ensure loading is turned off regardless of success or failure
                 setLoading(false);
-            }
-        };
+            });
 
-        fetchArticle();
-    }, [slug]); // Dependensi pada slug agar di-fetch ulang saat navigasi internal
-
-
-    /**
-     * Efek untuk mengambil dan memproses daftar artikel terbaru.
-     * Mengambil N data dan memfilter/memotong untuk mendapatkan 3 artikel unik.
-     */
-    useEffect(() => {
-        const fetchRecentArticles = async () => {
-            try {
-                // Asumsi endpoint /recent mengembalikan data dengan LIMIT N (misal: 5)
-                const response = await fetch(`http://localhost:8000/api/articles/recent`);
-
-                if (!response.ok) {
-                    console.error('Gagal mengambil artikel terbaru.');
-                    return;
-                }
-
-                const data: ApiArticleCard[] = await response.json();
-                
-                // 1. Filter slug: Hapus artikel yang sedang dibuka dari daftar recent.
-                const filteredBySlug = data.filter(item => item.slug !== slug);
-
-                // 2. Slice: Batasi hasilnya menjadi 3 artikel pertama (untuk menjamin tampilan 3 item).
-                const finalRecentArticles = filteredBySlug.slice(0, 3);
-
-                setRecentArticles(finalRecentArticles);
-            } catch (err) {
-                console.error("Fetch Recent Articles Error:", err);
-            }
-        };
-
-        fetchRecentArticles();
     }, [slug]);
 
+    /**
+     * Effect 2: Fetch Recent Articles (Sidebar)
+     * Runs independently from the main article fetch.
+     * Does NOT affect the main 'loading' state to prevent blocking the UI.
+     */
+    useEffect(() => {
+        getRecentArticlesCard()
+            .then((data) => {
+                // Filter: Exclude the currently viewed article from the sidebar
+                const otherArticles = data.filter((item) => item.slug !== slug);
 
-    // Tampilkan status Loading
+                // Limit: Take only the top 3 items
+                setRecentArticles(otherArticles.slice(0, 3));
+            })
+            .catch((err) => {
+                // Silent failure: If sidebar fails, just log it, don't crash the page
+                console.error("[ArticleDetail] Failed to fetch recent posts:", err);
+            });
+    }, [slug]);
+
+    // 2. Render Logic: Loading State
     if (loading) {
-        return <div className={styles.articleDetailPageContainer}>Memuat Artikel...</div>;
+        // TODO: Replace with a Skeleton Loader component for better UX
+        return (
+            <div className={styles.articleDetailPageContainer}>
+                <p>Memuat Artikel...</p>
+            </div>
+        );
     }
 
-    // Tampilkan status Error / Arahkan ke halaman utama jika artikel tidak ditemukan
+    // 3. Render Logic: Error / Not Found Handling
+    // If loading is done but article is missing, redirect to Home
     if (error || !article) {
         return <Navigate to="/" replace />;
     }
 
-    // Persiapan data untuk tampilan
+    // 4. Data Formatting
     const imgPath = `/article/${article.img}`;
-    const imgAlt = `poster ${article.title}`;
     const displayDate = formatWIBDate(article.created_at);
 
-
-    // --- Render Komponen ---
     return (
         <div className={styles.fullContainer}>
             <div className={styles.hero} />
 
             <div className={styles.articleDetailPageContainer}>
-                {/* Kolom Kiri: Konten Artikel Utama */}
+                {/* LEFT COLUMN: Main Content */}
                 <article className={styles.articleContainer}>
                     <header className={styles.articleHeader}>
                         <h2 className={styles.articleTitle}>{article.title}</h2>
-                        <img src={imgPath} alt={imgAlt} className={styles.heroImage} />
+
+                        <img
+                            src={imgPath}
+                            alt={`Poster ${article.title}`}
+                            className={styles.heroImage}
+                            loading="eager" // Priority loading for LCP
+                        />
+
                         <div className={styles.wrapApaYa}>
                             <div className={styles.metaInfo}>
-                                <span><FaRegUser /> <strong>{article.author_name}</strong></span>
-                                <span><FaCalendarDays /> {displayDate}</span>
+                                <span>
+                                    <FaRegUser /> <strong>{article.author_name}</strong>
+                                </span>
+                                <span>
+                                    <FaCalendarDays /> {displayDate}
+                                </span>
                             </div>
-                            {/* Kode Slider Font Dihapus */}
                         </div>
                     </header>
+
                     <br />
-                    {/* Render konten HTML, gunakan dangerouslySetInnerHTML dengan hati-hati */}
+
+                    {/* Content Body */}
+                    {/* SECURITY NOTE: Ensure backend sanitizes 'content' to prevent XSS */}
                     <div
                         className={styles.articleContent}
                         style={{ fontSize: `18px` }}
-                        dangerouslySetInnerHTML={{ __html: article.content }} 
+                        dangerouslySetInnerHTML={{ __html: article.content }}
                     />
                 </article>
 
-                {/* Kolom Kanan: Daftar Artikel Terbaru */}
-                <div className={styles.recentArticle}>
+                {/* RIGHT COLUMN: Sidebar (Recent Posts) */}
+                <aside className={styles.recentArticle}>
                     <h2>Recent Post</h2>
-                    {recentArticles.length === 0 && <p>Tidak ada postingan terbaru.</p>}
+
+                    {recentArticles.length === 0 && (
+                        <p className={styles.emptyText}>Tidak ada postingan terbaru.</p>
+                    )}
 
                     {recentArticles.map((recent, index) => (
                         <div key={recent.id}>
                             <Link to={`/article/${recent.slug}`} className={styles.recentItem}>
                                 <div className={styles.recentImg}>
-                                    <img src={`/article/${recent.img}`} alt={recent.title} />
+                                    <img
+                                        src={`/article/${recent.img}`}
+                                        alt={recent.title}
+                                        loading="lazy"
+                                    />
                                 </div>
                                 <div className={styles.recentBody}>
-                                    <p>{recent.title}</p>
-                                    <p style={{ fontSize: '13px' }}><FaCalendarDays /> {formatWIBDate(recent.created_at)}</p>
+                                    <p className={styles.recentTitle}>{recent.title}</p>
+                                    <p style={{ fontSize: '13px', color: '#888' }}>
+                                        <FaCalendarDays /> {formatWIBDate(recent.created_at)}
+                                    </p>
                                 </div>
                             </Link>
-                            {/* Pembatas antar item (dihilangkan untuk item terakhir) */}
+
+                            {/* Divider: Only render if not the last item */}
                             {index < recentArticles.length - 1 && (
                                 <><br /><hr /><br /></>
                             )}
                         </div>
                     ))}
-                </div>
-            </div >
+                </aside>
+            </div>
         </div>
     );
 };

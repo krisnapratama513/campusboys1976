@@ -1,3 +1,4 @@
+// client/src/pages/Member/index
 import styles from './MemberPage.module.css';
 
 const MemberPage = () => {

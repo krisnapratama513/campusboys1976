@@ -2,6 +2,7 @@
 import { useState, useEffect, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import type { ApiArticleCard } from '../../types/article.types';
+import { getRecentArticlesCard } from '../../services/articleService';
 
 // Import komponen kustom (Card dan Tombol)
 import ArticleCard from '../../components/ArticleCard/ArticleCard';
@@ -65,22 +66,16 @@ function RecentArticlesCarousel() {
 
     // Efek untuk mengambil (fetch) data artikel dari API
     useEffect(() => {
-        const fetchArticles = async () => {
-            try {
-                const response = await fetch('http://localhost:8000/api/articles/recent');
-                if (!response.ok) {
-                    throw new Error('Gagal mengambil data artikel');
-                }
-                const data: ApiArticleCard[] = await response.json();
-                setArticles(data); // Simpan data ke state
-            } catch (error) {
-                console.error(error);
-            } finally {
-                setLoading(false); // Selesai loading
-            }
-        };
+        getRecentArticlesCard()
+            .then(data => {
+                setArticles(data);
+                setLoading(false);
+            })
+            .catch(err => {
+                console.error(err);
+                setLoading(false);
+            });
 
-        fetchArticles();
     }, []); // [] = Jalankan sekali saat komponen di-mount
 
     // useEffect untuk menangani responsivitas carousel
@@ -99,7 +94,7 @@ function RecentArticlesCarousel() {
 
         // Panggil fungsi handleResize sekali saat komponen pertama kali di-mount
         handleResize();
-        
+
         // Tambahkan event listener untuk memanggil handleResize setiap kali ukuran window berubah
         window.addEventListener('resize', handleResize);
 
@@ -108,7 +103,7 @@ function RecentArticlesCarousel() {
         return () => window.removeEventListener('resize', handleResize);
     }, []); // Array dependensi kosong '[]' berarti efek ini hanya berjalan saat mount dan unmount
 
-    
+
     // Style dinamis untuk container slide
     // Jumlah kolom grid (gridTemplateColumns) diatur berdasarkan state 'cardsToShow'
     const slidesContainer: CSSProperties = {
@@ -158,11 +153,11 @@ function RecentArticlesCarousel() {
     if (loading) {
         return (
             <article style={{ backgroundColor: 'rgb(15, 25, 35)', height: '400px' }}>
-                <main className="container" style={{paddingTop: '50px', paddingBottom: '50px'}}>
+                <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
                     <div style={header}>
                         <h2 style={h2}>ARTIKEL TERBARU</h2>
                     </div>
-                    <div style={{color: 'white', textAlign: 'center', marginTop: '50px'}}>
+                    <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>
                         Memuat artikel...
                     </div>
                 </main>
@@ -178,8 +173,8 @@ function RecentArticlesCarousel() {
         // rgb(15, 25, 35)
         <article style={{ backgroundColor: 'rgb(15, 25, 35)', fontFamily: 'Roboto, sans-serif' }}>
             {/* 'container' mungkin kelas global untuk membatasi lebar dan memberi padding */}
-            <main className="container" style={{paddingTop: '50px', paddingBottom: '50px'}}>
-                
+            <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
+
                 {/* Bagian Header: Judul dan Link "Lihat Semua" */}
                 <div style={header}>
                     <h2 style={h2}>ARTIKEL TERBARU</h2>
