@@ -12,7 +12,15 @@ import PhotoDetail from './pages/public/PhotoDetail';
 import MagazineDetailPage from './pages/public/MagazineDetailPage';
 // import Login from './pages/auth/Login';
 import Login from './pages/auth/Login';
+
+
 import Dashboard from './pages/admin/Dashboard';
+import FanzineList from './pages/admin/Fanzine/FanzineList';
+import CreateFanzine from './pages/admin/Fanzine/CreateFanzine';
+import EditFanzine from './pages/admin/Fanzine/EditFanzine';
+import ArticleList from './pages/admin/articles/ArticleList';
+import CreateArticle from './pages/admin/articles/CreateArticle';
+import EditArticle from './pages/admin/articles/EditArticle';
 
 // Layouts & Components
 import PublicLayout from './layouts/PublicLayout'; // <--- Import Layout baru tadi
@@ -25,19 +33,19 @@ import AuthorEdit from './pages/admin/authors/AuthorEdit';
 function App() {
   return (
     <Routes>
-      
+
       {/* === KELOMPOK 1: PUBLIC PAGES (Pakai Navbar & Footer) === */}
       {/* Semua route di dalam sini otomatis punya Navbar & Footer */}
       <Route element={<PublicLayout />}>
-          <Route path='/' element={<HomePage />} />
-          <Route path='/photo' element={<PhotoPage />} />
-          <Route path="/photo/:id" element={<PhotoDetail />} />
-          <Route path='/video' element={<VideoPage />} />
-          <Route path='/article' element={<ArticlePage />} />
-          <Route path="/article/:slug" element={<ArticleDetailPage />} />
-          <Route path="/fanzine" element={<MagazinePage />} />
-          <Route path="/fanzine/:slug" element={<MagazineDetailPage />} />
-          <Route path='/about' element={<AboutPage />} />
+        <Route path='/' element={<HomePage />} />
+        <Route path='/photo' element={<PhotoPage />} />
+        <Route path="/photo/:id" element={<PhotoDetail />} />
+        <Route path='/video' element={<VideoPage />} />
+        <Route path='/article' element={<ArticlePage />} />
+        <Route path="/article/:slug" element={<ArticleDetailPage />} />
+        <Route path="/fanzine" element={<MagazinePage />} />
+        <Route path="/fanzine/:slug" element={<MagazineDetailPage />} />
+        <Route path='/about' element={<AboutPage />} />
       </Route>
 
 
@@ -47,25 +55,26 @@ function App() {
 
 
       <Route element={<PrivateRoute />}>
-          {/* Bungkus Dashboard dengan AdminLayout */}
-          <Route element={<AdminLayout />}>
-              
-              {/* Halaman Dashboard Utama */}
-              <Route path="/dashboard" element={<Dashboard />} />
+        {/* Bungkus Dashboard dengan AdminLayout */}
+        <Route element={<AdminLayout />}>
 
-              {/* 2. TAMBAHKAN ROUTE INI */}
-              {/* Saat URL = /dashboard/authors, tampilkan AuthorList di dalam Outlet AdminLayout */}
-              <Route path="/dashboard/authors" element={<AuthorList />} />
-              <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
-              <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
+          {/* Halaman Dashboard Utama */}
+          <Route path="/dashboard" element={<Dashboard />} />
 
-              {/* Nanti tambah Create juga */}
-              {/* <Route path="/dashboard/authors/create" element={<AuthorCreate />} /> */}
-              
-              {/* Nanti Anda bisa tambah route lain di sini tanpa buat layout lagi */}
-              {/* <Route path="/dashboard/articles" element={<ArticleManager />} /> */}
-              
-          </Route>
+          <Route path="/dashboard/authors" element={<AuthorList />} />
+          <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
+          <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
+
+          <Route path="/dashboard/fanzines" element={<FanzineList />} />        {/* List */}
+          <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />
+          <Route path="/dashboard/fanzines/edit/:id" element={<EditFanzine />} />
+
+          <Route path="/dashboard/articles" element={<ArticleList />} />
+          <Route path="/dashboard/articles/create" element={<CreateArticle />} />
+          <Route path="/dashboard/articles/edit/:id" element={<EditArticle />} />
+          
+
+        </Route>
       </Route>
 
     </Routes>

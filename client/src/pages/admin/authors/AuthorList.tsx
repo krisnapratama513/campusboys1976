@@ -2,65 +2,52 @@
 
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { API_BASE_URL } from '../../../config/api'; // Sesuaikan path config Anda
+// import { API_BASE_URL } from '../../../config/api';
+
+import { getAllAuthors, deleteAuthor } from '../../../services/authorService';
+import type { Author } from '../../../services/authorService';
 
 // Definisikan tipe data Author biar TypeScript senang
-interface Author {
-    id: number;
-    name: string;
-    total_articles: number;
-    total_fanzine: number;
-}
+// interface Author {
+//     id: number;
+//     name: string;
+//     total_articles: number;
+//     total_fanzine: number;
+// }
 
 const AuthorList = () => {
+
     const [authors, setAuthors] = useState<Author[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Ambil data dari Backend saat halaman dibuka
     useEffect(() => {
-        fetchAuthors();
+        fetchData();
     }, []);
 
-    const fetchAuthors = async () => {
+    const fetchData = async () => {
         try {
-            // Nanti ganti endpoint ini sesuai backend Anda
-            const response = await fetch(`${API_BASE_URL}/authors`);
-            const result = await response.json();
-
-            // Anggap result.data adalah array authors
-            if (result.data) {
-                setAuthors(result.data);
-            }
+            // Kode jadi lebih ringkas
+            const data = await getAllAuthors();
+            setAuthors(data);
         } catch (error) {
-            console.error("Gagal ambil data authors:", error);
+            console.error(error);
         } finally {
             setIsLoading(false);
         }
     };
+    
 
     const handleDelete = async (id: number, name: string) => {
-        // 1. Konfirmasi dulu (Penting!)
-        const confirm = window.confirm(`Apakah Anda yakin ingin menghapus author "${name}"?`);
+        const confirm = window.confirm(`Hapus author "${name}"?`);
         if (!confirm) return;
 
         try {
-            const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
-                method: 'DELETE',
-            });
-
-            const result = await response.json();
-
-            if (!response.ok) {
-                // Tampilkan pesan error dari backend (misal: Author masih dipakai)
-                alert(result.message);
-            } else {
-                // Sukses -> Refresh data tabel
-                alert("Berhasil dihapus!");
-                fetchAuthors(); // Panggil ulang fungsi ambil data
-            }
-        } catch (error) {
-            console.error(error);
-            alert("Terjadi kesalahan koneksi.");
+            // Panggil service delete
+            await deleteAuthor(id);
+            alert("Berhasil dihapus!");
+            fetchData();
+        } catch (error: any) {
+            alert(error.message);
         }
     };
 

@@ -10,3 +10,6 @@ server/dist
 client/.env
 server/.env
 .env
+
+# File PDF magazine
+client/public/magazine

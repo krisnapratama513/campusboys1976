@@ -9,6 +9,7 @@ import chapterRoutes from './routes/chapter.routes';
 import articleRoutes from './routes/article.routes';
 import videosRoutes from './routes/videos.routes';
 import albumRoutes from './routes/album.routes';
+import fanzineRoutes from './routes/fanzine.routes';
 
 import authRoutes from './routes/auth.routes';
 
@@ -43,11 +44,11 @@ app.get('/', (req, res) => {
 // Routes
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/articles', articleRoutes);
+app.use('/api/fanzines', fanzineRoutes);
 app.use('/api/videos', videosRoutes);
 app.use('/api/albums', albumRoutes);
 
 app.use('/api/auth', authRoutes);
-
 app.use('/api/authors', authorRoutes);
 
 

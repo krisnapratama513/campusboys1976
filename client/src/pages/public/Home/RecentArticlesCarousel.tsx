@@ -177,9 +177,9 @@ function RecentArticlesCarousel() {
 
                 {/* Bagian Header: Judul dan Link "Lihat Semua" */}
                 <div style={header}>
-                    <h2 style={h2}>ARTIKEL TERBARU</h2>
-                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/artikel">
-                        BUKA HALAMAN ARTIKEL
+                    <h2 style={h2}>RECENT ARTICLES</h2>
+                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/article">
+                        GO TO ARTICLE PAGE
                     </Link>
                 </div>
 

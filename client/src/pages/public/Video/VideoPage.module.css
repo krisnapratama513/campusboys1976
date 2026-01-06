@@ -1,7 +1,8 @@
 .container {
     width: 100%;
     padding-bottom: 40px;
-    background-color: #222526;
+    /* background-color: #222526; */
+    background-color: rgba(34, 37, 38, 0.9);
     color: white;
 }
 
@@ -13,22 +14,59 @@
     display: flex;
     flex-direction: column;
     gap: 30px;
+    filter: 
+        drop-shadow(4px 4px 6px #0e0f0f)    /* Bayangan gelap (bawah kanan) */
+        drop-shadow(-2px -2px 4px #363b3d);
 }
 
+
+    /* box-shadow: 2px 2px 5px #0e0f0f,
+        -1px -1px 3px #363b3d; */
+
+
 .videoItem {
-    padding: 20px;
-    border-radius: 40px;
-    /* box-shadow: 3px 3px 7px #0e0e0e,
-        -3px -3px 7px #383838; */
-    box-shadow: 2px 2px 5px #0e0f0f,
-        -1px -1px 3px #363b3d;
+    /* --- KONFIGURASI --- */
+    --cut-size: 40px;  /* Ukuran potongan sudut */
+    --p: 20px;         /* Padding yang diinginkan */
+
+    padding: var(--p);
+    background-color: rgba(34, 37, 38, 1);
+
+    /* Clip Path Induk (Menggunakan variabel) */
+    clip-path: polygon(
+        var(--cut-size) 0, 
+        calc(100% - var(--cut-size)) 0, 
+        100% var(--cut-size), 
+        100% calc(100% - var(--cut-size)), 
+        calc(100% - var(--cut-size)) 100%, 
+        var(--cut-size) 100%, 
+        0 calc(100% - var(--cut-size)), 
+        0 var(--cut-size)
+    );
 }
 
 .videoWrapper {
     width: 100%;
     aspect-ratio: 16 / 9;
-    border-radius: 20px;
+
+    /* --- RUMUS OPTIKAL --- */
+    /* 0.586 adalah konstanta agar tebal diagonal visualnya konsisten */
+    --inner-cut: calc(var(--cut-size) - (var(--p) * 0.586));
+
+    /* Clip Path Anak (Otomatis terhitung) */
+    clip-path: polygon(
+        var(--inner-cut) 0, 
+        calc(100% - var(--inner-cut)) 0, 
+        100% var(--inner-cut), 
+        100% calc(100% - var(--inner-cut)), 
+        calc(100% - var(--inner-cut)) 100%, 
+        var(--inner-cut) 100%, 
+        0 calc(100% - var(--inner-cut)), 
+        0 var(--inner-cut)
+    );
 }
+
+
 
 .videoTitle {
     padding: 20px 0;
@@ -44,13 +82,13 @@
     }
 
     .videoItem {
-        padding: 10px;
-        border-radius: 20px;
+        --cut-size: 20px;  /* Desktop 40px -> Mobile 20px */
+        --p: 10px;         /* Desktop 20px -> Mobile 10px */
     }
 
-    .videoWrapper {
+    /* .videoWrapper {
         border-radius: 10px;
-    }
+    } */
 
     .videoTitle {
         padding: 15px 0;

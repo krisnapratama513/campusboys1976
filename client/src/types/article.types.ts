@@ -29,11 +29,23 @@ export type ArticleCardProps = {
 
 
 export type FullArticleDetail = {
+    // id: number;
+    // slug: string;
+    // img: string;
+    // title: string;
+    // created_at: string;
+    // content: string; // Konten lengkap (HTML/string)
+    // author_name: string; // Sesuaikan dengan key 'author_name' dari API
+
     id: number;
+    id_author: number; // Admin butuh ini untuk edit
+    author_name?: string;
+    title: string;
     slug: string;
     img: string;
-    title: string;
+    content: string;
+    description: string;
+    status: 'publish' | 'pending'; // Admin butuh ini
+    password?: string; // Admin butuh ini (opsional)
     created_at: string;
-    content: string; // Konten lengkap (HTML/string)
-    author_name: string; // Sesuaikan dengan key 'author_name' dari API
 };

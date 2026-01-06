@@ -1,30 +1,32 @@
 // client/src/Pages/Home/InfiniteCarouselMagazine.tsx
 
 import InfiniteCarousel from "../../../components/InfiniteCarousel/InfiniteCarousel";
+import { getAllFanzine } from "../../../services/fanzineService";
+import type { FanzineType } from "../../../types/fanzine.types";
+import { useState, useEffect, useMemo } from "react";
 
-const carouselImages = [
-    { src: './magazine/cover/1_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-    { src: './magazine/cover/2_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/3_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/4_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-    { src: './magazine/cover/5_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/6_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/7_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-
-    { src: './magazine/cover/1_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-    { src: './magazine/cover/2_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/3_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/4_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-    { src: './magazine/cover/5_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/6_cover.png', alt: 'Gambar Lain' },
-    { src: './magazine/cover/7_cover.png', alt: 'Gambar dari Halaman 1 PDF' },
-    
-];
 
 const InfiniteCarouselMagazine = () => {
+    const [fanzines, setFanzines] = useState<FanzineType[]>([]);
+    useEffect(() => {
+        getAllFanzine()
+            .then(data => {
+                setFanzines(data);
+            })
+            .catch(err => {
+                console.error(err);
+            });
+
+    }, []);
+
+    const carouselImages = useMemo(() => {
+        return fanzines.map(fanzine => ({
+            src: `./magazine/cover/${fanzine.imgFilename}`,
+            alt: `cover${fanzine.imgFilename}`
+        }));
+    }, [fanzines]);
     return (
         <InfiniteCarousel images={carouselImages} direction="left" />
-
     );
 };
 

@@ -1,38 +1,29 @@
-.magazinePage {
-    width: 100%;
-    background-color: hsl(228, 12%, 8%);
-    padding-bottom: 40px;
+.fanzineContainerPage{
+    padding-bottom:40px ;
+    background-color: hsl(228,12%,8%);
 }
-
-.magazineContainer {
+.fanzineContainer {
     width: 80%;
     max-width: 1200px;
     margin: auto;
     background-color: hsl(228, 16%, 12%);
-    /* Perubahan untuk menggunakan Grid */
     display: grid;
-    /* Membuat 3 kolom dengan lebar yang sama dan responsif */
     grid-template-columns: repeat(3, 1fr);
-    /* Memberikan jarak horizontal dan vertikal antar item */
     gap: 20px;
 }
 
-/* KONDISI BARU (Layar antara 481px dan 900px): 2 Kolom */
-@media (max-width: 900px) and (min-width: 501px) {
-    .magazineContainer {
+
+@media (max-width: 900px) {
+    .fanzineContainer {
         grid-template-columns: repeat(2, 1fr);
         width: 90%;
-        /* Gap tetap 20px */
     }
 }
 
 
 @media (max-width: 500px) {
-    .magazineContainer {
-        width: 90%;
-        /* 1 kolom penuh */
+    .fanzineContainer {
         grid-template-columns: repeat(1, 1fr);
-        /* column-gap tidak diperlukan (0), row-gap tetap 20px */
         column-gap: 0;
     }
 }

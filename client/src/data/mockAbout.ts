@@ -1,7 +1,7 @@
 import type { AboutContent } from '../types/about';
 
 export const MOCK_aboutData: AboutContent = {
-    judul: "Apik e kei judul",
+    judul: "Sepakbola Sebagai Kebahagiaan",
     paragraf: [
         "Sepakbola bagi sebagian orang sudah dianggap sebagai agama, sesuatu yang begitu suci dan vital pada masing-masing tempatnya. Namun kami ingin memandang sepakbola sebagai suatu hal dalam pengertian yang lebih sederhana, sebagai kebahagiaan. Ya, sepakbola sebagai kebahagiaan, suatu hal yang yang harus dirayakan dan disyukuri kapan saja. Meskipun kami menempatkan pengertian sepakbola dalam hal yang paling sederhana, di lain tempat kami menjunjungnya sebagai hal agung, bak valhalla, valkuntha, atau surga, yang dengan begitu sepakbola mendapat tempat tersendiri di hati kami. Percaya atau tidak, sepakbola bagi kami tak akan pernah selesai hanya dengan 90 menit, ia abadi, ada dalam setiap perjalanan hidup kami, begitulah kami memaknai sepakbola sebagai cinta dan kebahagiaan.",
         "Sepak bola bagi sebagian orang adalah perjuangan hidup dan mati, namun bagi kami sepakbola adalah perjuangan hidup dan menghidupi, mati adalah hanya untuk mereka yang mencintai sesuatu dengan membabi buta. Sebab kami percaya, mencintai sesuatu dengan sewajarnya adalah bentuk paling tinggi. Kami dapat melangit untuk memuliakan suatu hal yang istimewa dengan membumi.",
