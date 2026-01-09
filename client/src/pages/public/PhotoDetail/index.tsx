@@ -1,33 +1,39 @@
+// client/src/pages/PhotoDetail/index.tsx
+
 import styles from './PhotoDetail.module.css';
 import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import type { AlbumDetail } from '../../../types/album.types';
-import { getAlbumById } from '../../../services/albumService';
+// Gunakan tipe 'Album' yang sudah disatukan
+import type { Album } from '../../../types/album.types';
+// Gunakan service khusus public by Slug
+import { getPublicAlbumBySlug } from '../../../services/albumService';
 
 // Import Komponen Baru
 import PhotoModal from '../../../components/PhotoModal';
 
 const PhotoDetail = () => {
-    const { id } = useParams<{ id: string }>();
-    const [album, setAlbum] = useState<AlbumDetail | null>(null);
+    // Ubah parameter dari 'id' menjadi 'slug'
+    const { slug } = useParams<{ slug: string }>();
+    
+    const [album, setAlbum] = useState<Album | null>(null);
     const [loading, setLoading] = useState(true);
     
     // State Modal
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
     useEffect(() => {
-        if (id) {
-            getAlbumById(id)
+        if (slug) {
+            getPublicAlbumBySlug(slug)
                 .then(data => {
                     setAlbum(data);
                     setLoading(false);
                 })
                 .catch(err => {
-                    console.error(err);
+                    console.error("Gagal load detail album:", err);
                     setLoading(false);
                 });
         }
-    }, [id]);
+    }, [slug]);
 
     const formatDate = (dateString: string) => {
         const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
@@ -35,7 +41,16 @@ const PhotoDetail = () => {
     };
 
     if (loading) return <div className={styles.centerText}>Memuat foto...</div>;
-    if (!album) return <div className={styles.centerText}>Album tidak ditemukan</div>;
+    
+    // Tampilan jika album tidak ditemukan / slug salah
+    if (!album) return (
+        <div className={styles.container}>
+            <div className={styles.centerText}>
+                <h3>Album tidak ditemukan</h3>
+                <Link to="/photo" className={styles.backButton}>&larr; Kembali ke Galeri</Link>
+            </div>
+        </div>
+    );
 
     return (
         <>
@@ -55,25 +70,30 @@ const PhotoDetail = () => {
                 <hr className={styles.divider} />
 
                 <div className={styles.photoGrid}>
-                    {album.photos.map((photo) => (
-                        <div 
-                            key={photo.id} 
-                            className={styles.photoItem}
-                            onClick={() => setSelectedPhoto(photo.image_filename)}
-                        >
-                            <img 
-                                src={`/album/${photo.image_filename}`} 
-                                alt={`Dokumentasi ${album.title}`} 
-                                className={styles.image}
-                                loading="lazy"
-                            />
-                        </div>
-                    ))}
+                    {/* Gunakan (album.photos || []) untuk keamanan jika photos undefined */}
+                    {(album.photos || []).length === 0 ? (
+                        <p style={{color:'#94a3b8', fontStyle:'italic'}}>Belum ada foto di album ini.</p>
+                    ) : (
+                        (album.photos || []).map((photo) => (
+                            <div 
+                                key={photo.id} 
+                                className={styles.photoItem}
+                                onClick={() => setSelectedPhoto(photo.image_filename)}
+                                style={{cursor: 'pointer'}}
+                            >
+                                <img 
+                                    src={`/albums/gallery/${photo.image_filename}`} 
+                                    alt={`Dokumentasi ${album.title}`} 
+                                    className={styles.image}
+                                    loading="lazy"
+                                />
+                            </div>
+                        ))
+                    )}
                 </div>
             </div>
 
-            {/* Panggil Component Modal di sini */}
-            {/* Logic render sudah dihandle di dalam komponen (if !image return null) */}
+            {/* Component Modal */}
             <PhotoModal 
                 imageFilename={selectedPhoto} 
                 onClose={() => setSelectedPhoto(null)} 

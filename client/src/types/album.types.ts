@@ -1,27 +1,25 @@
-// src/types/album.types.ts
+// client/src/types/album.types.ts
 
-// 1. Tipe untuk satu baris Foto
-export type Photo = {
+// 1. Tipe Foto (Digunakan di Public & Admin)
+export interface AlbumPhoto {
     id: number;
+    album_id: number; // Frontend public mungkin tidak butuh ini, tapi tidak apa-apa ada
     image_filename: string;
     created_at: string;
-};
+}
 
-// 2. Tipe untuk List Album
-export type AlbumListItem = {
+// 2. Tipe Album Utama (Gabungan kebutuhan Public & Admin)
+export interface Album {
     id: number;
     title: string;
-    name: string;
+    name: string; // Slug
     description: string;
-    image: string;
-    date: string;
-};
-
-// 3. Tipe untuk Detail Album
-export type AlbumDetail = {
-    id: number;
-    title: string;
-    description: string;
-    date: string;
-    photos: Photo[];
-};
+    image: string; // Cover filename
+    date: string;  // Tanggal event
+    
+    // Status wajib untuk Admin, optional/diabaikan untuk Public list
+    status: 'publish' | 'pending'; 
+    
+    // Photos optional, karena di List View (Card) kita tidak muat foto gallery
+    photos?: AlbumPhoto[]; 
+}

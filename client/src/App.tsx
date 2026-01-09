@@ -21,6 +21,7 @@ import EditFanzine from './pages/admin/Fanzine/EditFanzine';
 import ArticleList from './pages/admin/articles/ArticleList';
 import CreateArticle from './pages/admin/articles/CreateArticle';
 import EditArticle from './pages/admin/articles/EditArticle';
+import EditAlbum from './pages/admin/albums/EditAlbum';
 
 // Layouts & Components
 import PublicLayout from './layouts/PublicLayout'; // <--- Import Layout baru tadi
@@ -29,6 +30,8 @@ import AdminLayout from './layouts/AdminLayout';
 import AuthorList from './pages/admin/authors/AuthorList';
 import AuthorCreate from './pages/admin/authors/AuthorCreate';
 import AuthorEdit from './pages/admin/authors/AuthorEdit';
+import AlbumList from './pages/admin/albums/AlbumList';
+import CreateAlbum from './pages/admin/albums/CreateAlbum';
 
 function App() {
   return (
@@ -39,7 +42,7 @@ function App() {
       <Route element={<PublicLayout />}>
         <Route path='/' element={<HomePage />} />
         <Route path='/photo' element={<PhotoPage />} />
-        <Route path="/photo/:id" element={<PhotoDetail />} />
+        <Route path="/photo/:slug" element={<PhotoDetail />} />
         <Route path='/video' element={<VideoPage />} />
         <Route path='/article' element={<ArticlePage />} />
         <Route path="/article/:slug" element={<ArticleDetailPage />} />
@@ -64,6 +67,10 @@ function App() {
           <Route path="/dashboard/authors" element={<AuthorList />} />
           <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
           <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
+
+          <Route path='/dashboard/albums' element={<AlbumList />} />
+          <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
+          <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
 
           <Route path="/dashboard/fanzines" element={<FanzineList />} />        {/* List */}
           <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />

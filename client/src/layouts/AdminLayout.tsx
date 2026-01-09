@@ -11,9 +11,9 @@ const AdminLayout = () => {
     const [openMenus, setOpenMenus] = useState({
         chapters: false,
         authors: false,
-        fanzines: false, // Saya ganti nama key jadi 'fanzines' biar konsisten
+        fanzines: false,
         articles: false,
-        albums: false,
+        albums: false, // Sudah ada
         videos: false
     });
 
@@ -57,7 +57,6 @@ const AdminLayout = () => {
                         <div className={styles.sectionHeader}>MANAGEMENT</div>
 
                         {/* === MENU 1: CHAPTERS === */}
-                        {/* (Biarkan jika belum ada fitur) */}
                         <button className={styles.dropdownBtn} onClick={() => toggleMenu('chapters')}>
                             <span>📑 Chapters</span>
                             <span className={`${styles.arrow} ${openMenus.chapters ? styles.arrowOpen : ''}`}>▼</span>
@@ -81,14 +80,13 @@ const AdminLayout = () => {
                             </div>
                         )}
 
-                        {/* === MENU 3: FANZINES (Update Path Disini!) === */}
+                        {/* === MENU 3: FANZINES === */}
                         <button className={styles.dropdownBtn} onClick={() => toggleMenu('fanzines')}>
                             <span>📰 Fanzines</span>
                             <span className={`${styles.arrow} ${openMenus.fanzines ? styles.arrowOpen : ''}`}>▼</span>
                         </button>
                         {openMenus.fanzines && (
                             <div className={styles.submenu}>
-                                {/* Pastikan path ini sesuai route di App.tsx */}
                                 <NavLink to="/dashboard/fanzines" end className={styles.subLink}>
                                     👁️ Lihat Fanzines
                                 </NavLink>
@@ -110,7 +108,29 @@ const AdminLayout = () => {
                             </div>
                         )}
 
-                        {/* ... Menu Albums & Videos biarkan dulu ... */}
+                        {/* === MENU 5: ALBUMS (BARU DITAMBAHKAN) === */}
+                        <button className={styles.dropdownBtn} onClick={() => toggleMenu('albums')}>
+                            <span>📸 Albums</span>
+                            <span className={`${styles.arrow} ${openMenus.albums ? styles.arrowOpen : ''}`}>▼</span>
+                        </button>
+                        {openMenus.albums && (
+                            <div className={styles.submenu}>
+                                <NavLink to="/dashboard/albums" end className={styles.subLink}>👁️ Lihat Album</NavLink>
+                                <NavLink to="/dashboard/albums/create" className={styles.subLink}>➕ Buat Album Baru</NavLink>
+                            </div>
+                        )}
+
+                        {/* === MENU 6: VIDEOS (Placeholder untuk next step) === */}
+                        <button className={styles.dropdownBtn} onClick={() => toggleMenu('videos')}>
+                            <span>🎬 Videos</span>
+                            <span className={`${styles.arrow} ${openMenus.videos ? styles.arrowOpen : ''}`}>▼</span>
+                        </button>
+                        {openMenus.videos && (
+                            <div className={styles.submenu}>
+                                <NavLink to="/dashboard/videos" end className={styles.subLink}>👁️ Lihat Video</NavLink>
+                                <NavLink to="/dashboard/videos/create" className={styles.subLink}>➕ Tambah Video</NavLink>
+                            </div>
+                        )}
 
                         <div className={styles.sectionHeader}>SYSTEM</div>
                         
