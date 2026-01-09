@@ -1,36 +1,52 @@
 // client/src/Pages/Video/index.tsx
 
-import styles from './VideoPage.module.css';
+import styles from './VideoPage.module.css'; // Nama file CSS tetap sesuai punya Anda
 import { useState, useEffect } from 'react';
-import type { ApiVideo } from '../../../types/video.types';
+
+// 1. Update Import Tipe (Gunakan 'Video' bukan 'ApiVideo')
+import type { Video } from '../../../types/video.types';
 import MediaHeroSection from '../../../components/MediaHeroSection';
-import { getAllVideos } from '../../../services/videoService';
+
+// 2. Update Import Service (Gunakan 'getPublicVideos')
+import { getPublicVideos } from '../../../services/videoService';
 
 const VideoPage = () => {
 
-    const [videos, setVideos] = useState<ApiVideo[]>([]);
+    // 3. Update State Type
+    const [videos, setVideos] = useState<Video[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        getAllVideos()
+        // 4. Panggil Service Public (Backend otomatis filter is_active = 1)
+        getPublicVideos()
             .then(data => {
                 setVideos(data);
                 setLoading(false);
             })
             .catch(err => {
-                console.error(err);
-                setLoading(false)
-            })
+                console.error("Gagal memuat video:", err);
+                setLoading(false);
+            });
     }, []);
 
-
+    // Loading State (Dengan Hero Section agar layout tidak loncat)
     if (loading) {
-        return <p>Memuat daftar video...</p>;
+        return (
+            <div className={styles.container}>
+                <MediaHeroSection title="Our Video" />
+                <p style={{textAlign: 'center', marginTop: '2rem'}}>Memuat daftar video...</p>
+            </div>
+        );
     }
 
-    // Tampilkan pesan jika tidak ada data
+    // Empty State
     if (videos.length === 0) {
-        return <p>Tidak ada video yang ditemukan.</p>;
+        return (
+            <div className={styles.container}>
+                <MediaHeroSection title="Our Video" />
+                <p style={{textAlign: 'center', marginTop: '2rem'}}>Tidak ada video yang ditemukan.</p>
+            </div>
+        );
     }
 
     return (
@@ -38,18 +54,15 @@ const VideoPage = () => {
             <MediaHeroSection title="Our Video" />
 
             {/* Kontainer untuk semua video */}
-            {/* abaikan dibawah ini fokus ke header saja */}
             <div className={styles.videoGridContainer}>
-                {/* Looping (Perulangan) data videos */}
-                {videos.map(video => ( // Pastikan tidak ada ** di sini
-                    // Gunakan ID unik dari video sebagai key
+                {videos.map(video => (
                     <div className={styles.videoItem} key={video.id}>
 
                         {/* 1. iFrame Video */}
                         <iframe
                             id={`Youtubeer-${video.id}`}
-                            src={`https://www.youtube.com/embed/${video.youtube_id}`}
-                            // src={`https://www.youtube.com/embed/${video.youtube_id}?enablejsapi=1&controls=0&modestbranding=1&rel=0`}
+                            // Menggunakan field 'youtube_id' dari database
+                            src={`https://www.youtube.com/embed/${video.youtube_id}`} 
                             title={video.title}
                             frameBorder="0"
                             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
@@ -60,10 +73,11 @@ const VideoPage = () => {
                         {/* 2. Judul Video */}
                         <h2 className={styles.videoTitle}>{video.title}</h2>
 
-                        {/* 3. Deskripsi Video (dengan HTML) */}
+                        {/* 3. Deskripsi Video */}
                         <div className={styles.description}>
                             <div
-                                dangerouslySetInnerHTML={{ __html: video.description }}
+                                // Tambahkan fallback string kosong (|| '') agar tidak error jika description null
+                                dangerouslySetInnerHTML={{ __html: video.description || '' }}
                             />
                         </div>
                     </div>

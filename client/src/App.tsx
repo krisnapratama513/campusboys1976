@@ -23,6 +23,10 @@ import CreateArticle from './pages/admin/articles/CreateArticle';
 import EditArticle from './pages/admin/articles/EditArticle';
 import EditAlbum from './pages/admin/albums/EditAlbum';
 
+import VideoList from './pages/admin/videos/VideoList';
+import CreateVideo from './pages/admin/videos/CreateVideo';
+import EditVideo from './pages/admin/videos/EditVideo';
+
 // Layouts & Components
 import PublicLayout from './layouts/PublicLayout'; // <--- Import Layout baru tadi
 import PrivateRoute from './components/PrivateRoute';
@@ -71,6 +75,11 @@ function App() {
           <Route path='/dashboard/albums' element={<AlbumList />} />
           <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
           <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
+
+
+          <Route path='/dashboard/videos' element={<VideoList />} />
+          <Route path='/dashboard/videos/create' element={<CreateVideo />} />
+          <Route path='/dashboard/videos/edit/:id' element={<EditVideo />} />
 
           <Route path="/dashboard/fanzines" element={<FanzineList />} />        {/* List */}
           <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />

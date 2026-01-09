@@ -1,8 +1,8 @@
 // client/src/types/video.types.ts
-export type ApiVideo = {
+export type Video = {
     id: number;
     title: string;
     youtube_id: string;
-    is_active: boolean;
+    is_active: number;
     description: string;
 };
