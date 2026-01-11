@@ -1,6 +1,11 @@
+// client/src/pages/public/Article/index.tsx
+
 import { useState, useEffect } from 'react';
 import { useParams, Navigate, Link } from 'react-router-dom';
 import { FaCalendarDays, FaRegUser } from 'react-icons/fa6';
+
+// [PENTING] Import Config untuk akses URL Server
+import { API_BASE_URL } from '../../../config/api';
 
 // Styles & Utils
 import styles from './ArticleDetailPage.module.css';
@@ -13,10 +18,14 @@ import { getArticleBySlug, getRecentArticlesCard } from '../../../services/artic
 import type { ApiArticleCard, FullArticleDetail } from '../../../types/article.types';
 
 /**
- * ArticleDetailPage Component
- * * Responsible for displaying the full content of a single article based on the URL slug.
- * It also fetches and displays a list of recent articles in the sidebar, 
- * excluding the currently viewed article.
+ * ==============================================================================
+ * ARTICLE DETAIL PAGE
+ * ==============================================================================
+ * Halaman untuk membaca konten lengkap artikel.
+ * Fitur:
+ * 1. Menampilkan konten utama (Hero Image, Title, Content).
+ * 2. Sidebar menampilkan "Recent Post" (kecuali artikel yang sedang dibaca).
+ * * @component
  */
 const ArticleDetailPage = () => {
     // 1. Hooks & State Management
@@ -33,7 +42,6 @@ const ArticleDetailPage = () => {
     /**
      * Effect 1: Fetch Main Article
      * Triggered when 'slug' changes.
-     * Handles the primary loading state of the page.
      */
     useEffect(() => {
         if (!slug) return;
@@ -59,7 +67,6 @@ const ArticleDetailPage = () => {
                 setError("Internal Server Error");
             })
             .finally(() => {
-                // Ensure loading is turned off regardless of success or failure
                 setLoading(false);
             });
 
@@ -68,7 +75,6 @@ const ArticleDetailPage = () => {
     /**
      * Effect 2: Fetch Recent Articles (Sidebar)
      * Runs independently from the main article fetch.
-     * Does NOT affect the main 'loading' state to prevent blocking the UI.
      */
     useEffect(() => {
         getRecentArticlesCard()
@@ -80,14 +86,19 @@ const ArticleDetailPage = () => {
                 setRecentArticles(otherArticles.slice(0, 3));
             })
             .catch((err) => {
-                // Silent failure: If sidebar fails, just log it, don't crash the page
                 console.error("[ArticleDetail] Failed to fetch recent posts:", err);
             });
     }, [slug]);
 
+    /**
+     * Helper: Mendapatkan Root URL Server.
+     * Mengubah 'http://localhost:8000/api' -> 'http://localhost:8000'
+     * Digunakan untuk mengakses folder statis '/uploads/articles/'
+     */
+    const serverRoot = API_BASE_URL.replace('/api', '');
+
     // 2. Render Logic: Loading State
     if (loading) {
-        // TODO: Replace with a Skeleton Loader component for better UX
         return (
             <div className={styles.articleDetailPageContainer}>
                 <p>Memuat Artikel...</p>
@@ -96,13 +107,13 @@ const ArticleDetailPage = () => {
     }
 
     // 3. Render Logic: Error / Not Found Handling
-    // If loading is done but article is missing, redirect to Home
     if (error || !article) {
         return <Navigate to="/" replace />;
     }
 
     // 4. Data Formatting
-    const imgPath = `/article/${article.img}`;
+    // [UPDATE] Path Gambar Utama diarahkan ke Server Uploads
+    const imgPath = `${serverRoot}/uploads/articles/${article.img}`;
     const displayDate = formatWIBDate(article.created_at);
 
     return (
@@ -120,6 +131,7 @@ const ArticleDetailPage = () => {
                             alt={`Poster ${article.title}`}
                             className={styles.heroImage}
                             loading="eager" // Priority loading for LCP
+                            onError={(e) => (e.currentTarget.src = 'https://placehold.co/800x400?text=No+Image')}
                         />
 
                         <div className={styles.wrapApaYa}>
@@ -158,9 +170,11 @@ const ArticleDetailPage = () => {
                             <Link to={`/article/${recent.slug}`} className={styles.recentItem}>
                                 <div className={styles.recentImg}>
                                     <img
-                                        src={`/article/${recent.img}`}
+                                        // [UPDATE] Path Gambar Sidebar diarahkan ke Server Uploads
+                                        src={`${serverRoot}/uploads/articles/${recent.img}`}
                                         alt={recent.title}
                                         loading="lazy"
+                                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/100?text=No+Img')}
                                     />
                                 </div>
                                 <div className={styles.recentBody}>

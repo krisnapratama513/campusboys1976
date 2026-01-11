@@ -15,14 +15,14 @@ const ArticleCard = ({
 }: ArticleCardProps) => {
 
     const displayDate = formatWIBDate(date);
-    const fullImgPath = `/article/${imgFilename}`;
+    // const fullImgPath = `/article/${imgFilename}`;
     const imgAlt = `poster ${title}`;
     
     return (
         <article className={styles.articleCard}>
             <Link to={href} className={styles.link} >
                 <div className={styles.cardImage}>
-                    <img src={fullImgPath} alt={imgAlt} className={styles.image} />
+                    <img src={imgFilename} alt={imgAlt} className={styles.image} />
                 </div>
                 <div className={styles.cardBody}>
                     <div className={styles.cardHeader}>

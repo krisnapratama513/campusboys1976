@@ -1,22 +1,28 @@
 // client/src/types/article.types.ts
 
 /**
- * Tipe data mentah (raw) yang datang dari API
- * (Sesuai dengan apa yang dikirim server).
+ * ==============================================================================
+ * ARTICLE TYPES
+ * ==============================================================================
+ * Definisi tipe data untuk modul Artikel di sisi Frontend.
+ */
+
+/**
+ * Tipe data ringkas untuk Card Artikel (Halaman Depan/List).
+ * Sesuai dengan data yang dikirim oleh endpoint '/articles/recent' atau '/articles/all'.
  */
 export type ApiArticleCard = {
     id: number;
     slug: string;
     img: string;
     title: string;
-    created_at: string; // Ini adalah string (ISO Date)
+    created_at: string; // ISO Date String
     description: string;
     author_name: string;
 };
 
 /**
- * Tipe data (Props) yang dibutuhkan oleh
- * komponen UI <ArticleCard />.
+ * Props untuk komponen UI <ArticleCard />.
  */
 export type ArticleCardProps = {
     href: string;
@@ -27,25 +33,30 @@ export type ArticleCardProps = {
     description: string;
 };
 
-
+/**
+ * Tipe data lengkap untuk Detail Artikel & Form Admin.
+ * Mencakup field sensitif seperti password dan status yang hanya dibutuhkan Admin.
+ */
 export type FullArticleDetail = {
-    // id: number;
-    // slug: string;
-    // img: string;
-    // title: string;
-    // created_at: string;
-    // content: string; // Konten lengkap (HTML/string)
-    // author_name: string; // Sesuaikan dengan key 'author_name' dari API
-
     id: number;
-    id_author: number; // Admin butuh ini untuk edit
-    author_name?: string;
+    
+    // Foreign Key Author (Penting untuk edit)
+    id_author: number; 
+    
+    // Nama author (opsional karena di form edit kita mungkin cuma butuh ID)
+    author_name?: string; 
+    
     title: string;
     slug: string;
     img: string;
-    content: string;
+    content: string; // HTML Content dari Rich Text Editor
     description: string;
-    status: 'publish' | 'pending'; // Admin butuh ini
-    password?: string; // Admin butuh ini (opsional)
+    
+    // Status publikasi
+    status: 'publish' | 'pending'; 
+    
+    // Password proteksi artikel (Opsional)
+    password?: string; 
+    
     created_at: string;
 };

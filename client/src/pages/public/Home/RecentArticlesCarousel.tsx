@@ -1,20 +1,17 @@
-// Import dependensi React dan Tipe
+// client/src/pages/public/Home/RecentArticleCarousel.tsx
+
 import { useState, useEffect, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
 import type { ApiArticleCard } from '../../../types/article.types';
 import { getRecentArticlesCard } from '../../../services/articleService';
-
-// Import komponen kustom (Card dan Tombol)
 import ArticleCard from '../../../components/ArticleCard/ArticleCard';
 import ButtonCarousel from '../../../components/ButtonCarousel/ButtonCarousel';
 
+// [PENTING] Import Config untuk akses URL Server
+import { API_BASE_URL } from '../../../config/api';
 
-// ========================================================================
-// DEFINISI STYLE (CSS-in-JS)
-// Mendefinisikan style sebagai konstanta agar JSX lebih bersih
-// dan style mudah digunakan kembali.
-// ========================================================================
-
+// --- STYLE DEFINITIONS ---
+// Menggunakan CSS-in-JS untuk style yang terisolasi
 const header: CSSProperties = {
     display: 'flex',
     alignItems: 'baseline',
@@ -24,7 +21,7 @@ const header: CSSProperties = {
 };
 
 const h2: CSSProperties = {
-    fontFamily: "'Capture It', sans-serif", // Menggunakan font kustom
+    fontFamily: "'Capture It', sans-serif",
     fontSize: '1.75rem',
     letterSpacing: '1.2px',
     marginBottom: '-5px',
@@ -33,7 +30,7 @@ const h2: CSSProperties = {
 
 const slidesWrapper: CSSProperties = {
     position: 'relative',
-    overflow: 'hidden', // Penting untuk carousel agar kartu yang 'di luar' tidak terlihat
+    overflow: 'hidden',
     width: '100%'
 };
 
@@ -44,27 +41,34 @@ const carouselNavigation: CSSProperties = {
     marginTop: '30px'
 };
 
-
-
-
 /**
- * Komponen RecentArticlesCarousel
- * Menampilkan beberapa artikel terbaru dalam format carousel yang responsif.
+ * ==============================================================================
+ * RECENT ARTICLES CAROUSEL
+ * ==============================================================================
+ * Komponen Carousel yang menampilkan 5 artikel terbaru.
+ * * Fitur Utama:
+ * 1. Fetching data artikel terbaru dari API.
+ * 2. Responsif: Menampilkan 1, 2, atau 3 kartu tergantung lebar layar.
+ * 3. Infinite Loop Navigation (Circular Buffer Logic).
+ * * @component
  */
 function RecentArticlesCarousel() {
+    /** State: Menyimpan daftar artikel dari API */
     const [articles, setArticles] = useState<ApiArticleCard[]>([]);
+    
+    /** State: Indikator loading saat fetching data */
     const [loading, setLoading] = useState(true);
-
-    // State untuk melacak jumlah kartu yang akan ditampilkan (berubah sesuai lebar layar)
+    
+    /** State: Jumlah kartu yang ditampilkan per slide (Responsif) */
     const [cardsToShow, setCardsToShow] = useState(3);
-    // State untuk melacak indeks artikel pertama yang sedang ditampilkan di carousel
+    
+    /** State: Pointer indeks artikel pertama yang sedang tampil */
     const [currentIndex, setCurrentIndex] = useState(0);
 
-    // ========================================================================
-    // EFEK (EFFECTS)
-    // ========================================================================
-
-    // Efek untuk mengambil (fetch) data artikel dari API
+    /**
+     * Effect 1: Fetch Data
+     * Mengambil data artikel terbaru saat komponen dimuat (Mount).
+     */
     useEffect(() => {
         getRecentArticlesCard()
             .then(data => {
@@ -72,91 +76,87 @@ function RecentArticlesCarousel() {
                 setLoading(false);
             })
             .catch(err => {
-                console.error(err);
+                console.error("[RecentArticleCarousel] Fetch Error:", err);
                 setLoading(false);
             });
+    }, []);
 
-    }, []); // [] = Jalankan sekali saat komponen di-mount
-
-    // useEffect untuk menangani responsivitas carousel
+    /**
+     * Effect 2: Handle Resize (Responsif JS)
+     * Mengatur jumlah kartu yang tampil (cardsToShow) berdasarkan lebar window.
+     * Diperlukan karena logika pemotongan array terjadi di JavaScript, bukan CSS.
+     */
     useEffect(() => {
-        // Fungsi ini akan memeriksa lebar window dan mengatur state 'cardsToShow'
         const handleResize = () => {
             const width = window.innerWidth;
             if (width <= 600) {
-                setCardsToShow(1); // 1 kartu di layar kecil (mobile)
+                setCardsToShow(1); // Mobile
             } else if (width <= 900) {
-                setCardsToShow(2); // 2 kartu di layar sedang (tablet)
+                setCardsToShow(2); // Tablet
             } else {
-                setCardsToShow(3); // 3 kartu di layar besar (desktop)
+                setCardsToShow(3); // Desktop
             }
         };
 
-        // Panggil fungsi handleResize sekali saat komponen pertama kali di-mount
+        // Inisialisasi awal & pasang listener
         handleResize();
-
-        // Tambahkan event listener untuk memanggil handleResize setiap kali ukuran window berubah
         window.addEventListener('resize', handleResize);
-
-        // Fungsi cleanup: Hapus event listener saat komponen di-unmount
-        // Ini penting untuk mencegah memory leak
+        
+        // Cleanup listener saat unmount (Mencegah memory leak)
         return () => window.removeEventListener('resize', handleResize);
-    }, []); // Array dependensi kosong '[]' berarti efek ini hanya berjalan saat mount dan unmount
+    }, []);
 
-
-    // Style dinamis untuk container slide
-    // Jumlah kolom grid (gridTemplateColumns) diatur berdasarkan state 'cardsToShow'
+    // Style Grid Dinamis berdasarkan cardsToShow
     const slidesContainer: CSSProperties = {
         display: 'grid',
-        gridTemplateColumns: `repeat(${cardsToShow}, 1fr)`, // Misal: 'repeat(3, 1fr)'
+        gridTemplateColumns: `repeat(${cardsToShow}, 1fr)`,
         gap: '20px'
     };
 
-
-    // Fungsi untuk menggeser ke artikel sebelumnya (kiri)
+    /**
+     * Handler: Geser Kiri (Previous).
+     * Jika indeks < 0, putar balik ke elemen terakhir array.
+     */
     const handlePrevious = () => {
-        setCurrentIndex((prev) => {
-            // Jika indeks saat ini adalah 0, putar kembali ke akhir array (panjang array - 1)
-            // Jika tidak, cukup kurangi 1
-            return prev - 1 < 0 ? articles.length - 1 : prev - 1;
-        });
+        setCurrentIndex((prev) => (prev - 1 < 0 ? articles.length - 1 : prev - 1));
     };
 
-    // Fungsi untuk menggeser ke artikel berikutnya (kanan)
+    /**
+     * Handler: Geser Kanan (Next).
+     * Menggunakan modulo (%) untuk kembali ke 0 jika mencapai akhir array.
+     */
     const handleNext = () => {
-        setCurrentIndex((prev) => {
-            // Gunakan operasi modulo (%) untuk 'looping'
-            // (prev + 1) % articlesData.length
-            // Contoh: Jika prev = 4 dan panjang = 5, (4 + 1) % 5 = 0 (kembali ke awal)
-            return (prev + 1) % articles.length;
-        });
+        setCurrentIndex((prev) => (prev + 1) % articles.length);
     };
 
-    // Logika untuk menentukan artikel mana yang terlihat
-    // Ini mengambil data dari 'articlesData' berdasarkan 'currentIndex' dan 'cardsToShow'
+    /**
+     * Logika Circular Buffer (Infinite Loop).
+     * Memilih subset artikel dari array utama untuk ditampilkan.
+     * Contoh: Jika array length 5, current 4, show 3 -> Ambil index [4, 0, 1].
+     */
     const visibleArticles = [];
-    for (let i = 0; i < cardsToShow; i++) {
-        // Gunakan modulo (%) lagi untuk memastikan 'wrapping' jika mencapai akhir data
-        // Contoh: Jika currentIndex = 4, cardsToShow = 3, dan total data = 5
-        // i=0 -> (4 + 0) % 5 = 4 (artikel ke-4)
-        // i=1 -> (4 + 1) % 5 = 0 (artikel ke-0)
-        // i=2 -> (4 + 2) % 5 = 1 (artikel ke-1)
-        const index = (currentIndex + i) % articles.length;
-        visibleArticles.push(articles[index]);
+    if (articles.length > 0) {
+        for (let i = 0; i < cardsToShow; i++) {
+            const index = (currentIndex + i) % articles.length;
+            visibleArticles.push(articles[index]);
+        }
     }
 
-    // ========================================================================
-    // RENDER
-    // ========================================================================
+    /**
+     * Helper: URL Root Server.
+     * Menghapus suffix '/api' dari BASE_URL untuk mendapatkan root domain.
+     * Contoh: 'http://localhost:8000/api' -> 'http://localhost:8000'
+     * Digunakan untuk mengakses folder statis '/uploads'.
+     */
+    const serverRoot = API_BASE_URL.replace('/api', '');
 
-    // Tampilkan pesan loading jika data belum siap
+    // --- RENDER ---
+
     if (loading) {
         return (
             <article style={{ backgroundColor: 'rgb(15, 25, 35)', height: '400px' }}>
                 <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
-                    <div style={header}>
-                        <h2 style={h2}>ARTIKEL TERBARU</h2>
-                    </div>
+                    <div style={header}><h2 style={h2}>RECENT ARTICLES</h2></div>
                     <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>
                         Memuat artikel...
                     </div>
@@ -165,38 +165,34 @@ function RecentArticlesCarousel() {
         );
     }
 
+    // Fallback jika database kosong
+    if (articles.length === 0) return null;
 
-    // Render JSX
     return (
-        // Wrapper utama komponen dengan warna latar belakang
-        // 312F2C
-        // rgb(15, 25, 35)
         <article style={{ backgroundColor: 'rgb(15, 25, 35)', fontFamily: 'Roboto, sans-serif' }}>
-            {/* 'container' mungkin kelas global untuk membatasi lebar dan memberi padding */}
             <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
 
-                {/* Bagian Header: Judul dan Link "Lihat Semua" */}
+                {/* Header Section */}
                 <div style={header}>
                     <h2 style={h2}>RECENT ARTICLES</h2>
-                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/article">
+                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/articles">
                         GO TO ARTICLE PAGE
                     </Link>
                 </div>
 
-                {/* Wrapper untuk area slides (yang akan di-overflow) */}
+                {/* Carousel Slides */}
                 <div style={slidesWrapper}>
-                    {/* Container yang berisi kartu-kartu (menggunakan grid dinamis) */}
                     <div style={slidesContainer}>
-                        {/* Transformasi data dari API ke PROPS ArticleCard
-                            dilakukan langsung di dalam map
-                        */}
-                        {visibleArticles.map((article) => (
+                        {visibleArticles.map((article, index) => (
+                            // Key menggunakan kombinasi ID+index karena item yang sama 
+                            // bisa muncul 2x di carousel (saat looping)
                             <ArticleCard
-                                key={article.id} // 'key' adalah prop wajib di React untuk list, harus unik
+                                key={`${article.id}-${index}`} 
                                 href={`/article/${article.slug}`}
-                                imgFilename={article.img}
+                                // Construct Full URL: Server + Uploads Path + Filename
+                                imgFilename={`${serverRoot}/uploads/articles/${article.img}`}
                                 author={article.author_name}
-                                date={article.created_at}
+                                date={article.created_at} 
                                 title={article.title}
                                 description={article.description}
                             />
@@ -204,21 +200,15 @@ function RecentArticlesCarousel() {
                     </div>
                 </div>
 
-                {/* Bagian Navigasi Carousel (Tombol Kiri/Kanan) */}
+                {/* Navigation Buttons */}
                 <div style={carouselNavigation}>
-                    <ButtonCarousel
-                        direction="left"
-                        onClick={handlePrevious} // Menghubungkan tombol ke fungsi 'handlePrevious'
-                    />
-                    <ButtonCarousel
-                        direction="right"
-                        onClick={handleNext} // Menghubungkan tombol ke fungsi 'handleNext'
-                    />
+                    <ButtonCarousel direction="left" onClick={handlePrevious} />
+                    <ButtonCarousel direction="right" onClick={handleNext} />
                 </div>
 
             </main>
         </article>
-    )
+    );
 }
 
 export default RecentArticlesCarousel;

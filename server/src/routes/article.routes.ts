@@ -1,50 +1,103 @@
 // server/src/routes/article.routes.ts
-import { Router } from "express";
-import { 
-    getAllArticlesCard, 
-    getRecentArticlesCard, 
-    getArticleBySlug,
-    // Admin Controllers
-    getAdminArticlesList,
-    getArticleById,
-    createArticle,
-    updateArticle,
-    deleteArticle
-} from "../controllers/articles.controller";
 
-import { uploadArticle } from "../config/articleUpload"; // Config Multer tadi
+/**
+ * ==============================================================================
+ * ARTICLE ROUTES
+ * ==============================================================================
+ * Definisi endpoint untuk modul Artikel.
+ * Menggunakan Multer untuk upload gambar ke 'uploads/articles'.
+ */
+
+import { Router } from 'express';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import * as articleController from '../controllers/articles.controller';
+
+// Middleware Security
+import { authenticateToken, requireRole } from '../middlewares/auth.middleware';
+import { PERMISSIONS } from '../config/permissions';
 
 const router = Router();
 
-// --- ROUTE ADMIN (Letakkan Paling Atas) ---
-// Supaya tidak dianggap sebagai :slug
+// --- KONFIGURASI UPLOAD (MULTER) ---
+const uploadDir = path.join(__dirname, '../../uploads/articles');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir, { recursive: true });
+}
 
-// Create
-router.post('/', uploadArticle.single('img'), createArticle); 
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, uploadDir);
+    },
+    filename: (req, file, cb) => {
+        // Nama file sementara (akan direname di controller sesuai slug)
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, `temp-${uniqueSuffix}${path.extname(file.originalname)}`);
+    }
+});
 
-// List Admin (Table View - includes pending)
-router.get('/admin/list', getAdminArticlesList); 
+const upload = multer({ 
+    storage,
+    limits: { fileSize: 5 * 1024 * 1024 }, // Max 5MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Hanya file gambar yang diperbolehkan!'));
+        }
+    }
+});
 
-// Detail By ID (Untuk Edit Form)
-router.get('/detail/:id', getArticleById);
 
-// Update By ID
-router.put('/:id', uploadArticle.single('img'), updateArticle);
-
-// Delete By ID
-router.delete('/:id', deleteArticle);
+// --- PUBLIC ROUTES (Read Only) ---
+router.get('/recent', articleController.getRecentArticlesCard);
+router.get('/all', articleController.getAllArticlesCard);
+router.get('/:slug', articleController.getArticleBySlug);
 
 
-// --- ROUTE PUBLIC ---
+// --- ADMIN ROUTES (CRUD - Protected) ---
 
-// Recent (Static Path)
-router.get('/recent', getRecentArticlesCard); 
+// 1. List Admin (Table)
+router.get(
+    '/admin/list', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_EDITORIAL), 
+    articleController.getAdminArticlesList
+);
 
-// Get All Public (Root)
-router.get('/', getAllArticlesCard); 
+// 2. Detail by ID (Form Edit)
+router.get(
+    '/admin/detail/:id', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_EDITORIAL), 
+    articleController.getArticleById
+);
 
-// Detail By Slug (Dynamic Path - WAJIB PALING BAWAH)
-// Karena ini menangkap string apapun. 
-router.get('/:slug', getArticleBySlug);
+// 3. Create
+router.post(
+    '/', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_EDITORIAL), 
+    upload.single('img'), // 'img' adalah key di FormData
+    articleController.createArticle
+);
+
+// 4. Update
+router.put(
+    '/:id', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_EDITORIAL), 
+    upload.single('img'), 
+    articleController.updateArticle
+);
+
+// 5. Delete
+router.post(
+    '/delete/:id', // Menggunakan POST karena mungkin mengirim body (password konfirmasi)
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_EDITORIAL), 
+    articleController.deleteArticle
+);
 
 export default router;

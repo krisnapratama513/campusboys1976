@@ -1,55 +1,103 @@
 // client/src/service/articleService
 
+/**
+ * ==============================================================================
+ * ARTICLE SERVICE (CLIENT)
+ * ==============================================================================
+ * Mengelola komunikasi API untuk modul Artikel.
+ * Memisahkan endpoint Public (Tanpa Token) dan Admin (Wajib Token).
+ */
+
 import type { ApiArticleCard, FullArticleDetail } from '../types/article.types';
 import { API_BASE_URL } from '../config/api';
 
+/**
+ * Helper internal: Ambil token dari LocalStorage untuk Header Authorization.
+ */
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('accessToken');
+    return {
+        'Authorization': `Bearer ${token}`
+    };
+};
+
 // ==========================================
-// PUBLIC SERVICE (Milik Anda Sebelumnya)
+// PUBLIC SERVICE (Read Only - No Token)
 // ==========================================
 
+/**
+ * Mengambil 5 artikel terbaru untuk widget/homepage.
+ */
 export const getRecentArticlesCard = async (): Promise<ApiArticleCard[]> => {
     const response = await fetch(`${API_BASE_URL}/articles/recent`);
-    if (!response.ok) throw new Error('Gagal mengambil data recent article card');
+    if (!response.ok) throw new Error('Gagal mengambil data recent article');
     return response.json();
 };
 
+/**
+ * Mengambil SEMUA artikel publik (Arsip Blog).
+ * Endpoint server: /articles/all
+ */
 export const getAllArticlesCard = async (): Promise<ApiArticleCard[]> => {
-    const response = await fetch(`${API_BASE_URL}/articles`);
-    if (!response.ok) throw new Error('Gagal mengambil data getAllArticlesCard');
+    // PERBAIKAN: Tambahkan '/all' sesuai route server
+    const response = await fetch(`${API_BASE_URL}/articles/all`);
+    if (!response.ok) throw new Error('Gagal mengambil semua artikel');
     return response.json();
 };
 
+/**
+ * Mengambil detail artikel berdasarkan Slug (untuk halaman baca).
+ */
 export const getArticleBySlug = async (slug: string): Promise<FullArticleDetail[]> => {
     const response = await fetch(`${API_BASE_URL}/articles/${slug}`);
-    if (!response.ok) throw new Error('Gagal mengambil data getArticleBySlug');
+    if (!response.ok) throw new Error('Artikel tidak ditemukan');
     return response.json();
 };
 
 // ==========================================
-// ADMIN SERVICE (CRUD BARU)
+// ADMIN SERVICE (Protected - Wajib Token)
 // ==========================================
 
-// 1. Ambil Semua Data (Tabel Admin)
+/**
+ * Ambil data tabel dashboard admin.
+ * Endpoint server: /articles/admin/list
+ */
 export const getAdminArticles = async (): Promise<FullArticleDetail[]> => {
-    const response = await fetch(`${API_BASE_URL}/articles/admin/list`);
+    const response = await fetch(`${API_BASE_URL}/articles/admin/list`, {
+        headers: { ...getAuthHeaders() } // WAJIB ADA TOKEN
+    });
+    
     if (!response.ok) throw new Error('Gagal mengambil data admin articles');
     const result = await response.json();
-    return result.data; // Backend return { data: [...] }
+    return result.data; 
 };
 
-// 2. Ambil Detail by ID (Untuk Form Edit)
+/**
+ * Ambil detail by ID untuk mengisi Form Edit.
+ * Endpoint server: /articles/admin/detail/:id
+ */
 export const getArticleById = async (id: string | number): Promise<FullArticleDetail> => {
-    const response = await fetch(`${API_BASE_URL}/articles/detail/${id}`);
-    if (!response.ok) throw new Error('Gagal mengambil detail artikel');
+    const response = await fetch(`${API_BASE_URL}/articles/admin/detail/${id}`, {
+        headers: { ...getAuthHeaders() } // WAJIB ADA TOKEN
+    });
+
+    if (!response.ok) throw new Error('Gagal mengambil detail artikel edit');
     const result = await response.json();
     return result.data;
 };
 
-// 3. Create Article (Pakai FormData)
+/**
+ * Create Article Baru.
+ * Menggunakan FormData (File Upload).
+ */
 export const createArticle = async (formData: FormData) => {
     const response = await fetch(`${API_BASE_URL}/articles`, {
         method: 'POST',
-        body: formData, // Browser otomatis set Content-Type: multipart/form-data
+        headers: {
+            // Jangan set Content-Type manual untuk FormData
+            ...getAuthHeaders() // WAJIB ADA TOKEN
+        },
+        body: formData,
     });
 
     const result = await response.json();
@@ -59,10 +107,16 @@ export const createArticle = async (formData: FormData) => {
     return result;
 };
 
-// 4. Update Article
+/**
+ * Update Article.
+ * Menggunakan FormData (File Upload).
+ */
 export const updateArticle = async (id: string | number, formData: FormData) => {
     const response = await fetch(`${API_BASE_URL}/articles/${id}`, {
         method: 'PUT',
+        headers: {
+            ...getAuthHeaders() // WAJIB ADA TOKEN
+        },
         body: formData,
     });
 
@@ -71,12 +125,20 @@ export const updateArticle = async (id: string | number, formData: FormData) => 
     return result;
 };
 
-// 5. Delete Article (Butuh Confirm Password)
+/**
+ * Delete Article.
+ * PERBAIKAN: Server menggunakan method POST ke endpoint '/delete/:id'
+ * karena perlu menerima body (password konfirmasi).
+ */
 export const deleteArticle = async (id: number, confirm_password?: string) => {
-    const response = await fetch(`${API_BASE_URL}/articles/${id}`, {
-        method: 'DELETE',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ confirm_password }) // Kirim password via body
+    // Endpoint server: router.post('/delete/:id', ...)
+    const response = await fetch(`${API_BASE_URL}/articles/delete/${id}`, {
+        method: 'POST', 
+        headers: { 
+            'Content-Type': 'application/json',
+            ...getAuthHeaders() // WAJIB ADA TOKEN
+        },
+        body: JSON.stringify({ confirm_password }) 
     });
 
     const result = await response.json();

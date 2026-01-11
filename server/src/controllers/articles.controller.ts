@@ -1,16 +1,30 @@
 // server/src/controllers/articles.controller.ts
+
+/**
+ * ==============================================================================
+ * ARTICLES CONTROLLER
+ * ==============================================================================
+ * Menangani request/response HTTP untuk modul Artikel.
+ * Termasuk logika upload file, rename file sesuai slug, dan manajemen file fisik.
+ */
+
 import type { Request, Response } from 'express';
 import * as articleService from '../services/article.service';
 import slugify from 'slugify';
 import fs from 'fs';
 import path from 'path';
 
-// Konfigurasi Folder Target
-const targetDir = path.join(__dirname, '../../../client/public/article');
-if (!fs.existsSync(targetDir)) fs.mkdirSync(targetDir, { recursive: true });
+// --- KONFIGURASI FOLDER PENYIMPANAN ---
+// Mengarah ke 'server/uploads/articles'
+const targetDir = path.join(__dirname, '../../uploads/articles');
+
+// Pastikan folder ada (mkdir -p)
+if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+}
 
 // ==========================================
-// PUBLIC CONTROLLERS (Milik Anda Sebelumnya)
+// PUBLIC CONTROLLERS (READ ONLY)
 // ==========================================
 
 export const getRecentArticlesCard = async (req: Request, res: Response) => {
@@ -18,7 +32,7 @@ export const getRecentArticlesCard = async (req: Request, res: Response) => {
         const articles = await articleService.fetchRecentArticlesCard();
         res.json(articles);
     } catch (error) {
-        console.error("Error getRecentArticlesCard: ", error);
+        console.error("[Articles] getRecent Error:", error);
         res.status(500).json({ message: "Gagal mengambil data recent articles" });
     }
 };
@@ -28,7 +42,7 @@ export const getAllArticlesCard = async (req: Request, res: Response) => {
         const articles = await articleService.fetchAllArticlesCard();
         res.json(articles);
     } catch (error) {
-        console.error("Error getAllArticlesCard: ", error);
+        console.error("[Articles] getAll Error:", error);
         res.status(500).json({ message: "Gagal mengambil data all articles" });
     }
 };
@@ -36,29 +50,29 @@ export const getAllArticlesCard = async (req: Request, res: Response) => {
 export const getArticleBySlug = async (req: Request, res: Response) => {
     const { slug } = req.params;
     try {
-        if (!slug) return res.status(400).json({ message: "Slug tidak ditemukan" });
+        if (!slug) return res.status(400).json({ message: "Slug wajib diisi" });
 
         const articles = await articleService.fetchArticleBySlug(slug);
         
-        // Cek array kosong
         if (!articles || articles.length === 0) {
             return res.status(404).json({ message: "Artikel tidak ditemukan" });
         }
         
-        // Best Practice: Return object langsung jika detail, bukan array
-        // Tapi jika frontend Anda sudah terbiasa array, biarkan array.
         res.json(articles); 
     } catch (error) {
-        console.error("Error getArticleBySlug: ", error);
+        console.error("[Articles] getBySlug Error:", error);
         res.status(500).json({ message: "Gagal mengambil detail artikel" });
     }
 };
 
 // ==========================================
-// ADMIN CONTROLLERS (CRUD Baru)
+// ADMIN CONTROLLERS (CRUD & FILE MANAGER)
 // ==========================================
 
-// 1. Get List Admin (Table View)
+/**
+ * GET List Admin
+ * Mengambil semua data untuk tabel dashboard admin.
+ */
 export const getAdminArticlesList = async (req: Request, res: Response) => {
     try {
         const data = await articleService.getAdminArticles();
@@ -68,7 +82,10 @@ export const getAdminArticlesList = async (req: Request, res: Response) => {
     }
 };
 
-// 2. Get Detail By ID (Untuk Edit Form)
+/**
+ * GET Detail By ID
+ * Digunakan untuk mengisi form edit.
+ */
 export const getArticleById = async (req: Request, res: Response) => {
     try {
         const data = await articleService.getArticleById(Number(req.params.id));
@@ -79,111 +96,111 @@ export const getArticleById = async (req: Request, res: Response) => {
     }
 };
 
-// 3. Create Article (Dengan Upload & Slug)
+/**
+ * CREATE Article
+ * 1. Insert data teks dulu ke DB (dapat ID).
+ * 2. Generate slug dari Title.
+ * 3. Rename file upload sesuai slug.
+ * 4. Update record DB dengan slug dan nama file baru.
+ */
 export const createArticle = async (req: Request, res: Response) => {
     try {
-        // const { id_author, title, status, password, content, description } = req.body;
-
-        // // Insert Text Data
-        // const newId = await articleService.createArticleInitial({
-        //     id_author, title, status, password, content, description,
-        //     created_at: new Date()
-        // });
-
         const { id_author, title, status, password, content, description } = req.body;
 
-        // 1. Insert DB
+        // 1. Insert DB (Initial)
         const newId = await articleService.createArticleInitial({
             id_author, 
             title, 
             status, 
-            
-            // --- PERBAIKAN DI SINI ---
-            // Jika password tidak ada (undefined/kosong), kirim null
             password: password || null, 
-            
-            // Jaga-jaga description juga undefined
             content, 
             description: description || null, 
-            
             created_at: new Date()
         });
 
-        // Buat Slug & File
+        // 2. Generate Slug & File Name
+        // Slugify: "Berita Hari Ini!" -> "newId_berita_hari_ini"
         const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
         const slug = `${newId}_${cleanTitle}`;
         let finalImgName = 'default.png';
 
+        // 3. Handle File Upload
         if (req.file) {
             const ext = path.extname(req.file.originalname);
-            finalImgName = `${slug}${ext}`;
+            finalImgName = `${slug}${ext}`; // Nama file mengikuti slug
+            
+            // Pindahkan dari folder temp (multer) ke folder uploads
+            // Note: Multer default-nya sudah menaruh di 'uploads/articles' (sesuai config router),
+            // jadi kita tinggal rename saja.
             fs.renameSync(req.file.path, path.join(targetDir, finalImgName));
         }
 
-        // Update Slug & Img di DB
+        // 4. Update Slug & Img di DB
         await articleService.updateArticleFileAndSlug(newId, slug, finalImgName);
 
         res.status(201).json({ message: 'Artikel berhasil dibuat', data: { id: newId } });
 
     } catch (err: any) {
+        // Cleanup: Hapus file jika upload sukses tapi insert DB gagal
+        if (req.file && fs.existsSync(req.file.path)) {
+            fs.unlinkSync(req.file.path);
+        }
         res.status(500).json({ message: 'Gagal membuat artikel', error: err.message });
     }
 };
 
 /**
- * Update existing article
- * Handles: Data updates, File replacement, Slug regeneration, and Security checks.
+ * UPDATE Article
+ * Menangani logika update kompleks: ganti gambar, ganti judul (rename file), dan proteksi password.
  */
 export const updateArticle = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
         const { id_author, title, status, password, content, description, confirm_password } = req.body;
         
-        // 1. Fetch Existing Data (Required for comparison and file cleanup)
+        // 1. Ambil Data Lama
         const oldData = await articleService.getArticleById(id) as any;
         if (!oldData) {
+            // Cleanup jika user upload file tapi ID salah
+            if (req.file) fs.unlinkSync(req.file.path);
             return res.status(404).json({ message: 'Artikel tidak ditemukan' });
         }
 
-        // 2. Security Verification (Second-layer protection)
-        // If the article is protected, user must provide the old password to authorize changes.
+        // 2. Cek Password Lama (Proteksi Double)
         if (oldData.password && oldData.password !== '') {
             if (confirm_password !== oldData.password) {
-                // Cleanup: Delete the uploaded temp file if authentication fails to prevent storage clutter
                 if (req.file) fs.unlinkSync(req.file.path);
-                
-                return res.status(403).json({ message: 'Password salah! Update ditolak.' });
+                return res.status(403).json({ message: 'Password artikel salah! Update ditolak.' });
             }
         }
 
-        // 3. Slug Regeneration Logic
-        // Only regenerate slug if the title has changed to maintain SEO consistency.
+        // 3. Cek Perubahan Slug
         let newSlug = oldData.slug;
         if (title && title !== oldData.title) {
             const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
             newSlug = `${id}_${cleanTitle}`;
         }
 
-        // 4. File Management (Image Handling)
-        let finalImgName = undefined; // Default: undefined means "do not update image column"
+        // 4. Manajemen File
+        let finalImgName = undefined;
 
         if (req.file) {
-            // CASE A: User uploaded a NEW image
+            // A. User upload gambar BARU
             
-            // Step A1: Delete old image (Prevent checking default.png to avoid deleting system assets)
+            // Hapus gambar lama (kecuali default)
             if (oldData.img && oldData.img !== 'default.png') {
                 const oldPath = path.join(targetDir, oldData.img);
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
             }
             
-            // Step A2: Rename and move new image from temp to public
+            // Simpan gambar baru dengan nama slug baru
             const ext = path.extname(req.file.originalname);
             finalImgName = `${newSlug}${ext}`;
             fs.renameSync(req.file.path, path.join(targetDir, finalImgName));
 
         } else if (newSlug !== oldData.slug && oldData.img && oldData.img !== 'default.png') {
-            // CASE B: Title changed (slug changed), but NO new image uploaded.
-            // We must rename the existing image file to match the new slug structure.
+            // B. User TIDAK upload gambar, tapi JUDUL berubah (Slug berubah)
+            // Kita harus rename file gambar lama agar tetap sinkron dengan slug baru
             
             const ext = path.extname(oldData.img);
             const newImgName = `${newSlug}${ext}`;
@@ -192,59 +209,60 @@ export const updateArticle = async (req: Request, res: Response) => {
 
             if (fs.existsSync(oldPath)) {
                 fs.renameSync(oldPath, newPath);
-                finalImgName = newImgName; // Update DB with new filename
+                finalImgName = newImgName; // Update nama file di DB
             }
         }
 
-        // 5. Persist Data to Database
-        
-        // Update textual information
+        // 5. Update Database
         await articleService.updateArticleInfo(id, { 
             id_author, 
             title, 
             status, 
-            
-            // CRITICAL FIX: Handle undefined password
-            // Logic: If 'password' is sent (user typed something), use it. 
-            // If it's undefined (user left it blank), keep the 'oldData.password'.
+            // Logic: Jika password dikirim (string kosong atau isi), pakai itu. Jika undefined, pakai lama.
             password: password !== undefined ? password : oldData.password, 
-            
             content, 
             description 
         });
         
-        // Update file path and slug references
         await articleService.updateArticleFileAndSlug(id, newSlug, finalImgName);
 
-        // 6. Send Success Response
         res.json({ message: 'Artikel berhasil diupdate' });
 
     } catch (err: any) {
-        console.error("Update Article Error:", err); // Log for server-side debugging
+        if (req.file && fs.existsSync(req.file.path)) fs.unlinkSync(req.file.path);
+        console.error("Update Article Error:", err);
         res.status(500).json({ message: 'Gagal update', error: err.message });
     }
 };
 
-// 5. Delete Article
+/**
+ * DELETE Article
+ * Menghapus data di DB dan file fisik di server.
+ */
 export const deleteArticle = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
-        const { confirm_password } = req.body;
+        const { confirm_password } = req.body; // Jika delete butuh konfirmasi password artikel
 
         const oldData = await articleService.getArticleById(id) as any;
         if (!oldData) return res.status(404).json({ message: 'Artikel tidak ditemukan' });
 
+        // Cek Password Artikel (jika ada)
         if (oldData.password && oldData.password !== '') {
             if (confirm_password !== oldData.password) {
                 return res.status(403).json({ message: 'Password salah!' });
             }
         }
 
+        // Hapus File Fisik
         if (oldData.img && oldData.img !== 'default.png') {
             const imgPath = path.join(targetDir, oldData.img);
-            if (fs.existsSync(imgPath)) fs.unlinkSync(imgPath);
+            if (fs.existsSync(imgPath)) {
+                fs.unlinkSync(imgPath);
+            }
         }
 
+        // Hapus Data DB
         await articleService.deleteArticle(id);
         res.json({ message: 'Artikel berhasil dihapus' });
     } catch (err: any) {
