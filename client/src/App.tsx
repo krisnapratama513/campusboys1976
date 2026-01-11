@@ -81,49 +81,49 @@ function App() {
 
           {/* B. SUPERADMIN ONLY (Manajemen User & Chapter) */}
           <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_USERS} />}>
-             <Route path="/dashboard/users/create" element={<CreateUser />} />
+            <Route path="/dashboard/users/create" element={<CreateUser />} />
              {/* Note: User Edit/Delete di-handle di dalam page UserList via tombol */}
           </Route>
 
           <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_CHAPTERS} />}>
-             <Route path="/dashboard/chapters" element={<ChapterList />} />
-             <Route path="/dashboard/chapters/create" element={<CreateChapter />} />
-             <Route path="/dashboard/chapters/edit/:id" element={<EditChapter />} />
+            <Route path="/dashboard/chapters" element={<ChapterList />} />
+            <Route path="/dashboard/chapters/create" element={<CreateChapter />} />
+            <Route path="/dashboard/chapters/edit/:id" element={<EditChapter />} />
           </Route>
 
 
           {/* C. EDITORIAL GROUP (Superadmin + Editor) */}
           {/* Mengelola Teks: Authors, Articles, Fanzines */}
           <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_EDITORIAL} />}>
-             {/* Authors */}
-             <Route path="/dashboard/authors" element={<AuthorList />} />
-             <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
-             <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
+            {/* Authors */}
+            <Route path="/dashboard/authors" element={<AuthorList />} />
+            <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
+            <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
 
-             {/* Articles */}
-             <Route path="/dashboard/articles" element={<ArticleList />} />
-             <Route path="/dashboard/articles/create" element={<CreateArticle />} />
-             <Route path="/dashboard/articles/edit/:id" element={<EditArticle />} />
+            {/* Articles */}
+            <Route path="/dashboard/articles" element={<ArticleList />} />
+            <Route path="/dashboard/articles/create" element={<CreateArticle />} />
+            <Route path="/dashboard/articles/edit/:id" element={<EditArticle />} />
 
-             {/* Fanzines */}
-             <Route path="/dashboard/fanzines" element={<FanzineList />} />
-             <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />
-             <Route path="/dashboard/fanzines/edit/:id" element={<EditFanzine />} />
+            {/* Fanzines */}
+            <Route path="/dashboard/fanzines" element={<FanzineList />} />
+            <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />
+            <Route path="/dashboard/fanzines/edit/:id" element={<EditFanzine />} />
           </Route>
 
 
           {/* D. CREATIVE GROUP (Superadmin + Creative) */}
           {/* Mengelola Media: Albums, Videos */}
           <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_CREATIVE} />}>
-             {/* Albums */}
-             <Route path='/dashboard/albums' element={<AlbumList />} />
-             <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
-             <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
+            {/* Albums */}
+            <Route path='/dashboard/albums' element={<AlbumList />} />
+            <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
+            <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
 
-             {/* Videos */}
-             <Route path='/dashboard/videos' element={<VideoList />} />
-             <Route path='/dashboard/videos/create' element={<CreateVideo />} />
-             <Route path='/dashboard/videos/edit/:id' element={<EditVideo />} />
+            {/* Videos */}
+            <Route path='/dashboard/videos' element={<VideoList />} />
+            <Route path='/dashboard/videos/create' element={<CreateVideo />} />
+            <Route path='/dashboard/videos/edit/:id' element={<EditVideo />} />
           </Route>
 
         </Route>
