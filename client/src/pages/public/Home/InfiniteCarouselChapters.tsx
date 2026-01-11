@@ -3,48 +3,76 @@
 import { useState, useEffect, useMemo } from 'react';
 import InfiniteCarousel from '../../../components/InfiniteCarousel/InfiniteCarousel';
 
-// 1. Import Type yang sesuai (Hanya butuh ID dan IMG)
-import type { ChapterImage } from '../../../types/chapter.types';
+// Import Config untuk mendapatkan alamat Server
+import { API_BASE_URL } from '../../../config/api';
 
-// 2. Import Service yang baru (Optimized fetch)
+// Import Type dan Service
+import type { ChapterImage } from '../../../types/chapter.types';
 import { getChapterImages } from '../../../services/chapterService';
 
+/**
+ * Komponen Carousel Chapter (Infinite Loop).
+ * Menampilkan logo-logo chapter yang diambil dari server backend.
+ * * @component
+ * @returns {JSX.Element | null} Komponen Carousel atau null jika loading/kosong
+ */
 const InfiniteCarouselChapters = () => {
     
-    // State menggunakan tipe ChapterImage[]
+    /**
+     * State untuk menyimpan daftar gambar chapter.
+     * Menggunakan tipe ChapterImage[] yang ringan (hanya id & img).
+     */
     const [chapters, setChapters] = useState<ChapterImage[]>([]);
+    
+    /** State penanda proses loading data */
     const [loading, setLoading] = useState(true);
 
+    /**
+     * Effect: Mengambil data gambar chapter saat komponen dimuat.
+     * Menggunakan service 'getChapterImages' yang sudah teroptimasi.
+     */
     useEffect(() => {
-        // Panggil service khusus images
+        let isMounted = true; // Flag untuk mencegah update state jika komponen sudah unmount
+
         getChapterImages()
         .then(data => {
-            setChapters(data);
-            setLoading(false);
+            if (isMounted) {
+                setChapters(data);
+                setLoading(false);
+            }
         })
         .catch(err => {
-            console.error("Gagal load carousel chapters:", err);
-            setLoading(false);
+            console.error("[InfiniteCarousel] Gagal load chapters:", err);
+            if (isMounted) setLoading(false);
         });
 
+        return () => { isMounted = false; };
     }, []);
 
+    /**
+     * Memoized Data: Mengubah format data API menjadi format yang dibutuhkan Carousel.
+     * * Perubahan Penting:
+     * Mengubah path gambar dari client-side relative path ('/chapters/...')
+     * menjadi server-side static URL ('http://host/uploads/chapters/...').
+     */
     const carouselImages = useMemo(() => {
+        // 1. Dapatkan Root URL Server (Hapus '/api' dari API_BASE_URL)
+        // Contoh: 'http://localhost:8000/api' -> 'http://localhost:8000'
+        const serverRoot = API_BASE_URL.replace('/api', '');
+
         return chapters.map(chapter => ({
-            // Menggunakan path dari folder 'public/chapters'
-            src: `/chapters/${chapter.img}`,
+            // 2. Konstruksi URL lengkap ke folder uploads server
+            src: `${serverRoot}/uploads/chapters/${chapter.img}`,
             
-            // Note: Karena endpoint ini tidak mengambil 'name', kita pakai ID untuk alt
+            // Alt text untuk aksesibilitas
             alt: `Chapter Logo ${chapter.id}` 
         }));
     }, [chapters]);
 
-    
     // ----- RENDER -----
 
-    if (loading) return null;
-
-    if (carouselImages.length === 0) return null; 
+    // Jangan tampilkan apa-apa saat loading atau jika data kosong
+    if (loading || carouselImages.length === 0) return null;
 
     return (
         <InfiniteCarousel images={carouselImages} />

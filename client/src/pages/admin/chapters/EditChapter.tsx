@@ -1,19 +1,35 @@
+// client/src/pages/admin/chapters/EditChapter.tsx
+
+// client/src/pages/admin/chapters/EditChapter.tsx
+
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getChapterById, updateChapter } from '../../../services/chapterService';
+import { API_BASE_URL } from '../../../config/api'; // Import Config URL
 
+/**
+ * Halaman Admin: Edit Chapter.
+ * Memungkinkan admin mengubah nama, deskripsi, dan mengganti logo chapter.
+ * * @component
+ */
 const EditChapter = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
 
+    // Form States
     const [name, setName] = useState('');
     const [description, setDescription] = useState('');
-    const [currentImg, setCurrentImg] = useState(''); // Gambar dari DB
-    const [file, setFile] = useState<File | null>(null); // Gambar baru (opsional)
-    const [preview, setPreview] = useState<string>(''); // Preview gambar baru
+    
+    // Image States
+    const [currentImg, setCurrentImg] = useState(''); // Nama file gambar lama dari DB
+    const [file, setFile] = useState<File | null>(null); // File gambar baru (jika user upload)
+    const [preview, setPreview] = useState<string>(''); // Preview URL lokal untuk gambar baru
 
-    // Load Data
+    /**
+     * Effect: Load Data Chapter saat Mount.
+     * Mengambil detail chapter berdasarkan ID dari URL.
+     */
     useEffect(() => {
         if (id) {
             getChapterById(id)
@@ -24,13 +40,16 @@ const EditChapter = () => {
                     setIsLoading(false);
                 })
                 .catch(err => {
-                    alert("Gagal load data: " + err.message);
+                    alert("Gagal memuat data: " + err.message);
                     navigate('/dashboard/chapters');
                 });
         }
     }, [id, navigate]);
 
-    // Handle File Baru
+    /**
+     * Menangani perubahan input file.
+     * Membuat preview lokal agar user bisa melihat gambar sebelum di-upload.
+     */
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const f = e.target.files[0];
@@ -39,13 +58,20 @@ const EditChapter = () => {
         }
     };
 
-    // Cleanup Preview
+    /**
+     * Cleanup Effect.
+     * Membersihkan URL preview dari memori saat komponen unmount atau preview berubah.
+     */
     useEffect(() => {
         return () => {
             if (preview) URL.revokeObjectURL(preview);
         };
     }, [preview]);
 
+    /**
+     * Submit Handler.
+     * Mengirim data update ke server menggunakan FormData.
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -55,20 +81,26 @@ const EditChapter = () => {
             formData.append('name', name);
             formData.append('description', description);
             
-            // Hanya append jika user upload gambar baru
+            // Logic: Hanya kirim field 'img' jika user benar-benar memilih file baru
             if (file) {
                 formData.append('img', file);
             }
 
             await updateChapter(id!, formData);
-            alert("Chapter berhasil diupdate!");
+            alert("Chapter berhasil diperbarui!");
             navigate('/dashboard/chapters');
         } catch (error: any) {
-            alert(error.message);
+            alert(error.message || "Gagal mengupdate chapter");
         } finally {
             setIsLoading(false);
         }
     };
+
+    /**
+     * Helper: Mendapatkan Root URL Server untuk menampilkan gambar lama.
+     * Mengubah 'http://localhost:8000/api' menjadi 'http://localhost:8000'
+     */
+    const serverRoot = API_BASE_URL.replace('/api', '');
 
     const inputStyle = { width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '6px', backgroundColor: '#1e293b', border: '1px solid #475569', color: 'white' };
 
@@ -87,20 +119,30 @@ const EditChapter = () => {
 
                 <label style={{ display: 'block', marginBottom: 5 }}>Ganti Logo (Opsional)</label>
                 
-                {/* Tampilkan logo lama jika belum ada preview baru */}
+                {/* Tampilkan Logo LAMA (dari Server) jika belum ada preview baru */}
                 {!preview && currentImg && (
-                    <div style={{ marginBottom: 10, display:'flex', alignItems:'center', gap: 10 }}>
-                        <img src={`/chapters/${currentImg}`} alt="Old" style={{ width: 60, height: 60, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4 }} />
-                        <span style={{fontSize:'0.8rem', color:'#94a3b8'}}>&larr; Logo saat ini</span>
+                    <div style={{ marginBottom: 15, display:'flex', alignItems:'center', gap: 15, padding: 10, border: '1px dashed #475569', borderRadius: 6 }}>
+                        <img 
+                            // UPDATE PATH GAMBAR DISINI
+                            src={`${serverRoot}/uploads/chapters/${currentImg}`} 
+                            alt="Current Logo" 
+                            style={{ width: 60, height: 60, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4 }} 
+                            onError={(e) => (e.currentTarget.src = 'https://placehold.co/60?text=No+Img')}
+                        />
+                        <div>
+                            <span style={{fontSize:'0.85rem', color:'#94a3b8', display:'block'}}>Logo saat ini</span>
+                            <span style={{fontSize:'0.75rem', color:'#64748b'}}>{currentImg}</span>
+                        </div>
                     </div>
                 )}
 
                 <input type="file" accept="image/*" onChange={handleFileChange} style={inputStyle} />
 
+                {/* Tampilkan Preview Logo BARU (Local Blob) */}
                 {preview && (
                     <div style={{ marginBottom: 15 }}>
-                        <p style={{fontSize:'0.8rem', color:'#fbbf24'}}>Akan diganti menjadi:</p>
-                        <img src={preview} alt="New Preview" style={{ width: 80, height: 80, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4 }} />
+                        <p style={{fontSize:'0.8rem', color:'#fbbf24', marginBottom: 5}}>Akan diganti menjadi:</p>
+                        <img src={preview} alt="New Preview" style={{ width: 80, height: 80, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4, border: '2px solid #fbbf24' }} />
                     </div>
                 )}
 

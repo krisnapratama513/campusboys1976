@@ -13,3 +13,6 @@ server/.env
 
 # File PDF magazine
 client/public/magazine
+
+# Mencegah upload user masuk ke GitHub
+server/uploads

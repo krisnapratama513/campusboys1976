@@ -1,32 +1,49 @@
+// server/src/controllers/auth.controller.ts
+
+/**
+ * ==============================================================================
+ * AUTH CONTROLLER
+ * ==============================================================================
+ * Menangani request/response HTTP untuk fitur autentikasi.
+ */
+
 import type { Request, Response } from 'express';
 import * as authService from '../services/auth.service';
 
+/**
+ * Login User.
+ * Menerima username & password, mengembalikan Token JWT jika valid.
+ * * @route POST /api/auth/login
+ * @access Public
+ */
 export const login = async (req: Request, res: Response) => {
     try {
         const { username, password } = req.body;
 
-        // Validasi input kosong
+        // 1. Validasi Input Dasar
         if (!username || !password) {
             return res.status(400).json({ message: 'Username dan Password wajib diisi' });
         }
 
-        // Panggil Service
+        // 2. Panggil Business Logic di Service
         const result = await authService.loginUser(username, password);
 
-        // Kirim respon sukses
+        // 3. Kirim Respon Sukses (200 OK)
         res.json({
             message: 'Login berhasil',
             data: result
         });
 
     } catch (error: any) {
-        console.error("Login Error:", error.message);
-        // Jika error "Username tidak ditemukan" atau "Password salah", beri status 401
+        console.error("[AuthController] Login Error:", error.message);
+        
+        // Penanganan Error Spesifik (User Friendly)
         if (error.message === 'Username tidak ditemukan' || error.message === 'Password salah') {
+            // Gunakan 401 (Unauthorized) untuk kegagalan login
             return res.status(401).json({ message: 'Username atau Password salah' });
         }
         
-        // Error server lainnya
+        // Penanganan Error Server (Generic)
         res.status(500).json({ message: 'Terjadi kesalahan pada server' });
     }
 };

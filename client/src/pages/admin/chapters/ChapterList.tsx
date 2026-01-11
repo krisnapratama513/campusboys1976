@@ -1,12 +1,26 @@
+// client/src/pages/admin/chapters/ChapterList.tsx
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getChapters, deleteChapter } from '../../../services/chapterService';
+import { API_BASE_URL } from '../../../config/api'; // Import Config URL
 import type { Chapter } from '../../../types/chapter.types';
 
+/**
+ * Halaman Admin: Daftar Manajemen Chapters.
+ * Menampilkan tabel semua chapter dengan fitur Hapus dan Link ke Edit.
+ * * @component
+ */
 const ChapterList = () => {
+    /** State data chapters */
     const [chapters, setChapters] = useState<Chapter[]>([]);
+    /** State loading indicator */
     const [isLoading, setIsLoading] = useState(true);
 
+    /**
+     * Mengambil data terbaru dari server.
+     * Dipanggil saat mount dan setelah proses delete berhasil.
+     */
     const fetchData = () => {
         setIsLoading(true);
         getChapters()
@@ -19,19 +33,32 @@ const ChapterList = () => {
         fetchData();
     }, []);
 
+    /**
+     * Menangani penghapusan chapter.
+     * Meminta konfirmasi browser sebelum memanggil API delete.
+     * @param id ID Chapter
+     * @param name Nama Chapter (untuk pesan konfirmasi)
+     */
     const handleDelete = async (id: number, name: string) => {
         if (!window.confirm(`Hapus chapter "${name}"?`)) return;
 
         try {
             await deleteChapter(id);
-            fetchData();
+            fetchData(); // Refresh tabel setelah hapus
         } catch (error: any) {
             alert(error.message);
         }
     };
 
+    /**
+     * Helper: URL Root Server untuk gambar.
+     * Mengubah 'http://localhost:8000/api' -> 'http://localhost:8000'
+     */
+    const serverRoot = API_BASE_URL.replace('/api', '');
+
     return (
         <div style={{ color: '#e2e8f0' }}>
+            {/* Header Section */}
             <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
                 <h2>Manajemen Chapters</h2>
                 <Link to="/dashboard/chapters/create" style={{ backgroundColor: '#fbbf24', color: '#0f172a', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
@@ -39,6 +66,7 @@ const ChapterList = () => {
                 </Link>
             </div>
 
+            {/* Table Section */}
             <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#1e293b' }}>
                 <thead style={{ backgroundColor: '#334155', color: '#94a3b8' }}>
                     <tr>
@@ -57,11 +85,13 @@ const ChapterList = () => {
                         chapters.map((item) => (
                             <tr key={item.id} style={{ borderBottom: '1px solid #334155' }}>
                                 <td style={{ padding: 15 }}>
+                                    {/* UPDATE PATH GAMBAR DISINI */}
                                     <img 
-                                        src={`/chapters/${item.img}`} 
+                                        src={`${serverRoot}/uploads/chapters/${item.img}`} 
                                         alt={item.name} 
                                         style={{ width: 50, height: 50, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4, padding: 2 }} 
-                                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/50')}
+                                        // Fallback jika gambar error/hilang
+                                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/50?text=Error')}
                                     />
                                 </td>
                                 <td style={{ padding: 15, fontWeight: 'bold' }}>{item.name}</td>

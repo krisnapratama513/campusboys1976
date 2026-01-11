@@ -1,9 +1,16 @@
 // server/src/index.ts
+/**
+ * ==============================================================================
+ * ENTRY POINT SERVER
+ * ==============================================================================
+ * File ini bertugas untuk inisialisasi aplikasi Express, middleware global,
+ * koneksi database, dan pendaftaran rute API.
+ */
 
-import express from 'express';
+import express, { Express, Request, Response } from 'express';
 import dotenv from 'dotenv';
 import cors from 'cors';
-import path from 'path'; // Import path untuk folder uploads
+import path from 'path';
 
 // --- IMPORT CONFIG ---
 import { pool } from './config/database'; 
@@ -22,51 +29,74 @@ import fanzineRoutes from './routes/fanzine.routes';
 import albumRoutes from './routes/album.routes';
 import videosRoutes from './routes/videos.routes';
 
-// --- CONFIGURATION ---
+// Load environment variables
 dotenv.config();
-const app = express();
-const PORT = process.env.PORT || 3000; // Pastikan port sesuai .env (biasanya 8000)
 
-// --- MIDDLEWARES ---
-app.use(cors());
-app.use(express.json()); 
-app.use(express.urlencoded({ extended: true }));
+const app: Express = express();
+const PORT = process.env.PORT || 8000;
 
-// [PENTING] Serve Static Files (Agar gambar profil/cover bisa diakses)
-// Ini membuat folder 'uploads' bisa diakses via URL: http://localhost:3000/uploads/...
+/**
+ * ------------------------------------------------------------------------------
+ * MIDDLEWARES GLOBAL
+ * ------------------------------------------------------------------------------
+ */
+app.use(cors());                 // Mengizinkan akses Cross-Origin (Frontend ke Backend)
+app.use(express.json());         // Parser untuk payload JSON
+app.use(express.urlencoded({ extended: true })); // Parser untuk form-data
+
+// [PENTING] Melayani file statis (Gambar Profil, Cover, dll)
+// Endpoint: /uploads/namafile.jpg
+// Browser bisa mengakses: http://localhost:8000/uploads/profiles/user-1.jpg
 app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 
-// --- DATABASE CONNECTION CHECK ---
+/**
+ * ------------------------------------------------------------------------------
+ * HEALTH CHECK DATABASE
+ * ------------------------------------------------------------------------------
+ * Memastikan koneksi ke MySQL berhasil sebelum server menerima request.
+ */
 pool.getConnection()
     .then(connection => {
-        console.log("✅ Berhasil terhubung ke MySQL");
+        console.log("✅ Database: Terhubung ke MySQL");
         connection.release();
     })
     .catch(err => {
-        console.error("❌ Gagal koneksi ke MySQL:", err);
+        console.error("❌ Database: Gagal terhubung.", err);
+        // Opsional: process.exit(1) jika database wajib ada untuk aplikasi berjalan
     });
 
-// --- ROUTES REGISTRATION ---
+/**
+ * ------------------------------------------------------------------------------
+ * API ROUTES
+ * ------------------------------------------------------------------------------
+ */
 
-// 1. Root Check
-app.get('/', (req, res) => {
-    res.send('Server backend Community System berjalan! 🚀');
+// Root Endpoint (Cek Status Server)
+app.get('/', (req: Request, res: Response) => {
+    res.send({ 
+        message: 'Community System API is running correctly.', 
+        version: '1.0.0' 
+    });
 });
 
-// 2. System & Auth APIs
-app.use('/api/auth', authRoutes);         // Login & Register
-app.use('/api/users', userRoutes);        // User Management & Profile
-app.use('/api/dashboard', dashboardRoutes); // Dashboard Stats
-app.use('/api/authors', authorRoutes);    // Authors Management
+// 1. System & Auth Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/dashboard', dashboardRoutes);
 
-// 3. Content APIs
+// 2. Content Management Routes
+app.use('/api/authors', authorRoutes);
 app.use('/api/chapters', chapterRoutes);
 app.use('/api/articles', articleRoutes);
 app.use('/api/fanzines', fanzineRoutes);
 app.use('/api/albums', albumRoutes);
 app.use('/api/videos', videosRoutes);
 
-// --- START SERVER ---
+/**
+ * ------------------------------------------------------------------------------
+ * START SERVER
+ * ------------------------------------------------------------------------------
+ */
 app.listen(PORT, () => {
     console.log(`🚀 Server berjalan di http://localhost:${PORT}`);
 });
