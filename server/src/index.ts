@@ -14,6 +14,7 @@ import fanzineRoutes from './routes/fanzine.routes';
 import authRoutes from './routes/auth.routes';
 
 import authorRoutes from './routes/author.routes';
+import userRoutes from './routes/user.routes';
 
 // Import Pool dari config (Hanya untuk cek koneksi saat startup)
 import { pool } from './config/database'; 
@@ -50,6 +51,7 @@ app.use('/api/albums', albumRoutes);
 
 app.use('/api/auth', authRoutes);
 app.use('/api/authors', authorRoutes);
+app.use('/api/users', userRoutes);
 
 
 app.listen(port, () => {

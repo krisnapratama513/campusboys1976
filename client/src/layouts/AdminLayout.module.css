@@ -1,29 +1,34 @@
-/* Container Utama: Mengisi satu layar penuh */
+/* client/src/layouts/AdminLayout.module.css */
+
+/* 1. Container Utama: Reset Margin & Padding */
 .container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Full Height */
-    background-color: #0f172a; /* Dark Background (Slate-900) */
-    color: #e2e8f0; /* Teks Putih Terang */
+    height: 100vh; /* Viewport Height Full */
+    width: 100vw;
+    background-color: #0f172a;
+    color: #e2e8f0;
     font-family: 'Inter', sans-serif;
+    overflow: hidden; /* Mencegah scroll double di body utama */
 }
 
-/* --- HEADER (Atas) --- */
+/* 2. HEADER: Fixed Height */
 .header {
     height: 64px;
-    background-color: #1e293b; /* Sedikit lebih terang (Slate-800) */
+    background-color: #1e293b;
     display: flex;
     align-items: center;
     justify-content: space-between;
     padding: 0 24px;
     border-bottom: 1px solid #334155;
-    flex-shrink: 0; /* Header gak boleh mengecil */
+    flex-shrink: 0; /* Header tidak boleh mengecil */
+    z-index: 10;
 }
 
 .logo {
     font-size: 1.25rem;
     font-weight: bold;
-    color: #38bdf8; /* Warna Aksen Biru Muda */
+    color: #38bdf8;
 }
 
 .logoutBtn {
@@ -34,64 +39,21 @@
     border-radius: 6px;
     cursor: pointer;
     font-weight: 600;
-    transition: background 0.2s;
 }
 
 .logoutBtn:hover {
     background-color: #dc2626;
 }
 
-/* --- BODY (Bawah Header) --- */
+/* 3. BODY WRAPPER: Menampung Sidebar & Content */
 .body {
     display: flex;
-    flex: 1; /* Mengisi sisa ruang ke bawah */
-    overflow: hidden; /* Supaya scroll ada di dalam content, bukan body */
+    flex: 1; /* Mengisi sisa ruang setelah header */
+    height: calc(100vh - 64px); /* PENTING: Tinggi fix agar scroll anak bekerja */
+    overflow: hidden; /* Mencegah scrollbar muncul di wrapper ini */
 }
 
-/* --- SIDEBAR (Kiri) --- */
-.sidebar {
-    width: 260px;
-    background-color: #1e293b; /* Samakan dengan header */
-    border-right: 1px solid #334155;
-    display: flex;
-    flex-direction: column;
-    padding: 20px 0;
-    overflow-y: auto;
-}
-
-.navLink {
-    display: flex;
-    align-items: center;
-    padding: 12px 24px;
-    color: #94a3b8; /* Teks agak abu */
-    text-decoration: none;
-    transition: all 0.2s;
-    font-size: 0.95rem;
-}
-
-.navLink:hover {
-    background-color: #334155;
-    color: white;
-}
-
-/* Class untuk link yang sedang aktif */
-.activeLink {
-    background-color: #0ea5e9; /* Biru terang */
-    color: white;
-}
-
-/* --- CONTENT AREA (Kanan) --- */
-.content {
-    flex: 1; /* Mengambil sisa lebar */
-    padding: 30px;
-    overflow-y: auto; /* Kalau konten panjang, dia scroll sendiri */
-    background-color: #0f172a;
-}
-
-
-/* ... Style Container, Header, Body, Sidebar, Logo Tetap SAMA seperti sebelumnya ... */
-
-/* --- SIDEBAR NAVIGASI --- */
+/* 4. SIDEBAR: Scroll Independen */
 .sidebar {
     width: 260px;
     background-color: #1e293b;
@@ -99,93 +61,29 @@
     display: flex;
     flex-direction: column;
     padding: 20px 0;
-    overflow-y: auto;
+    
+    /* Scroll Logic */
+    overflow-y: auto; 
+    height: 100%; /* Full height dari .body */
+    flex-shrink: 0;
 }
 
-/* Style Link Biasa (Dashboard, Users) */
-.navLink {
-    display: flex;
-    align-items: center;
-    padding: 12px 24px;
-    color: #94a3b8;
-    text-decoration: none;
-    transition: all 0.2s;
-    font-size: 0.95rem;
-    border-left: 3px solid transparent; /* Garis indikator aktif */
+/* 5. CONTENT AREA: Scroll Independen (FIX DISINI) */
+.content {
+    flex: 1; /* Ambil sisa lebar */
+    background-color: #0f172a;
+    padding: 30px;
+    
+    /* Scroll Logic */
+    overflow-y: auto; /* Scroll vertikal jika konten panjang */
+    height: 100%; /* Full height dari .body */
+    
+    /* Smooth Scroll */
+    scroll-behavior: smooth;
 }
 
-.navLink:hover {
-    background-color: #334155;
-    color: white;
-}
+/* --- STYLE NAVIGASI & DROPDOWN --- */
 
-.activeLink {
-    background-color: rgba(14, 165, 233, 0.1); /* Biru transparan */
-    color: #38bdf8; /* Teks Biru terang */
-    border-left: 3px solid #38bdf8; /* Garis biru di kiri */
-}
-
-/* --- STYLE UNTUK DROPDOWN --- */
-
-/* Tombol Judul Dropdown (Management) */
-.dropdownBtn {
-    width: 100%;
-    background: none;
-    border: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between; /* Teks kiri, panah kanan */
-    padding: 12px 24px;
-    color: #e2e8f0;
-    font-size: 0.95rem;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.2s;
-    text-align: left;
-    font-family: inherit;
-}
-
-.dropdownBtn:hover {
-    background-color: #334155;
-}
-
-/* Area Menu Anak (Submenu) */
-.submenu {
-    background-color: #0f172a; /* Lebih gelap dari sidebar agar kontras */
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
-}
-
-/* Link di dalam Submenu (Menjorok ke dalam) */
-.subLink {
-    display: block;
-    padding: 10px 24px 10px 48px; /* Padding kiri lebih besar (indentasi) */
-    color: #94a3b8;
-    text-decoration: none;
-    font-size: 0.9rem;
-    transition: color 0.2s;
-}
-
-.subLink:hover {
-    color: white;
-}
-
-.activeSubLink {
-    color: #38bdf8; /* Biru */
-    font-weight: 500;
-}
-
-/* Icon Panah Kecil */
-.arrow {
-    transition: transform 0.3s;
-    font-size: 0.8rem;
-}
-
-.arrowOpen {
-    transform: rotate(180deg); /* Putar panah kalau menu terbuka */
-}
-
-/* Header kecil untuk pemisah section */
 .sectionHeader {
     margin-top: 20px;
     margin-bottom: 5px;
@@ -195,4 +93,73 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     font-weight: bold;
+}
+
+.navLink {
+    display: flex;
+    align-items: center;
+    padding: 12px 24px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.95rem;
+    border-left: 3px solid transparent;
+}
+
+.navLink:hover {
+    background-color: #334155;
+    color: white;
+}
+
+.activeLink {
+    background-color: rgba(14, 165, 233, 0.1);
+    color: #38bdf8;
+    border-left: 3px solid #38bdf8;
+}
+
+.dropdownBtn {
+    width: 100%;
+    background: none;
+    border: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 24px;
+    color: #e2e8f0;
+    font-size: 0.95rem;
+    font-weight: 600;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+.dropdownBtn:hover {
+    background-color: #334155;
+}
+
+.submenu {
+    background-color: #020617; /* Lebih gelap untuk submenu */
+}
+
+.subLink {
+    display: block;
+    padding: 10px 24px 10px 48px;
+    color: #94a3b8;
+    text-decoration: none;
+    font-size: 0.9rem;
+}
+
+.subLink:hover {
+    color: white;
+}
+
+.subLink.active { /* Jika pakai NavLink, class active otomatis ditambahkan */
+    color: #38bdf8;
+}
+
+.arrow {
+    font-size: 0.8rem;
+    transition: transform 0.2s;
+}
+
+.arrowOpen {
+    transform: rotate(180deg);
 }

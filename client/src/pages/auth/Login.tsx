@@ -1,34 +1,29 @@
-// client/src/pages/auth/Login.tsx
-
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom'; // Untuk pindah halaman
-import styles from './Login.module.css';
+import { useNavigate } from 'react-router-dom';
+import styles from './Login.module.css'; // Menggunakan CSS Anda
 
-// Import URL backend
-// import { API_BASE_URL } from '../../config/api';
+// Best Practice: Import URL API dari config agar mudah dikelola
 import { API_BASE_URL } from '../../config/api';
 
 const Login = () => {
+    // Hooks: Standar React untuk navigasi
     const navigate = useNavigate();
 
-    // 1. STATE: Penampung data inputan user
+    // 1. STATE MANAGEMENT
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
-
-    // 2. UI STATE: Untuk loading dan pesan error
     const [isLoading, setIsLoading] = useState(false);
     const [errorMessage, setErrorMessage] = useState('');
 
-    // 3. LOGIC: Saat tombol "Sign in" ditekan
+    // 2. HANDLER LOGIC
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault(); // Mencegah reload halaman
 
         setIsLoading(true);
-        setErrorMessage(''); // Reset error lama
-        // alert(password);
+        setErrorMessage('');
 
         try {
-            // Tembak API Backend
+            // API Request
             const response = await fetch(`${API_BASE_URL}/auth/login`, {
                 method: 'POST',
                 headers: {
@@ -39,32 +34,29 @@ const Login = () => {
 
             const result = await response.json();
 
-            // Jika Gagal (misal: password salah)
+            // Validasi Respon
             if (!response.ok) {
                 throw new Error(result.message || 'Gagal login ke server');
             }
 
-            // JIKA SUKSES:
-            // A. Simpan "Surat Jalan" (Token) ke kantong browser (LocalStorage)
+            // --- [CRITICAL UPDATE] --- 
+            // SUCCESS HANDLING:
+            
+            // A. Simpan Token untuk otentikasi request selanjutnya
             localStorage.setItem('accessToken', result.data.token);
 
-            // B. Simpan data user (opsional, untuk tampilkan nama di navbar)
-            localStorage.setItem('userBox', JSON.stringify({
-                username: result.data.username,
-                role: result.data.role
-            }));
+            // B. Simpan DATA USER LENGKAP (Termasuk ID, Chapter, Gen)
+            // Ini yang memperbaiki error "undefined" di halaman profil
+            localStorage.setItem('userBox', JSON.stringify(result.data));
 
-            // C. Beri notifikasi kecil (opsional)
-            // alert(`Selamat datang, ${result.data.username}!`);
-
-            // D. Pindah ke halaman Dashboard (Area Admin)
+            // C. Redirect ke Dashboard
             navigate('/dashboard');
 
         } catch (error: any) {
             console.error("Login Error:", error);
-            setErrorMessage(error.message);
+            setErrorMessage(error.message || "Terjadi kesalahan koneksi.");
         } finally {
-            setIsLoading(false); // Matikan loading dalam kondisi apapun
+            setIsLoading(false); 
         }
     };
 
@@ -76,50 +68,47 @@ const Login = () => {
                         <h1>Sign in</h1>
                     </div>
 
-                    {/* Tampilkan Error Box jika ada error */}
+                    {/* Menampilkan pesan error jika ada */}
                     {errorMessage && (
-                        <div style={{
-                            backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                            color: '#ef4444',
-                            padding: '10px',
-                            borderRadius: '6px',
-                            marginBottom: '15px',
-                            fontSize: '0.9rem',
-                            textAlign: 'center',
-                            border: '1px solid rgba(239, 68, 68, 0.2)'
-                        }}>
+                        <div className={styles.errorBox}>
                             {errorMessage}
                         </div>
                     )}
 
                     <form className={styles.form} onSubmit={handleLogin}>
+                        {/* Input Username */}
                         <div className={styles.inputGroup}>
                             <label htmlFor="username">Username</label>
                             <input
                                 type="text"
                                 id="username"
-                                placeholder="Username"
                                 required
                                 value={username}
-                                onChange={(e) => setUsername(e.target.value)} // Update state saat ngetik
+                                onChange={(e) => setUsername(e.target.value)}
+                                disabled={isLoading}
+                                placeholder="Masukkan username"
                             />
                         </div>
+
+                        {/* Input Password */}
                         <div className={styles.inputGroup}>
                             <label htmlFor="pass">Password</label>
                             <input
                                 type="password"
                                 id="pass"
-                                placeholder="•••••••"
                                 required
                                 value={password}
-                                onChange={(e) => setPassword(e.target.value)} // Update state saat ngetik
+                                onChange={(e) => setPassword(e.target.value)}
+                                disabled={isLoading}
+                                placeholder="•••••••"
                             />
                         </div>
 
+                        {/* Tombol Submit */}
                         <button
                             type="submit"
                             className={styles.btnPrimary}
-                            disabled={isLoading} // Tombol mati saat loading
+                            disabled={isLoading}
                             style={{ opacity: isLoading ? 0.7 : 1, cursor: isLoading ? 'not-allowed' : 'pointer' }}
                         >
                             {isLoading ? 'Memproses...' : 'Sign in'}

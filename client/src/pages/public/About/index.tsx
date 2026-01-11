@@ -5,18 +5,18 @@ import styles from './AboutPage.module.css';
 import HeroSection from './HeroSection';
 
 import { type AboutContent } from '../../../types/about';
-import type { ApiChapter } from '../../../types/chapter.types';
+import type { Chapter } from '../../../types/chapter.types';
 import { MOCK_aboutData } from '../../../data/mockAbout';
-import { getAllChapters } from '../../../services/chapterService';
+import { getChapters } from '../../../services/chapterService';
 
 const AboutPage = () => {
     const aboutData: AboutContent = MOCK_aboutData;
-    const [chapters, setChapters] = useState<ApiChapter[]>([]);
+    const [chapters, setChapters] = useState<Chapter[]>([]);
     const mainRef = useRef<HTMLElement>(null);
 
 
     useEffect(() => {
-        getAllChapters()
+        getChapters()
             .then(data => {
                 setChapters(data);
             })
@@ -78,14 +78,19 @@ const AboutPage = () => {
                                 className={`${styles.chapterItem} ${styles.reveal}`}
                             >
                                 <div className={styles.chapterLogo}>
-                                    <img src={`chapter/${chapter.img}`} alt={`Logo ${chapter.name}`} />
+                                    <img 
+                                    src={`/chapters/${chapter.img}`} 
+                                    alt={`Logo ${chapter.name}`} 
+                                    onError={(e) => (e.currentTarget.src = 'https://placehold.co/100?text=No+Img')}
+                                    />
+                                    
                                 </div>
                                 <div
                                     className={styles.chapterContent}
                                     data-chapter={chapter.id}
                                 >
                                     <h3>{chapter.name}</h3>
-                                    <p>{chapter.description}</p>
+                                    <p>{chapter.description || 'Tidak ada deskripsi.'}</p>
                                 </div>
                             </div>
                         ))}

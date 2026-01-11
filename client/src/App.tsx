@@ -10,10 +10,9 @@ import AboutPage from './pages/public/About';
 import PhotoPage from './pages/public/Photo';
 import PhotoDetail from './pages/public/PhotoDetail';
 import MagazineDetailPage from './pages/public/MagazineDetailPage';
-// import Login from './pages/auth/Login';
 import Login from './pages/auth/Login';
 
-
+// Admin Pages
 import Dashboard from './pages/admin/Dashboard';
 import FanzineList from './pages/admin/Fanzine/FanzineList';
 import CreateFanzine from './pages/admin/Fanzine/CreateFanzine';
@@ -22,27 +21,35 @@ import ArticleList from './pages/admin/articles/ArticleList';
 import CreateArticle from './pages/admin/articles/CreateArticle';
 import EditArticle from './pages/admin/articles/EditArticle';
 import EditAlbum from './pages/admin/albums/EditAlbum';
-
 import VideoList from './pages/admin/videos/VideoList';
 import CreateVideo from './pages/admin/videos/CreateVideo';
 import EditVideo from './pages/admin/videos/EditVideo';
-
-// Layouts & Components
-import PublicLayout from './layouts/PublicLayout'; // <--- Import Layout baru tadi
-import PrivateRoute from './components/PrivateRoute';
-import AdminLayout from './layouts/AdminLayout';
+import ChapterList from './pages/admin/chapters/ChapterList';
+import CreateChapter from './pages/admin/chapters/CreateChapter';
+import EditChapter from './pages/admin/chapters/EditChapter';
+import UserList from './pages/admin/users/UserList';
+import CreateUser from './pages/admin/users/CreateUser';
+import MyProfile from './pages/admin/profile/MyProfile';
 import AuthorList from './pages/admin/authors/AuthorList';
 import AuthorCreate from './pages/admin/authors/AuthorCreate';
 import AuthorEdit from './pages/admin/authors/AuthorEdit';
 import AlbumList from './pages/admin/albums/AlbumList';
 import CreateAlbum from './pages/admin/albums/CreateAlbum';
 
+// Layouts & Components
+import PublicLayout from './layouts/PublicLayout';
+import PrivateRoute from './components/PrivateRoute';
+import AdminLayout from './layouts/AdminLayout';
+
+// --- SECURITY & PERMISSIONS (BARU) ---
+import RoleGuard from './components/Auth/RoleGuard';
+import { PERMISSIONS } from './config/permissions';
+
 function App() {
   return (
     <Routes>
 
-      {/* === KELOMPOK 1: PUBLIC PAGES (Pakai Navbar & Footer) === */}
-      {/* Semua route di dalam sini otomatis punya Navbar & Footer */}
+      {/* === KELOMPOK 1: PUBLIC PAGES (Semua Orang) === */}
       <Route element={<PublicLayout />}>
         <Route path='/' element={<HomePage />} />
         <Route path='/photo' element={<PhotoPage />} />
@@ -56,39 +63,68 @@ function App() {
       </Route>
 
 
-      {/* === KELOMPOK 2: LOGIN PAGE (Polos / Tanpa Navbar Footer) === */}
-      {/* Saya taruh di luar PublicLayout agar terlihat full screen/fokus login */}
+      {/* === KELOMPOK 2: LOGIN PAGE === */}
       <Route path='/member' element={<Login />} />
 
 
+      {/* === KELOMPOK 3: ADMIN AREA (Butuh Login) === */}
       <Route element={<PrivateRoute />}>
         {/* Bungkus Dashboard dengan AdminLayout */}
         <Route element={<AdminLayout />}>
 
-          {/* Halaman Dashboard Utama */}
+          {/* A. AKSES UMUM (Semua Role: Member, Creative, Editor, Superadmin) */}
+          {/* Member biasa hanya bisa akses route di blok ini */}
           <Route path="/dashboard" element={<Dashboard />} />
-
-          <Route path="/dashboard/authors" element={<AuthorList />} />
-          <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
-          <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
-
-          <Route path='/dashboard/albums' element={<AlbumList />} />
-          <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
-          <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
+          <Route path="/dashboard/profile" element={<MyProfile />} />
+          <Route path="/dashboard/users" element={<UserList />} /> {/* Read Only List */}
 
 
-          <Route path='/dashboard/videos' element={<VideoList />} />
-          <Route path='/dashboard/videos/create' element={<CreateVideo />} />
-          <Route path='/dashboard/videos/edit/:id' element={<EditVideo />} />
+          {/* B. SUPERADMIN ONLY (Manajemen User & Chapter) */}
+          <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_USERS} />}>
+             <Route path="/dashboard/users/create" element={<CreateUser />} />
+             {/* Note: User Edit/Delete di-handle di dalam page UserList via tombol */}
+          </Route>
 
-          <Route path="/dashboard/fanzines" element={<FanzineList />} />        {/* List */}
-          <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />
-          <Route path="/dashboard/fanzines/edit/:id" element={<EditFanzine />} />
+          <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_CHAPTERS} />}>
+             <Route path="/dashboard/chapters" element={<ChapterList />} />
+             <Route path="/dashboard/chapters/create" element={<CreateChapter />} />
+             <Route path="/dashboard/chapters/edit/:id" element={<EditChapter />} />
+          </Route>
 
-          <Route path="/dashboard/articles" element={<ArticleList />} />
-          <Route path="/dashboard/articles/create" element={<CreateArticle />} />
-          <Route path="/dashboard/articles/edit/:id" element={<EditArticle />} />
-          
+
+          {/* C. EDITORIAL GROUP (Superadmin + Editor) */}
+          {/* Mengelola Teks: Authors, Articles, Fanzines */}
+          <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_EDITORIAL} />}>
+             {/* Authors */}
+             <Route path="/dashboard/authors" element={<AuthorList />} />
+             <Route path="/dashboard/authors/create" element={<AuthorCreate />} />
+             <Route path="/dashboard/authors/edit/:id" element={<AuthorEdit />} />
+
+             {/* Articles */}
+             <Route path="/dashboard/articles" element={<ArticleList />} />
+             <Route path="/dashboard/articles/create" element={<CreateArticle />} />
+             <Route path="/dashboard/articles/edit/:id" element={<EditArticle />} />
+
+             {/* Fanzines */}
+             <Route path="/dashboard/fanzines" element={<FanzineList />} />
+             <Route path="/dashboard/fanzines/create" element={<CreateFanzine />} />
+             <Route path="/dashboard/fanzines/edit/:id" element={<EditFanzine />} />
+          </Route>
+
+
+          {/* D. CREATIVE GROUP (Superadmin + Creative) */}
+          {/* Mengelola Media: Albums, Videos */}
+          <Route element={<RoleGuard allowedRoles={PERMISSIONS.CAN_MANAGE_CREATIVE} />}>
+             {/* Albums */}
+             <Route path='/dashboard/albums' element={<AlbumList />} />
+             <Route path='/dashboard/albums/create' element={<CreateAlbum />} />
+             <Route path="/dashboard/albums/edit/:id" element={<EditAlbum />} />
+
+             {/* Videos */}
+             <Route path='/dashboard/videos' element={<VideoList />} />
+             <Route path='/dashboard/videos/create' element={<CreateVideo />} />
+             <Route path='/dashboard/videos/edit/:id' element={<EditVideo />} />
+          </Route>
 
         </Route>
       </Route>

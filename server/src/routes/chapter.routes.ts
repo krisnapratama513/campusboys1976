@@ -1,14 +1,36 @@
+// server/src/routes/chapter.routes.ts
+
 import { Router } from 'express';
-// Pastikan ini singular (tanpa 's') dan tanpa '.js'
-import { getAllChapters, getChapterList } from '../controllers/chapters.controller';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
+import { 
+    getChapters, getChapterById, createChapter, updateChapter, deleteChapter, getChapterImages 
+} from '../controllers/chapter.controller';
 
 const router = Router();
 
-// (Akan diakses via GET /api/chapters)
-router.get('/', getAllChapters);
+// Config Upload
+const uploadDir = path.join(__dirname, '../../../client/public/chapters');
+if (!fs.existsSync(uploadDir)) fs.mkdirSync(uploadDir, { recursive: true });
 
-// (Akan diakses via GET /api/chapters/list)
-router.get('/list', getChapterList);
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => cb(null, uploadDir),
+    filename: (req, file, cb) => {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+        cb(null, uniqueSuffix + path.extname(file.originalname));
+    }
+});
+const upload = multer({ storage });
 
+// Routes
+router.get('/', getChapters);
+// Get Images Only (TARUH INI DI ATAS /:id)
+router.get('/images', getChapterImages);
+
+router.get('/:id', getChapterById);
+router.post('/', upload.single('img'), createChapter);
+router.put('/:id', upload.single('img'), updateChapter);
+router.delete('/:id', deleteChapter);
 
 export default router;
