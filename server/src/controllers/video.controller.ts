@@ -1,24 +1,39 @@
-// server/src/controllers/videos.controller.ts
+/**
+ * ==============================================================================
+ * VIDEO CONTROLLER
+ * ==============================================================================
+ * Menangani request HTTP untuk Video.
+ * Termasuk logika ekstraksi ID YouTube dari URL lengkap.
+ */
 
 import { Request, Response } from 'express';
 import * as videoService from '../services/video.service';
 
-// Helper: Ekstrak ID dari berbagai format link YouTube
+/**
+ * Helper: Ekstrak ID YouTube dari berbagai format URL.
+ * Support format:
+ * - youtube.com/watch?v=ID
+ * - youtu.be/ID
+ * - youtube.com/embed/ID
+ */
 const extractYouTubeID = (url: string) => {
     const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
     const match = url.match(regExp);
 
-    // PERBAIKAN:
-    // Gunakan Optional Chaining (?.) untuk mengecek panjangnya aman
-    // Logikanya: Jika match ada, DAN capture group ke-2 ada, DAN panjangnya 11 char -> Return ID
+    // YouTube ID standar panjangnya 11 karakter
     if (match && match[2] && match[2].length === 11) {
         return match[2];
     }
+    
+    // Jika user memang memasukkan ID saja (bukan URL), kembalikan apa adanya
+    if (url.length === 11) return url;
 
-    return url; 
+    return null; // Gagal ekstrak
 };
 
-// --- PUBLIC ---
+/**
+ * GET Public Videos
+ */
 export const getPublicVideos = async (req: Request, res: Response) => {
     try {
         const videos = await videoService.getPublicVideos();
@@ -28,7 +43,9 @@ export const getPublicVideos = async (req: Request, res: Response) => {
     }
 };
 
-// --- ADMIN ---
+/**
+ * GET Admin List (All Videos)
+ */
 export const getAdminVideos = async (req: Request, res: Response) => {
     try {
         const videos = await videoService.getAllVideos();
@@ -38,6 +55,9 @@ export const getAdminVideos = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * GET Detail Video
+ */
 export const getVideoById = async (req: Request, res: Response) => {
     try {
         const video = await videoService.getVideoById(Number(req.params.id));
@@ -48,24 +68,31 @@ export const getVideoById = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * CREATE Video
+ */
 export const createVideo = async (req: Request, res: Response) => {
     try {
-        const { title, url, description, is_active } = req.body; // 'url' bisa Link atau ID
+        const { title, url, description, is_active } = req.body;
 
-        if (!title || !url) return res.status(400).json({ message: 'Judul dan URL YouTube wajib diisi' });
+        if (!title || !url) {
+            return res.status(400).json({ message: 'Judul dan URL YouTube wajib diisi' });
+        }
 
         const youtube_id = extractYouTubeID(url);
+        if (!youtube_id) {
+            return res.status(400).json({ message: 'Format URL YouTube tidak valid' });
+        }
 
         const newId = await videoService.createVideo({
             title,
             youtube_id,
             description: description || '',
-            is_active: is_active ? 1 : 0 // Pastikan jadi number
+            is_active: is_active ? 1 : 0 
         });
 
         res.status(201).json({ message: 'Video berhasil ditambahkan', data: { id: newId } });
     } catch (error: any) {
-        // Handle error duplicate entry (kalau youtube_id sama)
         if (error.code === 'ER_DUP_ENTRY') {
             return res.status(400).json({ message: 'Video ini sudah ada di database!' });
         }
@@ -73,18 +100,25 @@ export const createVideo = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * UPDATE Video
+ */
 export const updateVideo = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
         const { title, url, description, is_active } = req.body;
 
+        // Cek URL: Jika user tidak ganti URL, pakai yang lama (tapi di sini kita ekstrak ulang aja biar aman)
         const youtube_id = extractYouTubeID(url);
+        if (!youtube_id) {
+            return res.status(400).json({ message: 'Format URL YouTube tidak valid' });
+        }
 
         await videoService.updateVideo(id, {
             title,
             youtube_id,
             description: description || '',
-            is_active: Number(is_active) // Konversi ke number (takutnya string "1" dari frontend)
+            is_active: Number(is_active) 
         });
 
         res.json({ message: 'Video berhasil diupdate' });
@@ -93,6 +127,9 @@ export const updateVideo = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * DELETE Video
+ */
 export const deleteVideo = async (req: Request, res: Response) => {
     try {
         await videoService.deleteVideo(Number(req.params.id));
