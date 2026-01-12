@@ -1,25 +1,26 @@
+/**
+ * ==============================================================================
+ * USER ROUTES
+ * ==============================================================================
+ * Endpoint manajemen User.
+ * Menggunakan Multer untuk upload foto profil ke 'server/uploads/profiles'.
+ */
+
 import { Router } from 'express';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
-import { 
-    getMembers, 
-    createMember, 
-    deleteMember, 
-    updateProfile ,
-    getMemberDetail,
-    updateMemberByAdmin,
-    changeUsername,
-    updatePassword
-} from '../controllers/user.controller';
+import * as userController from '../controllers/user.controller';
+
+// Middleware Auth
+import { authenticateToken, requireRole } from '../middlewares/auth.middleware';
+import { PERMISSIONS } from '../config/permissions';
 
 const router = Router();
 
-// --- CONFIG UPLOAD FOTO PROFIL ---
-// Simpan di folder client/public/uploads/profiles
-const uploadDir = path.join(__dirname, '../../../client/public/uploads/profiles');
+// --- CONFIG UPLOAD (MULTER) ---
+const uploadDir = path.join(__dirname, '../../uploads/profiles'); // Server Storage
 
-// Cek folder, buat jika belum ada
 if (!fs.existsSync(uploadDir)) {
     fs.mkdirSync(uploadDir, { recursive: true });
 }
@@ -29,41 +30,64 @@ const storage = multer.diskStorage({
         cb(null, uploadDir);
     },
     filename: (req, file, cb) => {
-        // Format: profile-{timestamp}-{random}.ext
         const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
         cb(null, 'profile-' + uniqueSuffix + path.extname(file.originalname));
     }
 });
 
-const upload = multer({ storage });
+const upload = multer({ 
+    storage,
+    limits: { fileSize: 2 * 1024 * 1024 }, // Max 2MB
+    fileFilter: (req, file, cb) => {
+        if (file.mimetype.startsWith('image/')) {
+            cb(null, true);
+        } else {
+            cb(new Error('Hanya file gambar yang diperbolehkan!'));
+        }
+    }
+});
 
 
-// --- DEFINISI ROUTE ---
-
-// 1. GET List Member (Public/Member)
-router.get('/', getMembers);
-
-// 2. GET Detail Lengkap (INI YANG KURANG)
-// Route ini menangkap request /api/users/5, /api/users/12, dst.
-router.get('/:id', getMemberDetail);
-
-// 2. CREATE Member (Superadmin)
-// Tidak perlu upload foto, karena foto default diset by system
-router.post('/', createMember);
-
-router.put('/:id/username', changeUsername);
-router.put('/:id/password', updatePassword);
-
-// 3. DELETE Member (Superadmin)
-router.delete('/:id', deleteMember);
+// --- PUBLIC ROUTES ---
+// Direktori member bisa dilihat publik (Read Only)
+router.get('/', userController.getMembers);
+router.get('/:id', userController.getMemberDetail);
 
 
-// UPDATE DATA SENSITIF (Superadmin Only)
-// Note: URL-nya kita buat beda sedikit atau pakai method PUT di root id
-router.put('/:id', updateMemberByAdmin);
+// --- PROTECTED ROUTES (USER SELF SERVICE) ---
+// User bisa edit profil sendiri (harus punya Token)
+// Note: Idealnya check ID di controller harus match dengan ID di token
+router.put(
+    '/:id/profile', 
+    authenticateToken, 
+    upload.single('image'), 
+    userController.updateProfile
+);
+router.put('/:id/username', authenticateToken, userController.changeUsername);
+router.put('/:id/password', authenticateToken, userController.updatePassword);
 
-// 4. UPDATE Profile (Member)
-// Menerima upload single file dengan key 'image'
-router.put('/:id/profile', upload.single('image'), updateProfile);
+
+// --- PROTECTED ROUTES (SUPERADMIN ONLY) ---
+// Hanya Superadmin yang boleh Create/Delete user dan ganti Role
+router.post(
+    '/', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_USERS), 
+    userController.createMember
+);
+
+router.delete(
+    '/:id', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_USERS), 
+    userController.deleteMember
+);
+
+router.put(
+    '/:id', 
+    authenticateToken, 
+    requireRole(PERMISSIONS.CAN_MANAGE_USERS), 
+    userController.updateMemberByAdmin
+);
 
 export default router;

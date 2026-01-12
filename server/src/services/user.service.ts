@@ -2,10 +2,14 @@
 
 import { pool } from '../config/database';
 import bcrypt from 'bcrypt';
-import type { MemberProfile , Member} from '../types/user.types';
+import type { MemberProfile } from '../types/user.types';
 import type { ResultSetHeader, RowDataPacket } from 'mysql2';
 
-export const getAllMembers = async () => {
+/**
+ * Mengambil daftar ringkas semua member.
+ * Digunakan untuk direktori anggota.
+ */
+export const getAllMembers = async (): Promise<MemberProfile[]> => {
     const query = `
         SELECT 
             m.id, m.username, m.role, m.chapter_id, m.generation,
@@ -20,9 +24,11 @@ export const getAllMembers = async () => {
     return rows;
 };
 
-// GET MEMBER BY ID (VERSI LENGKAP - UNTUK MODAL DETAIL)
-// Ini dipanggil cuma saat tombol 'Detail' diklik
-export const getMemberById = async (id: number) => {
+/**
+ * Mengambil detail lengkap satu member berdasarkan ID.
+ * Termasuk bio, no hp, dan detail lainnya.
+ */
+export const getMemberById = async (id: number): Promise<MemberProfile | null> => {
     const query = `
         SELECT 
             m.id, m.username, m.role, m.chapter_id, m.generation,
@@ -38,24 +44,25 @@ export const getMemberById = async (id: number) => {
 };
 
 
-// KHUSUS ADMIN: Update Role, Chapter, & Generation
+/**
+ * Admin Only: Mengupdate Role, Chapter, dan Angkatan member.
+ */
 export const updateMemberAccess = async (id: number, data: any) => {
     const { role, chapter_id, generation } = data;
-    
-    // Kita update tabel 'members' (bukan member_details)
     const query = `
         UPDATE members 
         SET role = ?, chapter_id = ?, generation = ? 
         WHERE id = ?
     `;
-    
     await pool.execute(query, [role, chapter_id, generation, id]);
 };
 
-// 2. CREATE MEMBER (Superadmin Only)
-// 2. CREATE MEMBER (Superadmin: Init Empty Detail)
+/**
+ * Admin Only: Membuat user baru.
+ * Menggunakan Database Transaction (ACID) untuk memastikan
+ * data masuk ke tabel 'members' DAN 'member_details' secara bersamaan.
+ */
 export const createMember = async (data: any) => {
-    // HAPUS full_name dari parameter, Superadmin tidak perlu tau
     const { username, password, role, chapter_id, generation } = data;
 
     const connection = await pool.getConnection();
@@ -64,18 +71,16 @@ export const createMember = async (data: any) => {
 
         const hashedPassword = await bcrypt.hash(password, 10);
         
-        // A. Insert Auth Data
+        // 1. Insert Login Data
         const [resMember] = await connection.execute<ResultSetHeader>(
             `INSERT INTO members (username, password, role, chapter_id, generation) VALUES (?, ?, ?, ?, ?)`,
             [username, hashedPassword, role, chapter_id, generation]
         );
         const newMemberId = resMember.insertId;
 
-        // B. Insert "WADAH KOSONG" ke member_details
-        // Kita isi full_name dengan string kosong '' agar tidak NULL
-        // Image otomatis default dari database ('default_user.png')
+        // 2. Init Detail Data (Wadah Kosong)
         await connection.execute(
-            `INSERT INTO member_details (member_id, full_name, bio, phone) VALUES (?, ?, ?, ?)`,
+            `INSERT INTO member_details (member_id, full_name, bio, phone, image) VALUES (?, ?, ?, ?, 'default_user.png')`,
             [newMemberId, '', '', ''] 
         );
 
@@ -90,13 +95,12 @@ export const createMember = async (data: any) => {
     }
 };
 
-// 3. UPDATE PROFILE (Fitur baru untuk Member)
-// Ini nanti dipanggil member sendiri di halaman "My Profile"
+/**
+ * User Self Service: Update data profil (Bio, Nama, Foto).
+ */
 export const updateMemberProfile = async (memberId: number, data: any) => {
     const { full_name, bio, phone, image } = data;
     
-    // Logicnya simpel: UPDATE saja, karena barisnya PASTI sudah dibuatkan Superadmin
-    // Kita cek dulu apakah ada image baru diupload atau tidak
     if (image) {
         await pool.execute(
             `UPDATE member_details SET full_name = ?, bio = ?, phone = ?, image = ? WHERE member_id = ?`,
@@ -110,10 +114,11 @@ export const updateMemberProfile = async (memberId: number, data: any) => {
     }
 };
 
-// GANTI USERNAME (Cek duplikat dulu)
+/**
+ * User Self Service: Ganti Username.
+ * Melakukan pengecekan duplikasi sebelum update.
+ */
 export const updateUsername = async (id: number, newUsername: string) => {
-    // 1. Cek apakah username sudah dipakai orang LAIN
-    // (Kita kecualikan user itu sendiri, kalau dia input username lama dia sendiri gak masalah)
     const checkQuery = `SELECT id FROM members WHERE username = ? AND id != ?`;
     const [existing] = await pool.execute<RowDataPacket[]>(checkQuery, [newUsername, id]);
 
@@ -121,23 +126,29 @@ export const updateUsername = async (id: number, newUsername: string) => {
         throw new Error('Username sudah digunakan user lain!');
     }
 
-    // 2. Update Username
     await pool.execute(
         `UPDATE members SET username = ? WHERE id = ?`,
         [newUsername, id]
     );
 };
 
-// 3. DELETE MEMBER
+/**
+ * Admin Only: Hapus Member permanen.
+ */
 export const deleteMember = async (id: number) => {
+    // Foreign Key constraint 'ON DELETE CASCADE' di DB biasanya sudah menangani hapus detail.
+    // Tapi untuk keamanan, query ini cukup menghapus parent-nya saja.
     await pool.execute('DELETE FROM members WHERE id = ?', [id]);
 };
 
-// GANTI PASSWORD
+/**
+ * User Self Service: Ganti Password.
+ * Memerlukan verifikasi password lama.
+ */
 export const changePassword = async (id: number, data: any) => {
     const { oldPassword, newPassword } = data;
 
-    // 1. Ambil password hash
+    // 1. Ambil hash password saat ini
     const [rows] = await pool.execute<RowDataPacket[]>(
         `SELECT password FROM members WHERE id = ?`, 
         [id]
@@ -145,21 +156,17 @@ export const changePassword = async (id: number, data: any) => {
     
     if (rows.length === 0) throw new Error('User tidak ditemukan.');
 
-    // --- PERBAIKAN DI SINI ---
-    // Kita paksa TS menganggap rows[0] sebagai object 'any' agar bisa akses .password
     const user = rows[0] as any; 
     const currentHash = user.password;
 
-    // 2. Bandingkan Password
+    // 2. Verifikasi Password Lama
     const isMatch = await bcrypt.compare(oldPassword, currentHash);
     if (!isMatch) {
         throw new Error('Password lama salah!');
     }
 
-    // 3. Hash Password Baru
+    // 3. Hash Password Baru & Simpan
     const newHash = await bcrypt.hash(newPassword, 10);
-
-    // 4. Update Database
     await pool.execute(
         `UPDATE members SET password = ? WHERE id = ?`,
         [newHash, id]

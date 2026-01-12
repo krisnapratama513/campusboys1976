@@ -1,7 +1,17 @@
 // server/src/types/user.types.ts
+
+/**
+ * ==============================================================================
+ * USER TYPES DEFINITION
+ * ==============================================================================
+ * Definisi tipe data untuk User/Member dalam sistem.
+ */
+
 import { RowDataPacket } from "mysql2";
 
-// 1. Tipe data tabel 'members' (Sekarang ada chapter_id)
+/**
+ * Data dasar tabel 'members' (Akun Login).
+ */
 export interface Member extends RowDataPacket {
     id: number;
     username: string;
@@ -10,11 +20,14 @@ export interface Member extends RowDataPacket {
     generation: number;
 }
 
-// 2. Tipe data Gabungan (Untuk dikirim ke Frontend)
+/**
+ * Data gabungan 'members' + 'member_details' + 'chapters'.
+ * Digunakan untuk response API profil lengkap.
+ */
 export interface MemberProfile extends Member {
     full_name: string | null;
     image: string | null;
     bio: string | null;
     phone: string | null;
-    chapter_name: string; // Tambahan dari join chapters
+    chapter_name: string; // Hasil Join
 }
