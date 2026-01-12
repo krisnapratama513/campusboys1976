@@ -1,21 +1,22 @@
 // server/src/services/author.service.ts
 
+/**
+ * ==============================================================================
+ * AUTHOR SERVICE
+ * ==============================================================================
+ * Menangani logika bisnis untuk manajemen Penulis.
+ * Termasuk menghitung statistik jumlah karya per penulis.
+ */
+
 import { pool } from '../config/database';
-import type { RowDataPacket, ResultSetHeader } from 'mysql2';
+import type { ResultSetHeader } from 'mysql2';
+import type { Author, AuthorWithStats } from '../types/author.types';
 
-// Interface untuk data yang keluar dari DB
-interface Author extends RowDataPacket {
-    id: number;
-    name: string;
-}
-
-interface AuthorWithStats extends Author {
-    total_articles: number;
-    total_fanzine: number;
-}
-
-export const getAllAuthors = async () => {
-    // HAPUS a.created_at dari SELECT
+/**
+ * Mengambil semua author beserta statistik karyanya.
+ * Query menggunakan sub-query untuk menghitung total artikel dan fanzine.
+ */
+export const getAllAuthors = async (): Promise<AuthorWithStats[]> => {
     const query = `
         SELECT 
             a.id, 
@@ -23,14 +24,29 @@ export const getAllAuthors = async () => {
             (SELECT COUNT(*) FROM articles WHERE id_author = a.id) AS total_articles,
             (SELECT COUNT(*) FROM fanzines WHERE author_id = a.id) AS total_fanzine
         FROM authors AS a
-        ORDER BY a.id
+        ORDER BY a.name ASC
     `;
     const [rows] = await pool.execute<AuthorWithStats[]>(query);
     return rows;
 };
 
+/**
+ * Mengambil satu author berdasarkan ID.
+ * @param id ID Author
+ */
+export const getAuthorById = async (id: number): Promise<Author | undefined> => {
+    const [rows] = await pool.execute<Author[]>(
+        'SELECT * FROM authors WHERE id = ?', 
+        [id]
+    );
+    return rows[0];
+};
+
+/**
+ * Membuat author baru.
+ * @param name Nama Author
+ */
 export const createAuthor = async (name: string) => {
-    // Logic insert pindah ke sini
     const [result] = await pool.execute<ResultSetHeader>(
         'INSERT INTO authors (name) VALUES (?)', 
         [name]
@@ -38,15 +54,11 @@ export const createAuthor = async (name: string) => {
     return result;
 };
 
-export const getAuthorById = async (id: number) => {
-    const [rows] = await pool.execute<Author[]>(
-        'SELECT * FROM authors WHERE id = ?', 
-        [id]
-    );
-    return rows[0]; // Kembalikan baris pertama saja
-};
-
-// 2. Fungsi untuk Update data
+/**
+ * Mengupdate nama author.
+ * @param id ID Author
+ * @param name Nama Baru
+ */
 export const updateAuthor = async (id: number, name: string) => {
     const [result] = await pool.execute<ResultSetHeader>(
         'UPDATE authors SET name = ? WHERE id = ?',
@@ -55,8 +67,11 @@ export const updateAuthor = async (id: number, name: string) => {
     return result;
 };
 
+/**
+ * Menghapus author.
+ * Hati-hati: Akan gagal jika author masih memiliki artikel/fanzine (Constraint FK).
+ */
 export const deleteAuthor = async (id: number) => {
-    // Jika author dipakai di tabel lain (Foreign Key), baris ini akan melempar ERROR otomatis
     const [result] = await pool.execute<ResultSetHeader>(
         'DELETE FROM authors WHERE id = ?', 
         [id]
