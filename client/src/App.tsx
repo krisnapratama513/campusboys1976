@@ -9,7 +9,7 @@ import MagazinePage from './pages/public/Fanzine';
 import AboutPage from './pages/public/About';
 import PhotoPage from './pages/public/Photo';
 import PhotoDetail from './pages/public/PhotoDetail';
-import MagazineDetailPage from './pages/public/MagazineDetailPage';
+import FanzinDetailPage from './pages/public/FanzinDetailPage';
 import Login from './pages/auth/Login';
 
 // Admin Pages
@@ -58,7 +58,7 @@ function App() {
         <Route path='/article' element={<ArticlePage />} />
         <Route path="/article/:slug" element={<ArticleDetailPage />} />
         <Route path="/fanzine" element={<MagazinePage />} />
-        <Route path="/fanzine/:slug" element={<MagazineDetailPage />} />
+        <Route path="/fanzine/:slug" element={<FanzinDetailPage />} />
         <Route path='/about' element={<AboutPage />} />
       </Route>
 

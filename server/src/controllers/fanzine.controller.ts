@@ -1,23 +1,52 @@
+/**
+ * ==============================================================================
+ * FANZINE CONTROLLER
+ * ==============================================================================
+ * Menangani upload PDF & Cover, serta manajemen data Fanzine.
+ */
+
 import { Request, Response } from 'express';
 import * as fanzineService from '../services/fanzine.service';
 import slugify from 'slugify';
 import fs from 'fs';
 import path from 'path';
 
-// --- DEFINISI FOLDER (Agar rapi dan konsisten) ---
-// PDF disimpan di folder 'magazine'
-const pdfDir = path.join(__dirname, '../../../client/public/magazine');
-// Cover disimpan di folder 'magazine/cover'
-const coverDir = path.join(__dirname, '../../../client/public/magazine/cover');
+// --- CONFIG STORAGE ---
+// Kita simpan di folder server/uploads agar konsisten dengan Article & User
+const baseUploadDir = path.join(__dirname, '../../uploads/fanzines');
+const pdfDir = baseUploadDir; 
+const coverDir = path.join(baseUploadDir, 'covers');
 
-// Pastikan folder cover ada (jaga-jaga)
-if (!fs.existsSync(coverDir)) {
-    fs.mkdirSync(coverDir, { recursive: true });
+// Pastikan folder ada
+if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
+if (!fs.existsSync(coverDir)) fs.mkdirSync(coverDir, { recursive: true });
+
+
+// --- PUBLIC: GET LIST ---
+export const getAllFanzines = async (req: Request, res: Response) => {
+    try {
+        const fanzines = await fanzineService.getAllFanzines();
+        res.json({ message: 'Berhasil ambil data fanzines', data: fanzines });
+    } catch (error: any) {
+        res.status(500).json({ message: 'Server Error', error: error.message })
+    }
+};
+
+// --- PUBLIC: GET DETAIL BY SLUG ---
+export const getFanzineBySlug = async (req: Request, res: Response) => {
+    try {
+        const slug = String(req.params.slug);
+        const fanzine = await fanzineService.getFanzineBySlug(slug);
+        if (!fanzine) {
+            return res.status(404).json({ message: 'Fanzine tidak ditemukan' });
+        }
+        res.json({ data: fanzine });
+    } catch (error: any) {
+        res.status(500).json({message: "Server Error", error: error.message})
+    }
 }
 
-// ==========================================
-// 1. GET BY ID
-// ==========================================
+// --- ADMIN: GET BY ID ---
 export const getFanzineById = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -30,9 +59,7 @@ export const getFanzineById = async (req: Request, res: Response) => {
     }
 }
 
-// ==========================================
-// 2. CREATE FANZINE (Fix Path Cover)
-// ==========================================
+// --- ADMIN: CREATE ---
 export const createFanzine = async (req: Request, res: Response) => {
     try {
         const { title, date, author_id } = req.body;
@@ -41,44 +68,42 @@ export const createFanzine = async (req: Request, res: Response) => {
             return res.status(400).json({ message: 'Title dan Author wajib diisi' });
         }
 
-        // A. Insert DB (Dapat ID)
+        // 1. Insert DB (Dapat ID untuk penamaan file)
         const newId = await fanzineService.createFanzineInitial({
             title,
             date: date || new Date(),
             author_id
         });
 
-        // B. Siapkan Nama
+        // 2. Siapkan Slug & Nama File
         const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
-        const baseName = `${newId}_${cleanTitle}`; 
-        const finalSlug = baseName; 
+        const finalSlug = `${newId}_${cleanTitle}`; 
 
-        // C. Proses File
+        // 3. Proses File Upload
+        // Multer menyimpan file di folder temp (sesuai config router), kita pindahkan ke folder final
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
         let finalImgName = null;
         let finalPdfName = null;
 
-        // --- PROSES COVER (Pindah ke folder COVER) ---
+        // Proses Cover
         if (files?.['cover']?.[0]) {
-            const tempFile = files['cover'][0]; // File ada di pdfDir (karena multer config)
+            const tempFile = files['cover'][0];
             const ext = path.extname(tempFile.originalname);
-            finalImgName = `${baseName}${ext}`; 
+            finalImgName = `${finalSlug}_cover${ext}`; // ex: 10_edisi_mei_cover.jpg
             
-            // Pindahkan dari temp (magazine/) ke final (magazine/cover/)
             fs.renameSync(tempFile.path, path.join(coverDir, finalImgName));
         }
 
-        // --- PROSES PDF (Tetap di folder MAGAZINE) ---
+        // Proses PDF
         if (files?.['pdf']?.[0]) {
             const tempFile = files['pdf'][0];
             const ext = path.extname(tempFile.originalname);
-            finalPdfName = `${baseName}${ext}`;
-
-            // Rename di folder yang sama
+            finalPdfName = `${finalSlug}${ext}`; // ex: 10_edisi_mei.pdf
+            
             fs.renameSync(tempFile.path, path.join(pdfDir, finalPdfName));
         }
 
-        // D. Update DB
+        // 4. Update DB dengan nama file final
         await fanzineService.updateFanzineFiles(newId, {
             slug: finalSlug,
             imgFilename: finalImgName,
@@ -91,14 +116,17 @@ export const createFanzine = async (req: Request, res: Response) => {
         });
 
     } catch (error: any) {
+        // Hapus file temp jika error (Cleanup)
+        const files = req.files as { [fieldname: string]: Express.Multer.File[] };
+        if (files?.['cover']?.[0]) fs.unlinkSync(files['cover'][0].path);
+        if (files?.['pdf']?.[0]) fs.unlinkSync(files['pdf'][0].path);
+
         console.error(error);
         res.status(500).json({ message: 'Gagal membuat fanzine', error: error.message });
     }
 };
 
-// ==========================================
-// 3. UPDATE FANZINE (Fix Path & Delete Old File)
-// ==========================================
+// --- ADMIN: UPDATE ---
 export const updateFanzine = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -107,7 +135,7 @@ export const updateFanzine = async (req: Request, res: Response) => {
         const oldData = await fanzineService.getFanzineById(id);
         if (!oldData) return res.status(404).json({ message: 'Fanzine tidak ditemukan' });
 
-        // Logic Slug
+        // Logic Slug Baru (Jika title berubah)
         let newSlug = oldData.slug;
         if (title && title !== oldData.title) {
             const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
@@ -115,41 +143,34 @@ export const updateFanzine = async (req: Request, res: Response) => {
         }
 
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
-        
         let finalImgName = oldData.imgFilename;
         let finalPdfName = oldData.pdfFilename;
 
-        // --- CEK COVER BARU ---
+        // Proses Cover Baru
         if (files?.['cover']?.[0]) {
-            // 1. Hapus Cover Lama (Cek di coverDir)
+            // Hapus file lama
             if (oldData.imgFilename) {
                 const oldPath = path.join(coverDir, oldData.imgFilename);
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
             }
-
-            // 2. Simpan Cover Baru
+            // Simpan file baru
             const tempFile = files['cover'][0];
             const ext = path.extname(tempFile.originalname);
-            finalImgName = `${newSlug}${ext}`;
-            
-            // Pindah ke coverDir
+            finalImgName = `${newSlug}_cover${ext}`;
             fs.renameSync(tempFile.path, path.join(coverDir, finalImgName));
         }
 
-        // --- CEK PDF BARU ---
+        // Proses PDF Baru
         if (files?.['pdf']?.[0]) {
-            // 1. Hapus PDF Lama (Cek di pdfDir)
+            // Hapus file lama
             if (oldData.pdfFilename) {
                 const oldPath = path.join(pdfDir, oldData.pdfFilename);
                 if (fs.existsSync(oldPath)) fs.unlinkSync(oldPath);
             }
-
-            // 2. Simpan PDF Baru
+            // Simpan file baru
             const tempFile = files['pdf'][0];
             const ext = path.extname(tempFile.originalname);
             finalPdfName = `${newSlug}${ext}`;
-            
-            // Rename di pdfDir
             fs.renameSync(tempFile.path, path.join(pdfDir, finalPdfName));
         }
 
@@ -170,37 +191,26 @@ export const updateFanzine = async (req: Request, res: Response) => {
     }
 };
 
-// ==========================================
-// 4. DELETE FANZINE (Hapus File Fisik + DB)
-// ==========================================
+// --- ADMIN: DELETE ---
 export const deleteFanzine = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
-        
-        // 1. Ambil Data Dulu (Untuk tahu nama filenya)
         const oldData = await fanzineService.getFanzineById(id);
         
-        if (!oldData) {
-            return res.status(404).json({ message: 'Fanzine tidak ditemukan' });
-        }
+        if (!oldData) return res.status(404).json({ message: 'Fanzine tidak ditemukan' });
 
-        // 2. Hapus File COVER (jika ada)
+        // Hapus Cover
         if (oldData.imgFilename) {
             const coverPath = path.join(coverDir, oldData.imgFilename);
-            if (fs.existsSync(coverPath)) {
-                fs.unlinkSync(coverPath); // Hapus fisik
-            }
+            if (fs.existsSync(coverPath)) fs.unlinkSync(coverPath);
         }
 
-        // 3. Hapus File PDF (jika ada)
+        // Hapus PDF
         if (oldData.pdfFilename) {
             const pdfPath = path.join(pdfDir, oldData.pdfFilename);
-            if (fs.existsSync(pdfPath)) {
-                fs.unlinkSync(pdfPath); // Hapus fisik
-            }
+            if (fs.existsSync(pdfPath)) fs.unlinkSync(pdfPath);
         }
 
-        // 4. Hapus Data di Database
         await fanzineService.deleteFanzine(id);
 
         res.json({ message: 'Fanzine dan file berhasil dihapus' });
@@ -210,29 +220,3 @@ export const deleteFanzine = async (req: Request, res: Response) => {
         res.status(500).json({ message: 'Gagal menghapus data', error: error.message });
     }
 };
-
-// ... function lainnya (getAll, getBySlug) tetap sama ...
-export const getAllFanzines = async (req: Request, res: Response) => {
-    try {
-        const fanzines = await fanzineService.getAllFanzines();
-        res.json({
-            message: 'Berhasil ambil data fanzines',
-            data: fanzines
-        });
-    } catch (error: any) {
-        res.status(500).json({ message: 'Server Error', error: error.message })
-    }
-};
-
-export const getFanzineBySlug = async (req: Request, res: Response) => {
-    try {
-        const slug = String(req.params.slug);
-        const fanzine = await fanzineService.getFanzineBySlug(slug);
-        if (!fanzine) {
-            return res.status(404).json({ message: 'Fanzine tidak ditemukan' });
-        }
-        res.json({ message: 'Detail fanzine ditemukan', data: fanzine });
-    } catch (error) {
-        res.status(500).json({message: "Gagal mengambil detail fanzine"})
-    }
-}

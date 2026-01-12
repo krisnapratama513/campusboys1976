@@ -1,84 +1,90 @@
 // client/src/service/fanzineService.ts
 
+/**
+ * ==============================================================================
+ * FANZINE SERVICE
+ * ==============================================================================
+ * Mengelola API Fanzine.
+ * - Public: Read List & Detail Slug
+ * - Admin: Create, Update, Delete (Wajib Token)
+ */
+
 import type { FanzineType } from "../types/fanzine.types";
 import { API_BASE_URL } from "../config/api";
 
-// 1. Definisikan bentuk respon Backend (Wrapper)
-interface FanzineResponse {
-    message: string;
-    data: FanzineType[];
-}
+// Helper: Header Auth
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('accessToken');
+    return {
+        'Authorization': `Bearer ${token}`
+    };
+};
 
-interface FanzineDetailResponse {
-    message: string;
-    data: FanzineType;
-}
+// --- PUBLIC ---
 
 export const getAllFanzine = async (): Promise<FanzineType[]> => {
     const response = await fetch(`${API_BASE_URL}/fanzines`);
     if(!response.ok) throw new Error('Gagal mengambil data getAllFanzine');
     
-    // UBAH DI SINI:
-    const result: FanzineResponse = await response.json();
-    return result.data; // <--- Ambil isinya saja
+    const result = await response.json();
+    return result.data; 
 };
 
-// Sekalian saya tambahkan untuk Get By Slug
 export const getFanzineBySlug = async (slug: string): Promise<FanzineType> => {
     const response = await fetch(`${API_BASE_URL}/fanzines/${slug}`);
     if(!response.ok) throw new Error('Gagal mengambil detail fanzine');
 
-    const result: FanzineDetailResponse = await response.json();
-    return result.data; // <--- Ambil isinya saja
+    const result = await response.json();
+    return result.data;
 };
 
-export const createFanzine = async (formData: FormData) => {
-    // PENTING: Jangan set 'Content-Type': 'application/json'
-    // Biarkan browser yang mengurus Header untuk FormData (Multipart)
-    const response = await fetch(`${API_BASE_URL}/fanzines`, {
-        method: 'POST',
-        body: formData, 
-    });
-
-    if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.message || 'Gagal membuat fanzine');
-    }
-
-    return response.json();
-};
-
-
-export const deleteFanzine = async (id: number) => {
-    const response = await fetch(`${API_BASE_URL}/fanzines/${id}`, {
-        method: 'DELETE',
-    });
-
-    if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.message || 'Gagal menghapus fanzine');
-    }
-    return response.json();
-};
-
+// --- ADMIN (PROTECTED) ---
 
 export const getFanzineById = async (id: string | number): Promise<FanzineType> => {
-    const response = await fetch(`${API_BASE_URL}/fanzines/detail/${id}`);
+    const response = await fetch(`${API_BASE_URL}/fanzines/detail/${id}`, {
+        headers: getAuthHeaders() // [PENTING]
+    });
     if (!response.ok) throw new Error('Gagal mengambil data fanzine');
     const result = await response.json();
     return result.data;
 };
 
-// 2. Update Data (Pakai FormData karena ada file)
+export const createFanzine = async (formData: FormData) => {
+    const response = await fetch(`${API_BASE_URL}/fanzines`, {
+        method: 'POST',
+        headers: {
+            ...getAuthHeaders() // [PENTING] Sisipkan token
+            // Content-Type jangan di-set manual saat pakai FormData!
+        },
+        body: formData, 
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal membuat fanzine');
+    return result;
+};
+
 export const updateFanzine = async (id: string | number, formData: FormData) => {
     const response = await fetch(`${API_BASE_URL}/fanzines/${id}`, {
-        method: 'PUT', // Method PUT
+        method: 'PUT',
+        headers: {
+            ...getAuthHeaders() // [PENTING]
+        },
         body: formData,
     });
 
-    if (!response.ok) {
-        const result = await response.json();
-        throw new Error(result.message || 'Gagal update fanzine');
-    }
-    return response.json();
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal update fanzine');
+    return result;
+};
+
+export const deleteFanzine = async (id: number) => {
+    const response = await fetch(`${API_BASE_URL}/fanzines/${id}`, {
+        method: 'DELETE',
+        headers: getAuthHeaders() // [PENTING]
+    });
+
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.message || 'Gagal menghapus fanzine');
+    return result;
 };

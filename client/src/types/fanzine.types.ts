@@ -10,14 +10,23 @@ export type FanzineCardProps = {
     title: string;
 };
 
+/**
+ * ==============================================================================
+ * FANZINE TYPES
+ * ==============================================================================
+ */
+
 export type FanzineType = {
     id: number;
     title: string;
-    date: string;
-    slug:string;
-    imgFilename: string;
+    date: string; // Format ISO string dari DB
+    slug: string;
+    
+    // Filename dari DB
+    imgFilename: string; 
     pdfFilename: string;
+    
+    // Join Data
     author_name: string;
-
     author_id: number;
-}
+};

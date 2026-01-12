@@ -6,63 +6,54 @@ import { getAllAuthors } from '../../../services/authorService';
 const EditFanzine = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState(true);
 
-    // State Data
     const [title, setTitle] = useState('');
     const [date, setDate] = useState('');
     const [authorId, setAuthorId] = useState('');
     
-    // State File Baru (Opsional)
+    // File Baru (Optional)
     const [coverFile, setCoverFile] = useState<File | null>(null);
     const [pdfFile, setPdfFile] = useState<File | null>(null);
 
-    // Preview Data Lama
-    const [oldCover, setOldCover] = useState<string | null>(null);
-    const [oldPdf, setOldPdf] = useState<string | null>(null);
+    // Info File Lama
+    const [oldCover, setOldCover] = useState('');
+    const [oldPdf, setOldPdf] = useState('');
 
     const [authors, setAuthors] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(true);
 
-    // 1. LOAD DATA SAAT BUKA
     useEffect(() => {
         const loadData = async () => {
             try {
-                // Load Authors & Fanzine Data paralel
-                const [authorsData, fanzineData] = await Promise.all([
+                const [authorData, fanzineData] = await Promise.all([
                     getAllAuthors(),
                     getFanzineById(id!)
                 ]);
-
-                setAuthors(authorsData);
                 
-                // Isi Form dengan data lama
+                setAuthors(authorData);
+                
                 setTitle(fanzineData.title);
-                // Format date YYYY-MM-DD untuk input type="date"
-                if (fanzineData.date) {
-                    const isoDate = new Date(fanzineData.date).toISOString().split('T')[0];
-                    setDate(isoDate);
-                }
-                setAuthorId(String(fanzineData.author_id || '')); // author_id mungkin perlu dicek di backend returnnya
+                // Convert DB date string to YYYY-MM-DD for input type="date"
+                const dateObj = new Date(fanzineData.date);
+                setDate(dateObj.toISOString().split('T')[0]);
+                
+                setAuthorId(String(fanzineData.author_id));
                 setOldCover(fanzineData.imgFilename);
                 setOldPdf(fanzineData.pdfFilename);
-
+                
             } catch (error) {
                 console.error(error);
-                alert("Gagal memuat data");
+                alert("Gagal load data");
+                navigate('/dashboard/fanzines');
             } finally {
                 setIsLoading(false);
             }
         };
-        loadData();
-    }, [id]);
+        if(id) loadData();
+    }, [id, navigate]);
 
-    // 2. SUBMIT UPDATE
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const confirm = window.confirm("Simpan perubahan?");
-        if (!confirm) return;
-
         setIsLoading(true);
 
         try {
@@ -71,74 +62,65 @@ const EditFanzine = () => {
             formData.append('date', date);
             formData.append('author_id', authorId);
             
-            // Hanya append file jika user memilih file baru
+            // Hanya append jika user upload file baru
             if (coverFile) formData.append('cover', coverFile);
             if (pdfFile) formData.append('pdf', pdfFile);
 
             await updateFanzine(id!, formData);
-
-            alert("Berhasil diupdate!");
+            alert("Fanzine berhasil diupdate!");
             navigate('/dashboard/fanzines');
-
         } catch (error: any) {
             alert(error.message);
+        } finally {
             setIsLoading(false);
         }
     };
 
-    // Helper Style (Sama kayak Create)
-    const inputStyle = { width: '100%', padding: '10px', borderRadius: '6px', backgroundColor: '#1e293b', border: '1px solid #475569', color: 'white', marginBottom: '16px' };
-    const labelStyle = { display: 'block', color: '#94a3b8', marginBottom: '6px', fontSize: '0.9rem' };
+    const inputStyle = { width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '6px', backgroundColor: '#1e293b', border: '1px solid #475569', color: 'white' };
+    const labelStyle = { display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem' };
 
-    if (isLoading) return <div style={{color:'white'}}>Loading data...</div>;
+    if (isLoading) return <div style={{padding: 20, color:'#94a3b8'}}>Loading...</div>;
 
     return (
         <div style={{ color: '#e2e8f0', maxWidth: '600px' }}>
-            <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '24px' }}>Edit Fanzine</h2>
-
-            <form onSubmit={handleSubmit} style={{ backgroundColor: '#0f172a', padding: '24px', borderRadius: '8px' }}>
+            <h2 style={{ marginBottom: '20px' }}>Edit Fanzine</h2>
+            <form onSubmit={handleSubmit} style={{ backgroundColor: '#0f172a', padding: 24, borderRadius: 8, border: '1px solid #1e293b' }}>
                 
-                <div>
-                    <label style={labelStyle}>Judul Fanzine</label>
-                    <input type="text" value={title} onChange={(e) => setTitle(e.target.value)} style={inputStyle} />
+                <label style={labelStyle}>Judul Edisi</label>
+                <input type="text" value={title} onChange={e => setTitle(e.target.value)} required style={inputStyle} />
+
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 20 }}>
+                    <div>
+                        <label style={labelStyle}>Tanggal Terbit</label>
+                        <input type="date" value={date} onChange={e => setDate(e.target.value)} required style={inputStyle} />
+                    </div>
+                    <div>
+                        <label style={labelStyle}>Penulis / Editor</label>
+                        <select value={authorId} onChange={e => setAuthorId(e.target.value)} required style={inputStyle}>
+                            <option value="">-- Pilih Author --</option>
+                            {authors.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
+                        </select>
+                    </div>
                 </div>
 
-                <div>
-                    <label style={labelStyle}>Tanggal Rilis</label>
-                    <input type="date" value={date} onChange={(e) => setDate(e.target.value)} style={inputStyle} />
+                <div style={{marginBottom: 15, padding: 10, backgroundColor: '#1e293b', borderRadius: 6}}>
+                    <label style={{...labelStyle, color: '#fbbf24'}}>Ganti Cover (Optional)</label>
+                    <div style={{fontSize:'0.8rem', color:'#94a3b8', marginBottom: 5}}>Saat ini: {oldCover}</div>
+                    <input type="file" accept="image/*" onChange={e => setCoverFile(e.target.files ? e.target.files[0] : null)} style={{...inputStyle, marginBottom:0}} />
                 </div>
 
-                <div>
-                    <label style={labelStyle}>Penulis</label>
-                    <select value={authorId} onChange={(e) => setAuthorId(e.target.value)} style={inputStyle}>
-                        <option value="">-- Pilih Author --</option>
-                        {authors.map((auth) => <option key={auth.id} value={auth.id}>{auth.name}</option>)}
-                    </select>
+                <div style={{marginBottom: 25, padding: 10, backgroundColor: '#1e293b', borderRadius: 6}}>
+                    <label style={{...labelStyle, color: '#fbbf24'}}>Ganti PDF (Optional)</label>
+                    <div style={{fontSize:'0.8rem', color:'#94a3b8', marginBottom: 5}}>Saat ini: {oldPdf}</div>
+                    <input type="file" accept="application/pdf" onChange={e => setPdfFile(e.target.files ? e.target.files[0] : null)} style={{...inputStyle, marginBottom:0}} />
                 </div>
 
-                {/* Cover Upload */}
-                <div>
-                    <label style={labelStyle}>Ganti Cover (Opsional)</label>
-                    {oldCover && <div style={{marginBottom: 5, fontSize:'0.8rem', color: '#fbbf24'}}>Cover saat ini: {oldCover}</div>}
-                    <input type="file" accept="image/*" onChange={(e) => setCoverFile(e.target.files ? e.target.files[0] : null)} style={inputStyle} />
-                </div>
-
-                {/* PDF Upload */}
-                <div>
-                    <label style={labelStyle}>Ganti PDF (Opsional)</label>
-                    {oldPdf && <div style={{marginBottom: 5, fontSize:'0.8rem', color: '#fbbf24'}}>File saat ini: {oldPdf}</div>}
-                    <input type="file" accept="application/pdf" onChange={(e) => setPdfFile(e.target.files ? e.target.files[0] : null)} style={inputStyle} />
-                </div>
-
-                <div style={{display:'flex', gap: 10}}>
-                    <button type="submit" disabled={isLoading} style={{ flex: 1, padding: '12px', backgroundColor: '#fbbf24', color: '#0f172a', fontWeight: 'bold', borderRadius: '6px', border: 'none', cursor: 'pointer' }}>
-                        Update Data
+                <div style={{ display: 'flex', gap: 15 }}>
+                    <button type="submit" disabled={isLoading} style={{ flex: 1, padding: 12, backgroundColor: '#fbbf24', color: '#0f172a', border: 'none', borderRadius: 6, cursor: 'pointer', fontWeight:'bold' }}>
+                        {isLoading ? 'Menyimpan...' : 'Update Fanzine'}
                     </button>
-                    <Link to="/dashboard/fanzines" style={{ padding: '12px', color: '#94a3b8', textDecoration: 'none', display: 'flex', alignItems: 'center' }}>
-                        Batal
-                    </Link>
+                    <Link to="/dashboard/fanzines" style={{ padding: '12px 20px', color: '#94a3b8', textDecoration: 'none', display:'flex', alignItems:'center' }}>Batal</Link>
                 </div>
-
             </form>
         </div>
     );
