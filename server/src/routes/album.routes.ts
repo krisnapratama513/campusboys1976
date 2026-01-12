@@ -1,3 +1,12 @@
+/**
+ * ==============================================================================
+ * ALBUM ROUTES
+ * ==============================================================================
+ * Endpoint manajemen Album Foto (Fanzine Gallery).
+ * - Public: Akses Read Only
+ * - Admin (Creative): Full CRUD dengan upload foto massal.
+ */
+
 import { Router } from "express";
 import { uploadAlbum } from "../config/albumUpload";
 import { 
@@ -7,40 +16,78 @@ import {
     updateAlbum, 
     deleteAlbum,
     deletePhoto,
-    // Import controller baru
     getPublicAlbums, 
     getPublicAlbumDetail 
 } from "../controllers/album.controller";
 
+// Security Middleware
+import { authenticateToken, requireRole } from "../middlewares/auth.middleware";
+import { PERMISSIONS } from "../config/permissions";
+
 const router = Router();
 
 // Konfigurasi Upload:
-// - Field 'cover': max 1 file
-// - Field 'photos': max 10 file (bisa diubah)
 const uploadFields = uploadAlbum.fields([
-    { name: 'cover', maxCount: 1 },
-    { name: 'photos', maxCount: 10 }
+    { name: 'cover', maxCount: 1 },    // 1 Cover Wajib
+    { name: 'photos', maxCount: 50 }   // Hingga 50 Foto Gallery
 ]);
 
-// --- ROUTE PUBLIC (Ditaruh ATAS agar tidak tertimpa :id) ---
-router.get('/public', getPublicAlbums);           // GET /api/albums/public
-router.get('/public/:slug', getPublicAlbumDetail); // GET /api/albums/public/slug-album
+// --- PUBLIC ROUTES (No Auth) ---
+router.get('/public', getPublicAlbums);           
+router.get('/public/:slug', getPublicAlbumDetail); 
 
-// --- ROUTE ADMIN ---
-// Read
-router.get('/', getAdminAlbums);
-router.get('/:id', getAlbumById);
+// --- ADMIN ROUTES (Protected) ---
+// Hanya Role Creative, Editor, dan Superadmin yang boleh mengelola Album
+const requireCreative = requireRole(PERMISSIONS.CAN_MANAGE_CREATIVE);
 
-// Create
-router.post('/', uploadFields, createAlbum);
+// Read Admin List (Termasuk Draft)
+router.get(
+    '/', 
+    authenticateToken, 
+    requireCreative, 
+    getAdminAlbums
+);
 
-// Update (Edit Info + Ganti Cover + Tambah Foto)
-router.put('/:id', uploadFields, updateAlbum);
+// Read Detail Admin (Untuk Form Edit)
+router.get(
+    '/:id', 
+    authenticateToken, 
+    requireCreative, 
+    getAlbumById
+);
 
-// Delete Album (Satu Album full)
-router.delete('/:id', deleteAlbum);
+// Create Album
+router.post(
+    '/', 
+    authenticateToken, 
+    requireCreative,
+    uploadFields, 
+    createAlbum
+);
 
-// Delete Single Photo (Hapus 1 foto dari gallery)
-router.delete('/photo/:photoId', deletePhoto);
+// Update Album
+router.put(
+    '/:id', 
+    authenticateToken, 
+    requireCreative,
+    uploadFields, 
+    updateAlbum
+);
+
+// Delete Album Full
+router.delete(
+    '/:id', 
+    authenticateToken, 
+    requireCreative, 
+    deleteAlbum
+);
+
+// Delete Single Photo
+router.delete(
+    '/photo/:photoId', 
+    authenticateToken, 
+    requireCreative, 
+    deletePhoto
+);
 
 export default router;

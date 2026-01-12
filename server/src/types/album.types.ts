@@ -1,3 +1,4 @@
+// server/src/types/album.types.ts
 import { RowDataPacket } from "mysql2";
 
 // Tabel 'album'

@@ -1,7 +1,10 @@
+// client/src/pages/admin/albums/AlbumList.tsx
+
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminAlbums, deleteAlbum } from '../../../services/albumService';
 import type { Album } from '../../../types/album.types';
+import { API_BASE_URL } from '../../../config/api'; // [1] Import Config
 
 // Helper format tanggal
 const formatDate = (dateString: string) => {
@@ -13,6 +16,9 @@ const formatDate = (dateString: string) => {
 const AlbumList = () => {
     const [albums, setAlbums] = useState<Album[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+
+    // [2] Helper URL Root Server (hapus '/api')
+    const serverRoot = API_BASE_URL.replace('/api', '');
 
     const fetchData = () => {
         setIsLoading(true);
@@ -67,10 +73,11 @@ const AlbumList = () => {
                             albums.map((item) => (
                                 <tr key={item.id} style={{ borderBottom: '1px solid #334155' }}>
                                     <td style={{ padding: '16px' }}>
+                                        {/* [3] GUNAKAN URL SERVER */}
                                         <img 
-                                            src={`/albums/covers/${item.image}`} 
+                                            src={`${serverRoot}/uploads/albums/covers/${item.image}`} 
                                             alt="Cover" 
-                                            style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px', backgroundColor:'#000' }} 
+                                            style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px', backgroundColor:'#0f172a' }} 
                                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/60x40?text=No+Img')}
                                         />
                                     </td>
@@ -82,17 +89,18 @@ const AlbumList = () => {
                                     <td style={{ padding: '16px' }}>
                                         <span style={{ 
                                             padding: '4px 10px', borderRadius: '4px', fontSize: '0.8rem',
-                                            backgroundColor: item.status === 'publish' ? '#22c55e' : '#f59e0b',
-                                            color: '#0f172a', fontWeight: 'bold'
+                                            backgroundColor: item.status === 'publish' ? 'rgba(34, 197, 94, 0.2)' : 'rgba(245, 158, 11, 0.2)', // Transparan dikit biar bagus
+                                            color: item.status === 'publish' ? '#4ade80' : '#fbbf24', 
+                                            fontWeight: 'bold', border: item.status === 'publish' ? '1px solid #22c55e' : '1px solid #f59e0b'
                                         }}>
                                             {item.status.toUpperCase()}
                                         </span>
                                     </td>
                                     <td style={{ padding: '16px', textAlign: 'right' }}>
-                                        <Link to={`/dashboard/albums/edit/${item.id}`} style={{ marginRight: '10px', color: '#38bdf8', textDecoration: 'none' }}>Edit</Link>
+                                        <Link to={`/dashboard/albums/edit/${item.id}`} style={{ marginRight: '15px', color: '#38bdf8', textDecoration: 'none', fontWeight:'bold' }}>Edit</Link>
                                         <button 
                                             onClick={() => handleDelete(item.id, item.title)}
-                                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer' }}
+                                            style={{ background: 'none', border: 'none', color: '#ef4444', cursor: 'pointer', fontWeight:'bold' }}
                                         >
                                             Hapus
                                         </button>

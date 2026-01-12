@@ -1,3 +1,5 @@
+// client/src/pages/admin/albums/CreateAlbums.tsx
+
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createAlbum } from '../../../services/albumService';

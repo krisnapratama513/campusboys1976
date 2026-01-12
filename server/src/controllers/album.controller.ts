@@ -1,57 +1,78 @@
+/**
+ * ==============================================================================
+ * ALBUM CONTROLLER
+ * ==============================================================================
+ * Menangani request HTTP untuk Album & Photo.
+ * Mengelola upload file, rename file, dan hapus file fisik.
+ */
+
 import { Request, Response } from 'express';
 import * as albumService from '../services/album.service';
+import { fetchAllPublishedAlbums, fetchPublicAlbumDetail } from '../services/album.service';
 import slugify from 'slugify';
 import fs from 'fs';
 import path from 'path';
 
-// Direktori penyimpanan
-const coverDir = path.join(__dirname, '../../../client/public/albums/covers');
-const galleryDir = path.join(__dirname, '../../../client/public/albums/gallery');
+// [PATH]  server/uploads agar konsisten dengan config multer
+const baseDir = path.join(__dirname, '../../uploads/albums');
+const coverDir = path.join(baseDir, 'covers');
+const galleryDir = path.join(baseDir, 'gallery');
 
-// Helper: Hapus file aman
+/**
+ * Helper: Menghapus file fisik secara aman.
+ * Mengecek keberadaan file sebelum unlink untuk mencegah error.
+ */
 const deleteFile = (filePath: string) => {
     if (fs.existsSync(filePath)) fs.unlinkSync(filePath);
 };
 
+// ==========================================
+// PUBLIC CONTROLLERS
+// ==========================================
 
-// Tambahkan import service public fetcher
-import { fetchAllPublishedAlbums, fetchPublicAlbumDetail } from '../services/album.service';
-
-// --- PUBLIC CONTROLLERS ---
-
+/**
+ * GET Public Albums
+ * Mengambil daftar album yang sudah publish (untuk pengunjung).
+ */
 export const getPublicAlbums = async (req: Request, res: Response) => {
     try {
-        // Service ini return Array murni, bukan object { data }
         const data = await fetchAllPublishedAlbums(); 
-        res.json(data); 
+        res.json({ message: 'Success', data }); 
     } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 };
 
+/**
+ * GET Public Detail
+ * Mengambil detail album + foto gallery berdasarkan SLUG atau ID.
+ */
 export const getPublicAlbumDetail = async (req: Request, res: Response) => {
     try {
         const { slug } = req.params;
         
-        // --- PERBAIKAN DI SINI ---
         if (!slug) {
             return res.status(400).json({ message: 'Slug album tidak ditemukan' });
         }
-        // -------------------------
 
-        // Sekarang TypeScript tahu 'slug' adalah string
         const data = await fetchPublicAlbumDetail(slug);
         
         if (!data) return res.status(404).json({ message: 'Album tidak ditemukan' });
         
-        res.json(data);
+        res.json({ data });
     } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 };
 
-// --- ADMIN READ ---
+// ==========================================
+// ADMIN CONTROLLERS
+// ==========================================
 
+/**
+ * ADMIN: Get All Albums
+ * Mengambil semua album termasuk status draft/pending.
+ */
 export const getAdminAlbums = async (req: Request, res: Response) => {
     try {
         const data = await albumService.getAllAlbums();
@@ -61,6 +82,10 @@ export const getAdminAlbums = async (req: Request, res: Response) => {
     }
 };
 
+/**
+ * ADMIN: Get Album By ID
+ * Mengambil detail album untuk keperluan form edit admin.
+ */
 export const getAlbumById = async (req: Request, res: Response) => {
     try {
         const data = await albumService.getAlbumById(Number(req.params.id));
@@ -71,24 +96,26 @@ export const getAlbumById = async (req: Request, res: Response) => {
     }
 };
 
-// --- CREATE ---
-
+/**
+ * ADMIN: Create Album
+ * 1. Validasi Cover -> 2. Insert DB Awal -> 3. Rename File (Slug) -> 4. Update DB -> 5. Insert Photos
+ */
 export const createAlbum = async (req: Request, res: Response) => {
     try {
         const { title, description, date, status } = req.body;
         
+        // Casting req.files
         const files = req.files as { [fieldname: string]: Express.Multer.File[] };
         
-        // 1. Validasi Cover
+        // Validasi: Cover Wajib
         if (!files || !files.cover || files.cover.length === 0) {
             return res.status(400).json({ message: 'Cover album wajib diupload!' });
         }
 
-        // FIX 1: Gunakan Non-null assertion (!) karena kita sudah cek length diatas
         const coverFile = files.cover[0]!; 
         const galleryFiles = files.photos || [];
 
-        // 2. Insert DB Awal
+        // 1. Insert DB Awal (nama & image sementara)
         const newId = await albumService.createAlbumInitial({
             title, 
             name: 'temp', 
@@ -98,19 +125,21 @@ export const createAlbum = async (req: Request, res: Response) => {
             status: status || 'pending'
         });
 
-        // 3. Generate Slug & Rename Cover
+        // 2. Generate Slug & Rename Cover
+        // Format Slug: ID_judul-album
         const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
         const slug = `${newId}_${cleanTitle}`;
         
         const coverExt = path.extname(coverFile.originalname);
         const finalCoverName = `${slug}${coverExt}`;
         
+        // Rename fisik file
         fs.renameSync(coverFile.path, path.join(coverDir, finalCoverName));
 
-        // 4. Update DB
+        // 3. Update DB dengan info final
         await albumService.updateAlbumInfo(newId, { name: slug, image: finalCoverName });
 
-        // 5. Handle Gallery Photos
+        // 4. Proses Gallery Photos
         if (galleryFiles.length > 0) {
             const photoFilenames = galleryFiles.map(f => f.filename);
             await albumService.addAlbumPhotos(newId, photoFilenames);
@@ -119,12 +148,15 @@ export const createAlbum = async (req: Request, res: Response) => {
         res.status(201).json({ message: 'Album berhasil dibuat', data: { id: newId } });
 
     } catch (err: any) {
+        // [Optional] Bisa tambahkan cleanup file temp disini jika error
         res.status(500).json({ message: 'Gagal membuat album', error: err.message });
     }
 };
 
-// --- UPDATE ---
-
+/**
+ * ADMIN: Update Album
+ * Menangani perubahan info, cover replacement, dan penambahan foto baru.
+ */
 export const updateAlbum = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
@@ -138,25 +170,27 @@ export const updateAlbum = async (req: Request, res: Response) => {
         const newCoverFile = files?.cover ? files.cover[0] : null;
         const newGalleryFiles = files?.photos || [];
 
-        // 2. Slug Logic
+        // 2. Logic Slug Baru (Jika title berubah)
         let newSlug = oldData.name;
         if (title && title !== oldData.title) {
             const cleanTitle = slugify(title, { lower: true, strict: true, replacement: '_' });
             newSlug = `${id}_${cleanTitle}`;
         }
 
-        // 3. Handle Cover Update
+        // 3. Handle Cover File
         let finalCoverName: string | undefined = undefined; 
 
-        // A. Upload baru
+        // CASE A: User upload cover baru
         if (newCoverFile) {
+            // Hapus cover lama
             if (oldData.image) deleteFile(path.join(coverDir, oldData.image));
             
+            // Simpan cover baru
             const ext = path.extname(newCoverFile.originalname);
             finalCoverName = `${newSlug}${ext}`;
             fs.renameSync(newCoverFile.path, path.join(coverDir, finalCoverName));
         } 
-        // B. Rename file lama jika slug berubah
+        // CASE B: User TIDAK upload cover, tapi judul berubah (Slug berubah -> Rename file lama)
         else if (newSlug !== oldData.name && oldData.image) {
             const ext = path.extname(oldData.image);
             const newName = `${newSlug}${ext}`;
@@ -168,8 +202,8 @@ export const updateAlbum = async (req: Request, res: Response) => {
             }
         }
 
-        // 4. Update Info Album
-        // FIX 2: Gunakan Conditional Spread agar tidak mengirim properti image jika undefined
+        // 4. Update DB
+        // Gunakan spread syntax untuk update conditional image
         await albumService.updateAlbumInfo(id, {
             title, 
             description, 
@@ -179,7 +213,7 @@ export const updateAlbum = async (req: Request, res: Response) => {
             ...(finalCoverName && { image: finalCoverName }) 
         });
 
-        // 5. Tambah Foto Gallery Baru
+        // 5. Tambah Foto Gallery Baru (Append)
         if (newGalleryFiles.length > 0) {
             const photoFilenames = newGalleryFiles.map(f => f.filename);
             await albumService.addAlbumPhotos(id, photoFilenames);
@@ -192,27 +226,29 @@ export const updateAlbum = async (req: Request, res: Response) => {
     }
 };
 
-// --- DELETE ALBUM ---
-
+/**
+ * ADMIN: Delete Album
+ * Menghapus data album di DB, data foto di DB, serta semua file fisik terkait.
+ */
 export const deleteAlbum = async (req: Request, res: Response) => {
     try {
         const id = Number(req.params.id);
         
-        // 1. Ambil data album dulu sebelum dihapus (agar tahu nama cover)
+        // 1. Ambil data dulu (untuk nama file cover)
         const albumData = await albumService.getAlbumById(id);
         if(!albumData) return res.status(404).json({message: 'Album tidak ditemukan'});
 
-        // 2. Hapus Album & Foto dari Database (Service return list foto gallery)
+        // 2. Hapus DB & Dapat list foto yang terhapus (untuk nama file gallery)
         const photosToDelete = await albumService.deleteAlbum(id) as any[];
         
-        // 3. Hapus File Foto Gallery
+        // 3. Hapus Fisik Foto Gallery
         if (photosToDelete && photosToDelete.length > 0) {
             photosToDelete.forEach(photo => {
                 deleteFile(path.join(galleryDir, photo.image_filename));
             });
         }
 
-        // 4. Hapus File Cover
+        // 4. Hapus Fisik Cover
         if (albumData.image) {
             deleteFile(path.join(coverDir, albumData.image));
         }
@@ -223,15 +259,19 @@ export const deleteAlbum = async (req: Request, res: Response) => {
     }
 };
 
-// --- DELETE SINGLE PHOTO ---
-
+/**
+ * ADMIN: Delete Single Photo
+ * Menghapus satu foto dari dalam album (biasanya dipanggil dari halaman Edit Album).
+ */
 export const deletePhoto = async (req: Request, res: Response) => {
     try {
         const photoId = Number(req.params.photoId);
         
+        // Service menghapus di DB dan me-return data foto yang dihapus
         const deletedPhoto = await albumService.deletePhotoById(photoId);
         
         if (deletedPhoto) {
+            // Hapus file fisik
             deleteFile(path.join(galleryDir, deletedPhoto.image_filename));
             res.json({ message: 'Foto berhasil dihapus' });
         } else {

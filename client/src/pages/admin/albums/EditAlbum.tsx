@@ -3,10 +3,16 @@ import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getAlbumById, updateAlbum, deleteAlbumPhoto } from '../../../services/albumService';
 import type { Album, AlbumPhoto } from '../../../types/album.types';
 
+// [1] IMPORT CONFIG API
+import { API_BASE_URL } from '../../../config/api';
+
 const EditAlbum = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
+
+    // [2] SETUP URL SERVER ROOT (Hapus '/api')
+    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // --- STATE FORM ---
     const [title, setTitle] = useState('');
@@ -16,14 +22,12 @@ const EditAlbum = () => {
 
     // --- STATE COVER ---
     const [currentCover, setCurrentCover] = useState(''); // Nama file lama
-    const [newCoverFile, setNewCoverFile] = useState<File | null>(null); // File baru (jika ganti)
+    const [newCoverFile, setNewCoverFile] = useState<File | null>(null); // File baru
     const [newCoverPreview, setNewCoverPreview] = useState<string>('');
 
     // --- STATE GALLERY ---
-    // 1. Foto yang SUDAH ADA di database
     const [existingPhotos, setExistingPhotos] = useState<AlbumPhoto[]>([]);
     
-    // 2. Foto BARU yang mau diupload
     interface GalleryItem {
         file: File;
         preview: string;
@@ -39,25 +43,29 @@ const EditAlbum = () => {
             .then((data: Album) => {
                 setTitle(data.title);
                 setDescription(data.description || '');
-                // Format tanggal untuk input date (YYYY-MM-DD)
+                
                 const dateObj = new Date(data.date);
-                setDate(dateObj.toISOString().split('T')[0]);
+                // Validasi agar tidak error jika tanggal invalid
+                if(!isNaN(dateObj.getTime())) {
+                    setDate(dateObj.toISOString().split('T')[0]);
+                }
+                
                 setStatus(data.status);
                 setCurrentCover(data.image);
                 
-                // Set foto gallery lama
                 if (data.photos) {
                     setExistingPhotos(data.photos);
                 }
             })
             .catch(err => {
-                alert("Gagal memuat data album: " + err.message);
+                console.error(err);
+                alert("Gagal memuat data album.");
                 navigate('/dashboard/albums');
             })
             .finally(() => setIsLoading(false));
     }, [id, navigate]);
 
-    // 2. CLEANUP MEMORY (Preview)
+    // 2. CLEANUP MEMORY
     useEffect(() => {
         return () => {
             if (newCoverPreview) URL.revokeObjectURL(newCoverPreview);
@@ -65,7 +73,7 @@ const EditAlbum = () => {
         };
     }, []);
 
-    // 3. HANDLER COVER BARU
+    // HANDLERS...
     const handleCoverChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files && e.target.files[0]) {
             const file = e.target.files[0];
@@ -74,7 +82,6 @@ const EditAlbum = () => {
         }
     };
 
-    // 4. HANDLER GALLERY BARU (ADD)
     const handleNewGalleryChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const newFiles = Array.from(e.target.files);
@@ -87,25 +94,21 @@ const EditAlbum = () => {
         }
     };
 
-    // 5. HANDLER HAPUS FOTO BARU (QUEUE)
     const removeNewGalleryItem = (tempId: number) => {
         setNewGalleryItems(prev => prev.filter(item => item.id !== tempId));
     };
 
-    // 6. HANDLER HAPUS FOTO LAMA (API CALL)
     const handleDeleteExistingPhoto = async (photoId: number) => {
         if (!window.confirm("Hapus foto ini secara permanen?")) return;
 
         try {
             await deleteAlbumPhoto(photoId);
-            // Update UI: Hapus dari state existingPhotos
             setExistingPhotos(prev => prev.filter(p => p.id !== photoId));
         } catch (error: any) {
             alert("Gagal menghapus foto: " + error.message);
         }
     };
 
-    // 7. SUBMIT UPDATE
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
@@ -117,12 +120,10 @@ const EditAlbum = () => {
             formData.append('date', date);
             formData.append('status', status);
 
-            // Jika ada cover baru, kirim. Jika tidak, backend pakai cover lama.
             if (newCoverFile) {
                 formData.append('cover', newCoverFile);
             }
 
-            // Kirim foto-foto gallery BARU
             newGalleryItems.forEach(item => {
                 formData.append('photos', item.file);
             });
@@ -183,13 +184,19 @@ const EditAlbum = () => {
                     {!newCoverPreview && currentCover && (
                         <div style={{marginBottom: 10}}>
                             <div style={{fontSize: '0.8rem', color: '#94a3b8', marginBottom: 5}}>Cover Saat Ini:</div>
-                            <img src={`/albums/covers/${currentCover}`} alt="Old Cover" style={{height: '100px', borderRadius: '4px', border: '1px solid #475569'}} />
+                            
+                            {/* [UPDATE] SRC Mengarah ke Server */}
+                            <img 
+                                src={`${serverRoot}/uploads/albums/covers/${currentCover}`} 
+                                alt="Old Cover" 
+                                style={{height: '100px', borderRadius: '4px', border: '1px solid #475569'}} 
+                                onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=Error')}
+                            />
                         </div>
                     )}
 
                     <input type="file" accept="image/*" onChange={handleCoverChange} style={inputStyle} />
                     
-                    {/* Preview Cover Baru */}
                     {newCoverPreview && (
                         <div style={{ marginTop: '10px' }}>
                             <div style={{fontSize: '0.8rem', color: '#fbbf24', marginBottom: 5}}>Akan diganti menjadi:</div>
@@ -210,11 +217,15 @@ const EditAlbum = () => {
                         <div style={gridStyle}>
                             {existingPhotos.map((photo) => (
                                 <div key={photo.id} style={{ position: 'relative', height: '100px' }}>
+                                    
+                                    {/* [UPDATE] SRC Mengarah ke Server */}
                                     <img 
-                                        src={`/albums/gallery/${photo.image_filename}`} 
+                                        src={`${serverRoot}/uploads/albums/gallery/${photo.image_filename}`} 
                                         alt="Existing" 
                                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #475569' }} 
+                                        onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=Error')}
                                     />
+                                    
                                     <button 
                                         type="button"
                                         onClick={() => handleDeleteExistingPhoto(photo.id)}
