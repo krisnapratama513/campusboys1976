@@ -24,7 +24,7 @@ export const getAllAuthors = async (): Promise<AuthorWithStats[]> => {
             (SELECT COUNT(*) FROM articles WHERE id_author = a.id) AS total_articles,
             (SELECT COUNT(*) FROM fanzines WHERE author_id = a.id) AS total_fanzine
         FROM authors AS a
-        ORDER BY a.name ASC
+        ORDER BY a.id ASC
     `;
     const [rows] = await pool.execute<AuthorWithStats[]>(query);
     return rows;

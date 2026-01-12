@@ -1,47 +1,59 @@
+// client/src/pages/admin/authors/AuthorEdit.tsx
+
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
-import { API_BASE_URL } from '../../../config/api';
+import { getAuthorById, updateAuthor } from '../../../services/authorService';
 
+/**
+ * Halaman Admin: Edit Author.
+ * 1. Load data author lama berdasarkan ID.
+ * 2. Update data author dengan validasi backend (Auth & Duplicate Check).
+ * * @component
+ */
 const AuthorEdit = () => {
     const navigate = useNavigate();
     const { id } = useParams(); // Ambil ID dari URL
+    
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
-    // 1. SAAT HALAMAN DIBUKA: AMBIL DATA LAMA
+    /**
+     * Effect: Load Data Lama
+     */
     useEffect(() => {
-        const fetchAuthor = async () => {
+        const loadData = async () => {
             try {
-                const response = await fetch(`${API_BASE_URL}/authors/${id}`);
-                const result = await response.json();
-                if (result.data) {
-                    setName(result.data.name); // Isi input dengan nama lama
+                if (id) {
+                    const data = await getAuthorById(id);
+                    setName(data.name);
                 }
             } catch (error) {
-                console.error("Gagal ambil data", error);
+                console.error("Gagal load data author:", error);
+                navigate('/dashboard/authors'); // Redirect jika ID tidak valid
             }
         };
 
-        fetchAuthor();
-    }, [id]);
+        loadData();
+    }, [id, navigate]);
 
-    // 2. SAAT TOMBOL SIMPAN DITEKAN
+    /**
+     * Handle Update
+     */
     const handleUpdate = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        if (!id) return;
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
-                method: 'PUT', // Pakai PUT untuk update
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
-            });
+            // Panggil Service Update
+            await updateAuthor(id, name);
 
-            if (!response.ok) throw new Error('Gagal update');
-
-            navigate('/dashboard/authors'); // Kembali ke tabel
-        } catch (error) {
-            alert("Gagal update data");
+            // Redirect sukses
+            navigate('/dashboard/authors');
+        } catch (error: any) {
+            // Tampilkan error (misal: "Gagal update! Nama author tersebut sudah digunakan")
+            alert(error.message);
         } finally {
             setIsLoading(false);
         }
@@ -54,7 +66,9 @@ const AuthorEdit = () => {
             <div style={{ backgroundColor: '#1e293b', padding: '24px', borderRadius: '8px', border: '1px solid #334155' }}>
                 <form onSubmit={handleUpdate}>
                     <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', color: '#94a3b8' }}>Nama Author</label>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem' }}>
+                            Nama Author
+                        </label>
                         <input 
                             type="text" 
                             required
@@ -76,19 +90,27 @@ const AuthorEdit = () => {
                             type="submit" 
                             disabled={isLoading}
                             style={{
-                                backgroundColor: '#fbbf24', // Warna Kuning untuk Edit
+                                backgroundColor: '#fbbf24', // Warna Kuning (Warning/Edit)
                                 color: '#0f172a',
                                 padding: '10px 20px',
                                 border: 'none',
                                 borderRadius: '6px',
                                 fontWeight: 'bold',
-                                cursor: isLoading ? 'not-allowed' : 'pointer'
+                                cursor: isLoading ? 'not-allowed' : 'pointer',
+                                opacity: isLoading ? 0.7 : 1
                             }}
                         >
                             {isLoading ? 'Menyimpan...' : 'Update Data'}
                         </button>
                         
-                        <Link to="/dashboard/authors" style={{ padding: '10px 20px', color: '#94a3b8', textDecoration: 'none', display:'flex', alignItems:'center' }}>
+                        <Link to="/dashboard/authors" style={{ 
+                            padding: '10px 20px', 
+                            color: '#94a3b8', 
+                            textDecoration: 'none', 
+                            display:'flex', 
+                            alignItems:'center',
+                            fontWeight: '500'
+                        }}>
                             Batal
                         </Link>
                     </div>

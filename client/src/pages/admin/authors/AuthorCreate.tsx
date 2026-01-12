@@ -1,29 +1,36 @@
+// client/src/pages/admin/authors/AuthorCreate.tsx
+
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { API_BASE_URL } from '../../../config/api';
+import { createAuthor } from '../../../services/authorService';
 
+/**
+ * Halaman Admin: Tambah Author Baru.
+ * Menggunakan service 'createAuthor' untuk menangani request ke API
+ * dengan header otentikasi yang benar.
+ * * @component
+ */
 const AuthorCreate = () => {
     const navigate = useNavigate();
     const [name, setName] = useState('');
     const [isLoading, setIsLoading] = useState(false);
 
+    /**
+     * Handle Submit Form
+     */
     const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault(); // Cegah reload
+        e.preventDefault();
         setIsLoading(true);
 
         try {
-            const response = await fetch(`${API_BASE_URL}/authors`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name }),
-            });
+            // Panggil Service (Otomatis handle Auth Header)
+            await createAuthor(name);
 
-            if (!response.ok) throw new Error('Gagal menambah author');
-
-            // Sukses -> Kembali ke tabel
+            // Jika sukses, redirect
             navigate('/dashboard/authors');
-        } catch (error) {
-            alert("Error: Gagal menyimpan data.");
+        } catch (error: any) {
+            // Tampilkan pesan error dari backend (misal: "Nama author sudah terdaftar")
+            alert(error.message);
         } finally {
             setIsLoading(false);
         }
@@ -36,7 +43,9 @@ const AuthorCreate = () => {
             <div style={{ backgroundColor: '#1e293b', padding: '24px', borderRadius: '8px', border: '1px solid #334155' }}>
                 <form onSubmit={handleSubmit}>
                     <div style={{ marginBottom: '20px' }}>
-                        <label style={{ display: 'block', marginBottom: '8px', color: '#94a3b8' }}>Nama Lengkap</label>
+                        <label style={{ display: 'block', marginBottom: '8px', color: '#94a3b8', fontSize: '0.9rem' }}>
+                            Nama Lengkap
+                        </label>
                         <input 
                             type="text" 
                             required
@@ -77,7 +86,8 @@ const AuthorCreate = () => {
                             color: '#94a3b8',
                             textDecoration: 'none',
                             display: 'flex',
-                            alignItems: 'center'
+                            alignItems: 'center',
+                            fontWeight: '500'
                         }}>
                             Batal
                         </Link>

@@ -1,8 +1,19 @@
 // client/src/services/authorService.ts
 
+/**
+ * ==============================================================================
+ * AUTHOR SERVICE (CLIENT)
+ * ==============================================================================
+ * Mengelola komunikasi API untuk modul Author.
+ * Menangani CRUD Author dengan header otentikasi.
+ */
+
 import { API_BASE_URL } from '../config/api';
 
-// Kita definisikan tipe datanya di sini agar bisa dipakai ulang
+/**
+ * Interface data Author yang diterima dari API.
+ * Mencakup data statistik (total artikel/fanzine) untuk dashboard.
+ */
 export interface Author {
     id: number;
     name: string;
@@ -10,65 +21,105 @@ export interface Author {
     total_fanzine?: number;
 }
 
-// 1. AMBIL SEMUA AUTHOR (Dipakai di AuthorList & CreateFanzine)
+/**
+ * Helper internal: Ambil token dari LocalStorage untuk Header Authorization.
+ * Diperlukan untuk endpoint Create, Update, dan Delete.
+ */
+const getAuthHeaders = () => {
+    const token = localStorage.getItem('accessToken');
+    return {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+    };
+};
+
+/**
+ * Mengambil daftar semua author.
+ * Endpoint ini Public (tidak perlu token), kecuali jika diubah di backend.
+ */
 export const getAllAuthors = async (): Promise<Author[]> => {
     const response = await fetch(`${API_BASE_URL}/authors`);
+    
     if (!response.ok) {
         throw new Error('Gagal mengambil data authors');
     }
+    
     const result = await response.json();
-    return result.data; // Mengembalikan array authors
+    return result.data; // Backend return structure: { message, data: [...] }
 };
 
-// 2. AMBIL SATU AUTHOR (Dipakai di AuthorEdit)
+/**
+ * Mengambil detail satu author berdasarkan ID.
+ * Digunakan untuk pre-fill form edit.
+ */
 export const getAuthorById = async (id: number | string): Promise<Author> => {
     const response = await fetch(`${API_BASE_URL}/authors/${id}`);
+    
     if (!response.ok) {
         throw new Error('Gagal mengambil detail author');
     }
+    
     const result = await response.json();
     return result.data;
 };
 
-// 3. TAMBAH AUTHOR (Dipakai di AuthorCreate)
+/**
+ * Membuat Author Baru.
+ * Protected: Memerlukan Token.
+ */
 export const createAuthor = async (name: string) => {
     const response = await fetch(`${API_BASE_URL}/authors`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(), // [PENTING] Pakai helper auth
         body: JSON.stringify({ name }),
     });
 
+    const result = await response.json();
+    
     if (!response.ok) {
-        const result = await response.json();
+        // Menangkap pesan error spesifik dari backend (misal: "Nama author sudah terdaftar")
         throw new Error(result.message || 'Gagal menambah author');
     }
-    return response.json();
+    
+    return result;
 };
 
-// 4. UPDATE AUTHOR (Dipakai di AuthorEdit)
+/**
+ * Update Data Author.
+ * Protected: Memerlukan Token.
+ */
 export const updateAuthor = async (id: number | string, name: string) => {
     const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
         method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
+        headers: getAuthHeaders(), // [PENTING] Pakai helper auth
         body: JSON.stringify({ name }),
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-        const result = await response.json();
         throw new Error(result.message || 'Gagal update author');
     }
-    return response.json();
+    
+    return result;
 };
 
-// 5. DELETE AUTHOR (Dipakai di AuthorList)
+/**
+ * Delete Author.
+ * Protected: Memerlukan Token.
+ */
 export const deleteAuthor = async (id: number) => {
     const response = await fetch(`${API_BASE_URL}/authors/${id}`, {
         method: 'DELETE',
+        headers: getAuthHeaders(), // [PENTING] Pakai helper auth (meski tanpa body, header auth tetap perlu)
     });
 
+    const result = await response.json();
+
     if (!response.ok) {
-        const result = await response.json();
+        // Menangkap error constraint (misal: "Gagal! Author ini tidak bisa dihapus...")
         throw new Error(result.message || 'Gagal menghapus author');
     }
-    return response.json();
+    
+    return result;
 };
