@@ -1,52 +1,69 @@
+// client/src/pages/admin/users/UserList.tsx
+
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { getMembers, deleteMember, getMemberDetail } from '../../../services/userService';
 import type { Member, MemberDetail } from '../../../types/user.types';
 
-// Import Komponen Modal
+// Components
 import UserDetailModal from '../../../components/Modals/UserDetailModal';
-import EditMemberModal from '../../../components/Modals/EditMemberModal'; // <--- Import Modal Edit
+import EditMemberModal from '../../../components/Modals/EditMemberModal';
 
+/**
+ * Halaman Admin: Direktori User.
+ * Menampilkan daftar member dengan fitur filter role (visual) dan akses CRUD.
+ * - View Detail: Tersedia untuk semua user login.
+ * - Create/Edit/Delete: HANYA untuk Superadmin.
+ * * @component
+ */
 const UserList = () => {
-    // State Tabel
+    // --- STATE MANAGEMENT ---
     const [members, setMembers] = useState<Member[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    // State Modal Detail (View)
+    // Modal Detail (View Only)
     const [isDetailOpen, setIsDetailOpen] = useState(false);
     const [selectedMember, setSelectedMember] = useState<MemberDetail | null>(null);
     const [isDetailLoading, setIsDetailLoading] = useState(false);
 
-    // State Modal Edit (Admin Only)
+    // Modal Edit (Admin Only)
     const [isEditOpen, setIsEditOpen] = useState(false);
     const [memberToEdit, setMemberToEdit] = useState<MemberDetail | null>(null);
 
-    // STATE USER LOGIN
+    // Current User Info (RBAC)
     const [currentUserRole, setCurrentUserRole] = useState<string>('');
 
-    // Fetch Data List & Cek User Login
+    /**
+     * Effect: Init Data
+     */
+    useEffect(() => {
+        fetchData();
+
+        // Cek Role User Login
+        const userBox = localStorage.getItem('userBox');
+        if (userBox) {
+            try {
+                const user = JSON.parse(userBox);
+                setCurrentUserRole(user.role);
+            } catch (e) {
+                console.error("Gagal parse user role", e);
+            }
+        }
+    }, []);
+
     const fetchData = () => {
         setIsLoading(true);
         getMembers()
             .then(data => setMembers(data))
-            .catch(err => alert(err.message))
+            .catch(err => console.error("Fetch Error:", err)) // Cukup console log, alert bikin annoying
             .finally(() => setIsLoading(false));
     };
 
-    useEffect(() => {
-        fetchData();
-        
-        // Cek Role User yang sedang login dari localStorage
-        const userBox = localStorage.getItem('userBox');
-        if (userBox) {
-            const user = JSON.parse(userBox);
-            setCurrentUserRole(user.role);
-        }
-    }, []);
-
-    // Handle Delete (Hanya Admin)
+    /**
+     * Action: Delete Member
+     */
     const handleDelete = async (id: number, username: string) => {
-        if (!window.confirm(`Yakin ingin menghapus user "${username}"?`)) return;
+        if (!window.confirm(`PERINGATAN: Menghapus user "${username}" akan menghapus semua data terkait.\n\nLanjutkan?`)) return;
         try {
             await deleteMember(id);
             fetchData();
@@ -55,26 +72,30 @@ const UserList = () => {
         }
     };
 
-    // Handle Open Detail (Semua User)
+    /**
+     * Action: Open Detail Modal
+     */
     const handleOpenDetail = async (id: number) => {
         setIsDetailOpen(true);
         setIsDetailLoading(true);
-        setSelectedMember(null); 
+        setSelectedMember(null);
         try {
             const detail = await getMemberDetail(id);
             setSelectedMember(detail);
         } catch (error: any) {
-            alert("Gagal memuat: " + error.message);
+            alert("Gagal memuat detail: " + error.message);
             setIsDetailOpen(false);
         } finally {
             setIsDetailLoading(false);
         }
     };
 
-    // Handle Open Edit (Admin Only)
+    /**
+     * Action: Open Edit Modal
+     */
     const handleOpenEdit = async (id: number) => {
-        // Kita perlu data detail dulu untuk mengisi form edit
         try {
+            // Ambil data terbaru sebelum edit agar form terisi benar
             const detail = await getMemberDetail(id);
             setMemberToEdit(detail);
             setIsEditOpen(true);
@@ -83,17 +104,27 @@ const UserList = () => {
         }
     };
 
-    // Helper Badge (Sama seperti sebelumnya)
+    // Helper: Role Badge Style
     const getRoleBadge = (role: string) => {
-        const styles: any = {
+        const styles: Record<string, { bg: string, color: string }> = {
             superadmin: { bg: '#dc2626', color: 'white' },
             editor: { bg: '#2563eb', color: 'white' },
             creative: { bg: '#d97706', color: 'white' },
             member: { bg: '#475569', color: '#e2e8f0' }
         };
         const style = styles[role] || styles.member;
+
         return (
-            <span style={{ backgroundColor: style.bg, color: style.color, padding: '4px 8px', borderRadius: '4px', fontSize: '0.75rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
+            <span style={{
+                backgroundColor: style.bg,
+                color: style.color,
+                padding: '4px 10px',
+                borderRadius: '4px',
+                fontSize: '0.7rem',
+                textTransform: 'uppercase',
+                fontWeight: 'bold',
+                letterSpacing: '0.5px'
+            }}>
                 {role}
             </span>
         );
@@ -101,90 +132,104 @@ const UserList = () => {
 
     return (
         <div style={{ color: '#e2e8f0' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '24px' }}>
-                <h2>Directory Members</h2>
-                
-                {/* Tombol Tambah Hanya untuk Superadmin */}
+            {/* Header */}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
+                <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Directory Members</h2>
+
+                {/* Tombol Tambah (RBAC Check) */}
                 {currentUserRole === 'superadmin' && (
-                    <Link to="/dashboard/users/create" style={{ backgroundColor: '#fbbf24', color: '#0f172a', padding: '10px 20px', borderRadius: '6px', textDecoration: 'none', fontWeight: 'bold' }}>
+                    <Link to="/dashboard/users/create" style={{
+                        backgroundColor: '#fbbf24',
+                        color: '#0f172a',
+                        padding: '10px 20px',
+                        borderRadius: '6px',
+                        textDecoration: 'none',
+                        fontWeight: 'bold',
+                        fontSize: '0.9rem',
+                        boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                    }}>
                         + Tambah Member
                     </Link>
                 )}
             </div>
 
-             <table style={{ width: '100%', borderCollapse: 'collapse', backgroundColor: '#1e293b', borderRadius: '8px', overflow: 'hidden' }}>
-                 <thead style={{ backgroundColor: '#334155', color: '#94a3b8' }}>
-                    <tr>
-                        <th style={{ padding: 15, textAlign: 'left' }}>Username</th>
-                        <th style={{ padding: 15, textAlign: 'left' }}>Role</th>
-                        <th style={{ padding: 15, textAlign: 'left' }}>Chapter</th>
-                        <th style={{ padding: 15, textAlign: 'center' }}>Gen</th>
-                        <th style={{ padding: 15, textAlign: 'right' }}>Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {isLoading ? (
-                        <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center' }}>Loading directory...</td></tr>
-                    ) : members.length === 0 ? (
-                        <tr><td colSpan={5} style={{ padding: 20, textAlign: 'center' }}>Belum ada member.</td></tr>
-                    ) : (
-                        members.map((m) => (
-                            <tr key={m.id} style={{ borderBottom: '1px solid #334155' }}>
-                                <td style={{ padding: 15, fontWeight: 'bold' }}>{m.username}</td>
-                                <td style={{ padding: 15 }}>{getRoleBadge(m.role)}</td>
-                                <td style={{ padding: 15 }}>{m.chapter_name || '-'}</td>
-                                <td style={{ padding: 15, textAlign: 'center' }}>{m.generation}</td>
-                                <td style={{ padding: 15, textAlign: 'right' }}>
-                                    
-                                    {/* Tombol DETAIL (Semua User Bisa Lihat) */}
-                                    <button 
-                                        onClick={() => handleOpenDetail(m.id)}
-                                        style={{ marginRight: 10, backgroundColor: 'transparent', border: '1px solid #38bdf8', color: '#38bdf8', padding: '5px 10px', borderRadius: 4, cursor: 'pointer' }}
-                                    >
-                                        👁️ Detail
-                                    </button>
+            {/* Table */}
+            <div style={{ backgroundColor: '#1e293b', borderRadius: '8px', overflow: 'hidden', border: '1px solid #334155' }}>
+                <table style={{ width: '100%', borderCollapse: 'collapse' }}>
+                    <thead style={{ backgroundColor: '#334155', color: '#94a3b8', fontSize: '0.85rem', textTransform: 'uppercase' }}>
+                        <tr>
+                            <th style={{ padding: 16, textAlign: 'left' }}>Username</th>
+                            <th style={{ padding: 16, textAlign: 'left' }}>Role</th>
+                            <th style={{ padding: 16, textAlign: 'left' }}>Chapter</th>
+                            <th style={{ padding: 16, textAlign: 'center' }}>Gen</th>
+                            <th style={{ padding: 16, textAlign: 'right' }}>Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {isLoading ? (
+                            <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#94a3b8' }}>Memuat direktori...</td></tr>
+                        ) : members.length === 0 ? (
+                            <tr><td colSpan={5} style={{ padding: 24, textAlign: 'center', color: '#94a3b8' }}>Belum ada member terdaftar.</td></tr>
+                        ) : (
+                            members.map((m) => (
+                                <tr key={m.id} style={{ borderBottom: '1px solid #334155' }}>
+                                    <td style={{ padding: 16, fontWeight: 'bold' }}>{m.username}</td>
+                                    <td style={{ padding: 16 }}>{getRoleBadge(m.role)}</td>
+                                    <td style={{ padding: 16, color: '#cbd5e1' }}>{m.chapter_name || '-'}</td>
+                                    <td style={{ padding: 16, textAlign: 'center', fontFamily: 'monospace' }}>{m.generation}</td>
+                                    <td style={{ padding: 16, textAlign: 'right' }}>
 
-                                    {/* Tombol EDIT & HAPUS (Hanya Superadmin) */}
-                                    {currentUserRole === 'superadmin' && (
-                                        <>
-                                            <button 
-                                                onClick={() => handleOpenEdit(m.id)}
-                                                style={{ marginRight: 10, backgroundColor: 'transparent', border: '1px solid #fbbf24', color: '#fbbf24', padding: '5px 10px', borderRadius: 4, cursor: 'pointer' }}
-                                            >
-                                                ✎ Edit
-                                            </button>
+                                        {/* DETAIL BUTTON */}
+                                        <button
+                                            onClick={() => handleOpenDetail(m.id)}
+                                            style={{ marginRight: 8, backgroundColor: 'transparent', border: '1px solid #38bdf8', color: '#38bdf8', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                                        >
+                                            Detail
+                                        </button>
 
-                                            <button 
-                                                onClick={() => handleDelete(m.id, m.username)} 
-                                                style={{ backgroundColor: 'transparent', border: 'none', color: '#ef4444', cursor: 'pointer' }}
-                                            >
-                                                Hapus
-                                            </button>
-                                        </>
-                                    )}
+                                        {/* ADMIN ACTIONS */}
+                                        {currentUserRole === 'superadmin' && (
+                                            <>
+                                                <button
+                                                    onClick={() => handleOpenEdit(m.id)}
+                                                    style={{ marginRight: 8, backgroundColor: 'transparent', border: '1px solid #fbbf24', color: '#fbbf24', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                                                >
+                                                    Edit
+                                                </button>
 
-                                </td>
-                            </tr>
-                        ))
-                    )}
-                </tbody>
-             </table>
+                                                <button
+                                                    onClick={() => handleDelete(m.id, m.username)}
+                                                    style={{ backgroundColor: 'transparent', border: '1px solid #ef4444', color: '#ef4444', padding: '6px 12px', borderRadius: 4, cursor: 'pointer', fontSize: '0.8rem', fontWeight: 'bold' }}
+                                                >
+                                                    Hapus
+                                                </button>
+                                            </>
+                                        )}
 
-            {/* MODAL VIEW (Semua) */}
-            <UserDetailModal 
+                                    </td>
+                                </tr>
+                            ))
+                        )}
+                    </tbody>
+                </table>
+            </div>
+
+            {/* MODALS */}
+            <UserDetailModal
                 isOpen={isDetailOpen}
                 isLoading={isDetailLoading}
                 member={selectedMember}
                 onClose={() => setIsDetailOpen(false)}
             />
 
-            {/* MODAL EDIT (Admin Only) */}
-            <EditMemberModal 
-                isOpen={isEditOpen}
-                member={memberToEdit}
-                onClose={() => setIsEditOpen(false)}
-                onSuccess={fetchData} // Refresh tabel setelah edit
-            />
+            {currentUserRole === 'superadmin' && (
+                <EditMemberModal
+                    isOpen={isEditOpen}
+                    member={memberToEdit}
+                    onClose={() => setIsEditOpen(false)}
+                    onSuccess={fetchData}
+                />
+            )}
         </div>
     );
 };
