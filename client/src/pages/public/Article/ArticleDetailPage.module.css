@@ -82,6 +82,14 @@
     display: grid;
     row-gap: 1.25rem;
     text-align: justify;
+
+    /* --- SOLUSI: ANTI JEBOL --- */
+    overflow-wrap: break-word;  /* Standar modern */
+    word-wrap: break-word;      /* Support browser lama */
+    word-break: break-word;     /* Opsi tambahan */
+    
+    /* Pastikan lebar tidak "mekar" melebihi parent */
+    max-width: 100%;
 }
 
 /* --- PERBAIKAN RECENT POST --- */
@@ -92,6 +100,8 @@
     /* 1. Hapus garis bawah link */
     text-decoration: none; 
 }
+
+/* sekkk kosek */
 
 .recentItem>.recentImg {
     /* 2. Ubah width tetap (150px) ke persentase (misal: 30%) */

@@ -23,6 +23,13 @@ if (!fs.existsSync(targetDir)) {
     fs.mkdirSync(targetDir, { recursive: true });
 }
 
+// [BARU] Helper: Membersihkan HTML Content dari karakter bandel
+const sanitizeContent = (htmlContent: string): string => {
+    if (!htmlContent) return "";
+    // Mengganti &nbsp; (Non-Breaking Space) dengan spasi biasa
+    return htmlContent.replace(/&nbsp;/g, ' ');
+};
+
 // ==========================================
 // PUBLIC CONTROLLERS (READ ONLY)
 // ==========================================
@@ -107,13 +114,15 @@ export const createArticle = async (req: Request, res: Response) => {
     try {
         const { id_author, title, status, password, content, description } = req.body;
 
+        const cleanContent = sanitizeContent(content);
+
         // 1. Insert DB (Initial)
         const newId = await articleService.createArticleInitial({
             id_author, 
             title, 
             status, 
             password: password || null, 
-            content, 
+            content : cleanContent, 
             description: description || null, 
             created_at: new Date()
         });
@@ -214,13 +223,14 @@ export const updateArticle = async (req: Request, res: Response) => {
         }
 
         // 5. Update Database
+        const cleanContent = sanitizeContent(content);
         await articleService.updateArticleInfo(id, { 
             id_author, 
             title, 
             status, 
             // Logic: Jika password dikirim (string kosong atau isi), pakai itu. Jika undefined, pakai lama.
             password: password !== undefined ? password : oldData.password, 
-            content, 
+            content : cleanContent, 
             description 
         });
         
