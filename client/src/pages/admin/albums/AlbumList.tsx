@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminAlbums, deleteAlbum } from '../../../services/albumService';
 import type { Album } from '../../../types/album.types';
-import { API_BASE_URL } from '../../../config/api'; // [1] Import Config
+import { SERVER_ROOT } from '../../../config/api'; // [1] Import Config
 
 // Helper format tanggal
 const formatDate = (dateString: string) => {
@@ -16,9 +16,6 @@ const formatDate = (dateString: string) => {
 const AlbumList = () => {
     const [albums, setAlbums] = useState<Album[]>([]);
     const [isLoading, setIsLoading] = useState(true);
-
-    // [2] Helper URL Root Server (hapus '/api')
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     const fetchData = () => {
         setIsLoading(true);
@@ -75,7 +72,7 @@ const AlbumList = () => {
                                     <td style={{ padding: '16px' }}>
                                         {/* [3] GUNAKAN URL SERVER */}
                                         <img 
-                                            src={`${serverRoot}/uploads/albums/covers/${item.image}`} 
+                                            src={`${SERVER_ROOT}/uploads/albums/covers/${item.image}`} 
                                             alt="Cover" 
                                             style={{ width: '60px', height: '40px', objectFit: 'cover', borderRadius: '4px', backgroundColor:'#0f172a' }} 
                                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/60x40?text=No+Img')}

@@ -3,7 +3,7 @@
 import { Link } from 'react-router-dom';
 import { FaCircle } from 'react-icons/fa6';
 import type { FanzineCardProps } from '../types/fanzine.types';
-import { API_BASE_URL } from '../config/api'; // Import Config
+import { SERVER_ROOT } from '../config/api'; // Import Config
 
 /**
  * Komponen Kartu Fanzine.
@@ -17,12 +17,9 @@ const FanzineCard = ({
     date,
     title,
 }: FanzineCardProps) => {
-    
-    // 1. Definisikan Root URL Server (hapus '/api' dari API_BASE_URL)
-    const serverRoot = API_BASE_URL.replace('/api', '');
-    
-    // 2. Susun Path ke folder uploads server
-    const imgPath = `${serverRoot}/uploads/fanzines/covers/${imgFilename}`;
+        
+    // Path ke folder uploads server
+    const imgPath = `${SERVER_ROOT}/uploads/fanzines/covers/${imgFilename}`;
 
     return (
         <Link to={href} style={{ color:'hsl(228, 8%, 70%)', textDecoration:'none'}}>

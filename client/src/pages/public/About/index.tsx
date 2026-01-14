@@ -5,7 +5,7 @@ import styles from './AboutPage.module.css';
 import HeroSection from './HeroSection';
 
 // Import Config untuk mendapatkan alamat Server
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 import { type AboutContent } from '../../../types/about';
 import type { Chapter } from '../../../types/chapter.types';
@@ -82,11 +82,6 @@ const AboutPage = () => {
         };
     }, [chapters]);
 
-    /**
-     * Helper: Mendapatkan Root URL Server untuk aset gambar.
-     * Mengubah 'http://localhost:8000/api' menjadi 'http://localhost:8000'
-     */
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // 3. Render Komponen
     return (
@@ -125,7 +120,7 @@ const AboutPage = () => {
                                         Menggunakan URL absolut ke server backend (/uploads/chapters/...)
                                     */}
                                     <img 
-                                        src={`${serverRoot}/uploads/chapters/${chapter.img}`} 
+                                        src={`${SERVER_ROOT}/uploads/chapters/${chapter.img}`} 
                                         alt={`Logo ${chapter.name}`} 
                                         onError={(e) => (e.currentTarget.src = 'https://placehold.co/100?text=No+Img')}
                                     />

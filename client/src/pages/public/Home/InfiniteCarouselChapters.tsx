@@ -4,7 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import InfiniteCarousel from '../../../components/InfiniteCarousel/InfiniteCarousel';
 
 // Import Config untuk mendapatkan alamat Server
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 // Import Type dan Service
 import type { ChapterImage } from '../../../types/chapter.types';
@@ -56,13 +56,9 @@ const InfiniteCarouselChapters = () => {
      * menjadi server-side static URL ('http://host/uploads/chapters/...').
      */
     const carouselImages = useMemo(() => {
-        // 1. Dapatkan Root URL Server (Hapus '/api' dari API_BASE_URL)
-        // Contoh: 'http://localhost:8000/api' -> 'http://localhost:8000'
-        const serverRoot = API_BASE_URL.replace('/api', '');
-
         return chapters.map(chapter => ({
             // 2. Konstruksi URL lengkap ke folder uploads server
-            src: `${serverRoot}/uploads/chapters/${chapter.img}`,
+            src: `${SERVER_ROOT}/uploads/chapters/${chapter.img}`,
             
             // Alt text untuk aksesibilitas
             alt: `Chapter Logo ${chapter.id}` 

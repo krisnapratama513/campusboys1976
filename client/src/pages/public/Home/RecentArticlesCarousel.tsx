@@ -8,7 +8,7 @@ import ArticleCard from '../../../components/ArticleCard/ArticleCard';
 import ButtonCarousel from '../../../components/ButtonCarousel/ButtonCarousel';
 
 // [PENTING] Import Config untuk akses URL Server
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 // --- STYLE DEFINITIONS ---
 // Menggunakan CSS-in-JS untuk style yang terisolasi
@@ -148,7 +148,6 @@ function RecentArticlesCarousel() {
      * Contoh: 'http://localhost:8000/api' -> 'http://localhost:8000'
      * Digunakan untuk mengakses folder statis '/uploads'.
      */
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // --- RENDER ---
 
@@ -190,7 +189,7 @@ function RecentArticlesCarousel() {
                                 key={`${article.id}-${index}`} 
                                 href={`/article/${article.slug}`}
                                 // Construct Full URL: Server + Uploads Path + Filename
-                                imgFilename={`${serverRoot}/uploads/articles/${article.img}`}
+                                imgFilename={`${SERVER_ROOT}/uploads/articles/${article.img}`}
                                 author={article.author_name}
                                 date={article.created_at} 
                                 title={article.title}

@@ -5,7 +5,7 @@ import { useParams, Navigate, Link } from 'react-router-dom';
 import { FaCalendarDays, FaRegUser } from 'react-icons/fa6';
 
 // [PENTING] Import Config untuk akses URL Server
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 // Styles & Utils
 import styles from './ArticleDetailPage.module.css';
@@ -90,13 +90,6 @@ const ArticleDetailPage = () => {
             });
     }, [slug]);
 
-    /**
-     * Helper: Mendapatkan Root URL Server.
-     * Mengubah 'http://localhost:8000/api' -> 'http://localhost:8000'
-     * Digunakan untuk mengakses folder statis '/uploads/articles/'
-     */
-    const serverRoot = API_BASE_URL.replace('/api', '');
-
     // 2. Render Logic: Loading State
     if (loading) {
         return (
@@ -113,7 +106,7 @@ const ArticleDetailPage = () => {
 
     // 4. Data Formatting
     // [UPDATE] Path Gambar Utama diarahkan ke Server Uploads
-    const imgPath = `${serverRoot}/uploads/articles/${article.img}`;
+    const imgPath = `${SERVER_ROOT}/uploads/articles/${article.img}`;
     const displayDate = formatWIBDate(article.created_at);
 
     return (
@@ -171,7 +164,7 @@ const ArticleDetailPage = () => {
                                 <div className={styles.recentImg}>
                                     <img
                                         // [UPDATE] Path Gambar Sidebar diarahkan ke Server Uploads
-                                        src={`${serverRoot}/uploads/articles/${recent.img}`}
+                                        src={`${SERVER_ROOT}/uploads/articles/${recent.img}`}
                                         alt={recent.title}
                                         loading="lazy"
                                         onError={(e) => (e.currentTarget.src = 'https://placehold.co/100?text=No+Img')}

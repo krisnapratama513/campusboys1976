@@ -4,7 +4,7 @@ import styles from './ArticlePage.module.css';
 import { useState, useEffect } from 'react';
 
 // [PENTING] Import Config untuk akses URL Server
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 import ArticleCard from '../../../components/ArticleCard/ArticleCard';
 import type { ApiArticleCard } from '../../../types/article.types';
@@ -37,12 +37,6 @@ const ArticlePage = () => {
             });
     }, []);
 
-    /**
-     * Helper: Mendapatkan Root URL Server.
-     * Mengubah 'http://localhost:8000/api' -> 'http://localhost:8000'
-     */
-    const serverRoot = API_BASE_URL.replace('/api', '');
-
     return (
         <div className={styles.pageWrapper}>
             <MediaHeroSection title='Article' />
@@ -56,7 +50,7 @@ const ArticlePage = () => {
                         
                         // [PENTING] Update Path Gambar:
                         // Gabungkan URL Server + Folder Uploads + Nama File
-                        imgFilename={`${serverRoot}/uploads/articles/${article.img}`}
+                        imgFilename={`${SERVER_ROOT}/uploads/articles/${article.img}`}
                         
                         author={article.author_name}
                         date={article.created_at}

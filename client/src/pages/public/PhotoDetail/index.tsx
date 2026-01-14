@@ -9,7 +9,7 @@ import type { Album } from '../../../types/album.types';
 import { getPublicAlbumBySlug } from '../../../services/albumService';
 
 // Config & Components
-import { API_BASE_URL } from '../../../config/api'; // [PENTING]
+import { SERVER_ROOT } from '../../../config/api'; // [PENTING]
 import PhotoModal from '../../../components/PhotoModal';
 
 /**
@@ -27,9 +27,6 @@ const PhotoDetail = () => {
     
     // State untuk Modal (menyimpan filename foto yang sedang di-zoom)
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
-
-    // Helper: Root URL Server (hapus '/api')
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     /**
      * Effect: Load Detail Album by Slug
@@ -103,7 +100,7 @@ const PhotoDetail = () => {
                             >
                                 {/* [UPDATE] Gunakan URL Server */}
                                 <img 
-                                    src={`${serverRoot}/uploads/albums/gallery/${photo.image_filename}`} 
+                                    src={`${SERVER_ROOT}/uploads/albums/gallery/${photo.image_filename}`} 
                                     alt={`Dokumentasi ${album.title}`} 
                                     className={styles.image}
                                     loading="lazy"

@@ -10,14 +10,11 @@ import MediaHeroSection from '../../../components/MediaHeroSection';
 import { getPublicAlbums } from '../../../services/albumService'; 
 
 // [PENTING] Import Config untuk akses Server Static Files
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 const PhotoPage = () => {
     const [albums, setAlbums] = useState<Album[]>([]);
     const [loading, setLoading] = useState(true);
-
-    // [HELPER] URL Root Server (Hapus '/api' jika ada)
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     useEffect(() => {
         getPublicAlbums()
@@ -55,7 +52,7 @@ const PhotoPage = () => {
                                     <div className={styles.imageWrapper}>
                                         {/* [UPDATE] Source mengarah ke Server Uploads */}
                                         <img 
-                                            src={`${serverRoot}/uploads/albums/covers/${album.image}`} 
+                                            src={`${SERVER_ROOT}/uploads/albums/covers/${album.image}`} 
                                             alt={album.title} 
                                             className={styles.image}
                                             loading="lazy"

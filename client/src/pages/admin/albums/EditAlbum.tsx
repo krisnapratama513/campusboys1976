@@ -4,15 +4,12 @@ import { getAlbumById, updateAlbum, deleteAlbumPhoto } from '../../../services/a
 import type { Album, AlbumPhoto } from '../../../types/album.types';
 
 // [1] IMPORT CONFIG API
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 const EditAlbum = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = useState(true);
-
-    // [2] SETUP URL SERVER ROOT (Hapus '/api')
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // --- STATE FORM ---
     const [title, setTitle] = useState('');
@@ -187,7 +184,7 @@ const EditAlbum = () => {
                             
                             {/* [UPDATE] SRC Mengarah ke Server */}
                             <img 
-                                src={`${serverRoot}/uploads/albums/covers/${currentCover}`} 
+                                src={`${SERVER_ROOT}/uploads/albums/covers/${currentCover}`} 
                                 alt="Old Cover" 
                                 style={{height: '100px', borderRadius: '4px', border: '1px solid #475569'}} 
                                 onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=Error')}
@@ -220,7 +217,7 @@ const EditAlbum = () => {
                                     
                                     {/* [UPDATE] SRC Mengarah ke Server */}
                                     <img 
-                                        src={`${serverRoot}/uploads/albums/gallery/${photo.image_filename}`} 
+                                        src={`${SERVER_ROOT}/uploads/albums/gallery/${photo.image_filename}`} 
                                         alt="Existing" 
                                         style={{ width: '100%', height: '100%', objectFit: 'cover', borderRadius: '4px', border: '1px solid #475569' }} 
                                         onError={(e) => (e.currentTarget.src = 'https://placehold.co/100x100?text=Error')}

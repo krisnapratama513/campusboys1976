@@ -5,7 +5,7 @@ import { FaUser, FaWhatsapp, FaPencil, FaPenToSquare, FaLock } from 'react-icons
 
 import { getMemberDetail } from '../../../services/userService';
 import type { MemberDetail } from '../../../types/user.types';
-import { API_BASE_URL } from '../../../config/api'; // Import Config
+import { SERVER_ROOT } from '../../../config/api'; // Import Config
 
 // Import Modals
 import EditProfileModal from '../../../components/Modals/EditProfileModal';
@@ -27,8 +27,6 @@ const MyProfile = () => {
     const [isUsernameModalOpen, setIsUsernameModalOpen] = useState(false); 
     const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
 
-    // Helper: URL Root Server (untuk akses gambar)
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     /**
      * Fetch Profile Data
@@ -96,7 +94,7 @@ const MyProfile = () => {
                     {(profile.image && profile.image !== 'default_user.png') ? (
                         <img 
                             // Gunakan URL Server
-                            src={`${serverRoot}/uploads/profiles/${profile.image}`} 
+                            src={`${SERVER_ROOT}/uploads/profiles/${profile.image}`} 
                             alt="Profile" 
                             style={{ width: 150, height: 150, borderRadius: '50%', objectFit: 'cover', border: '4px solid #0f172a', boxShadow: '0 4px 6px rgba(0,0,0,0.3)' }} 
                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/150?text=Error')}

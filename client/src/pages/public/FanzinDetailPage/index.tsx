@@ -9,7 +9,7 @@ import FlipbookViewer from '../../../components/FlipbookViewer';
 // Service, Type & Config
 import { getFanzineBySlug } from '../../../services/fanzineService';
 import type { FanzineType } from '../../../types/fanzine.types';
-import { API_BASE_URL } from '../../../config/api'; 
+import { SERVER_ROOT } from '../../../config/api'; 
 
 // Style
 import styles from './FanzinDetailPage.module.css';
@@ -26,8 +26,6 @@ const FanzinDetailPage = () => {
     const [fanzine, setFanzine] = useState<FanzineType | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Helper: URL Server Root (Hapus '/api' jika ada)
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     /**
      * Effect: Fetch Data
@@ -79,7 +77,7 @@ const FanzinDetailPage = () => {
 
     // --- SETUP URL PDF (BACKEND STORAGE) ---
     // [UPDATE] Menggunakan fanzine.pdfFilename
-    const fullPdfPath = `${serverRoot}/uploads/fanzines/${fanzine.pdfFilename}`;
+    const fullPdfPath = `${SERVER_ROOT}/uploads/fanzines/${fanzine.pdfFilename}`;
 
     // Format Tanggal
     // [UPDATE] Menggunakan fanzine.date

@@ -6,7 +6,7 @@ import { getAllFanzine } from "../../../services/fanzineService";
 import type { FanzineType } from "../../../types/fanzine.types";
 
 // [PENTING] Import Config untuk menyusun URL gambar dari server
-import { API_BASE_URL } from "../../../config/api";
+import { SERVER_ROOT } from "../../../config/api";
 
 /**
  * Komponen Carousel Majalah (Fanzine) di Halaman Home.
@@ -14,10 +14,6 @@ import { API_BASE_URL } from "../../../config/api";
  */
 const InfiniteCarouselMagazine = () => {
     const [fanzines, setFanzines] = useState<FanzineType[]>([]);
-
-    // [CONFIG] Helper untuk mendapatkan URL root server (hapus '/api')
-    // Contoh: http://localhost:8000
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     useEffect(() => {
         getAllFanzine()
@@ -33,12 +29,12 @@ const InfiniteCarouselMagazine = () => {
     const carouselImages = useMemo(() => {
         return fanzines.map(fanzine => ({
             // Arahkan ke folder uploads di server backend
-            src: `${serverRoot}/uploads/fanzines/covers/${fanzine.imgFilename}`,
+            src: `${SERVER_ROOT}/uploads/fanzines/covers/${fanzine.imgFilename}`,
             
             // Menggunakan judul majalah untuk alt text
             alt: `Cover ${fanzine.title}` 
         }));
-    }, [fanzines, serverRoot]); // Tambahkan serverRoot ke dependency array
+    }, [fanzines, SERVER_ROOT]); // Tambahkan serverRoot ke dependency array
 
     // Optional: Jangan render jika data kosong
     if (fanzines.length === 0) return null;

@@ -4,13 +4,12 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllFanzine, deleteFanzine } from '../../../services/fanzineService';
 import type { FanzineType } from '../../../types/fanzine.types';
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 const FanzineList = () => {
     const [fanzines, setFanzines] = useState<FanzineType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const serverRoot = API_BASE_URL.replace('/api', ''); // Helper URL
 
     const fetchData = () => {
         setIsLoading(true);
@@ -65,7 +64,7 @@ const FanzineList = () => {
                                 <tr key={item.id} style={{ borderBottom: '1px solid #334155' }}>
                                     <td style={{ padding: 15 }}>
                                         <img 
-                                            src={`${serverRoot}/uploads/fanzines/covers/${item.imgFilename}`} 
+                                            src={`${SERVER_ROOT}/uploads/fanzines/covers/${item.imgFilename}`} 
                                             alt="cover" 
                                             style={{ width: 50, height: 70, objectFit: 'cover', borderRadius: 4, backgroundColor: '#334155' }}
                                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/50x70?text=No+Img')}

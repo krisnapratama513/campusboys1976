@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getChapters, deleteChapter } from '../../../services/chapterService';
-import { API_BASE_URL } from '../../../config/api'; // Import Config URL
+import { SERVER_ROOT } from '../../../config/api'; // Import Config URL
 import type { Chapter } from '../../../types/chapter.types';
 
 /**
@@ -50,11 +50,6 @@ const ChapterList = () => {
         }
     };
 
-    /**
-     * Helper: URL Root Server untuk gambar.
-     * Mengubah 'http://localhost:8000/api' -> 'http://localhost:8000'
-     */
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     return (
         <div style={{ color: '#e2e8f0' }}>
@@ -87,7 +82,7 @@ const ChapterList = () => {
                                 <td style={{ padding: 15 }}>
                                     {/* UPDATE PATH GAMBAR DISINI */}
                                     <img 
-                                        src={`${serverRoot}/uploads/chapters/${item.img}`} 
+                                        src={`${SERVER_ROOT}/uploads/chapters/${item.img}`} 
                                         alt={item.name} 
                                         style={{ width: 50, height: 50, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4, padding: 2 }} 
                                         // Fallback jika gambar error/hilang

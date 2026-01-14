@@ -1,11 +1,9 @@
 // client/src/pages/admin/chapters/EditChapter.tsx
 
-// client/src/pages/admin/chapters/EditChapter.tsx
-
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getChapterById, updateChapter } from '../../../services/chapterService';
-import { API_BASE_URL } from '../../../config/api'; // Import Config URL
+import { SERVER_ROOT } from '../../../config/api'; // Import Config URL
 
 /**
  * Halaman Admin: Edit Chapter.
@@ -96,11 +94,6 @@ const EditChapter = () => {
         }
     };
 
-    /**
-     * Helper: Mendapatkan Root URL Server untuk menampilkan gambar lama.
-     * Mengubah 'http://localhost:8000/api' menjadi 'http://localhost:8000'
-     */
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     const inputStyle = { width: '100%', padding: '10px', marginBottom: '15px', borderRadius: '6px', backgroundColor: '#1e293b', border: '1px solid #475569', color: 'white' };
 
@@ -124,7 +117,7 @@ const EditChapter = () => {
                     <div style={{ marginBottom: 15, display:'flex', alignItems:'center', gap: 15, padding: 10, border: '1px dashed #475569', borderRadius: 6 }}>
                         <img 
                             // UPDATE PATH GAMBAR DISINI
-                            src={`${serverRoot}/uploads/chapters/${currentImg}`} 
+                            src={`${SERVER_ROOT}/uploads/chapters/${currentImg}`} 
                             alt="Current Logo" 
                             style={{ width: 60, height: 60, objectFit: 'contain', backgroundColor: '#fff', borderRadius: 4 }} 
                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/60?text=No+Img')}

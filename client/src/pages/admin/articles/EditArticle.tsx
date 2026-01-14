@@ -6,7 +6,7 @@ import { getArticleById, updateArticle } from '../../../services/articleService'
 import { getAllAuthors } from '../../../services/authorService';
 
 // Import Config untuk akses URL Server (Preview Gambar)
-import { API_BASE_URL } from '../../../config/api';
+import { SERVER_ROOT } from '../../../config/api';
 
 // Editor
 import ReactQuill from 'react-quill-new';
@@ -24,7 +24,6 @@ import 'react-quill-new/dist/quill.snow.css';
 const EditArticle = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // --- STATE MANAGEMENT ---
     
@@ -205,7 +204,7 @@ const EditArticle = () => {
                 {!preview && oldImage && (
                     <div style={{ marginBottom: 15, display:'flex', alignItems:'center', gap: 15, padding: 10, border: '1px dashed #475569', borderRadius: 6 }}>
                         <img 
-                            src={`${serverRoot}/uploads/articles/${oldImage}`} 
+                            src={`${SERVER_ROOT}/uploads/articles/${oldImage}`} 
                             alt="Current Cover" 
                             style={{ width: 80, height: 60, objectFit: 'cover', borderRadius: 4 }} 
                             onError={(e) => (e.currentTarget.src = 'https://placehold.co/80?text=Error')}
