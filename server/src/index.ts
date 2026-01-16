@@ -40,14 +40,30 @@ const PORT = process.env.PORT || 8000;
  * MIDDLEWARES GLOBAL
  * ------------------------------------------------------------------------------
  */
-app.use(cors());                 // Mengizinkan akses Cross-Origin (Frontend ke Backend)
+// KONFIGURASI CORS YANG LEBIH KUAT
+// Izinkan secara eksplisit domain frontend
+app.use(cors({
+    origin: [
+        'http://localhost:5173',           // Untuk dev local
+        'https://campusboys1976.com',      // Domain Frontend
+        'https://www.campusboys1976.com'   // Domain dengan www
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Izinkan method ini
+    allowedHeaders: ['Content-Type', 'Authorization'],    // Izinkan header ini
+    credentials: true // Izinkan cookies/session (penting agar tidak dianggap spam)
+}));
 app.use(express.json());         // Parser untuk payload JSON
 app.use(express.urlencoded({ extended: true })); // Parser untuk form-data
 
 // [PENTING] Melayani file statis (Gambar Profil, Cover, dll)
 // Endpoint: /uploads/namafile.jpg
 // Browser bisa mengakses: http://localhost:8000/uploads/profiles/user-1.jpg
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+app.use('/uploads', (req, res, next) => {
+    res.header("Access-Control-Allow-Origin", "https://campusboys1976.com");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+}, express.static(path.join(__dirname, '../uploads')));
 
 /**
  * ------------------------------------------------------------------------------
