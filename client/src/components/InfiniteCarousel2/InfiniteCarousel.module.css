@@ -14,7 +14,6 @@
     padding: 1.5rem 0;
     background-color: lightslategray;
     background-color: black;
-    background-color: rgb(15, 25, 35);
 }
 
 /*
@@ -71,7 +70,7 @@
 
 .item img {
     width: auto;
-    height: 120px;
+    height: 250px;
     background-color: black;
     border: 5px solid white;
     object-fit: contain;

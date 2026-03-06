@@ -1,0 +1,25 @@
+.container {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    padding: 60px 0;
+    color: #ccc;
+}
+
+.sectionTitle {
+    font-family: 'Oswald', sans-serif;
+    text-align: center;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    position: relative;
+    color: #ccc;
+}
+
+.sectionTitle::after {
+    content: '';
+    display: block;
+    width: 90px;
+    height: 6px;
+    background-color: #00d9ff;
+    background-color: rgb(32, 201, 151);
+    margin: 10px auto 0;
+}

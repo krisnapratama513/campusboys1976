@@ -36,8 +36,28 @@ const deleteFile = (filePath: string) => {
  */
 export const getPublicAlbums = async (req: Request, res: Response) => {
     try {
-        const data = await fetchAllPublishedAlbums(); 
-        res.json({ message: 'Success', data }); 
+        // Tangkap query ?page= dari URL, default ke 1 jika kosong
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 9; // Sesuai kebutuhan frontend
+        const offset = (page - 1) * limit;
+
+        // Panggil service
+        const { albums, totalItems } = await albumService.fetchAllPublishedAlbums(limit, offset);
+        
+        // Hitung total halaman
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Kirim response
+        res.json({ 
+            message: 'Success', 
+            data: albums,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        }); 
     } catch (err: any) {
         res.status(500).json({ message: err.message });
     }

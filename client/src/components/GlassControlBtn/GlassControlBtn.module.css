@@ -1,0 +1,73 @@
+.btnClass {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    /* Kunci Efek Liquid Glass */
+    background: rgba(255, 255, 255, 0.15);
+    /* Transparansi dasar */
+    backdrop-filter: blur(15px);
+    /* Efek blur latar belakang */
+    -webkit-backdrop-filter: blur(15px);
+
+    /* Kombinasi Shadow untuk efek 3D/Cembung */
+    box-shadow:
+        /* Highlight atas (cahaya pantul) */
+        inset 0 2px 4px rgba(255, 255, 255, 0.9),
+        /* Shadow dalam bawah (kedalaman) */
+        inset 0 -4px 10px rgba(0, 0, 0, 0.1),
+        /* Rim/Pinggiran tipis */
+        0 0 0 1px rgba(255, 255, 255, 0.4),
+        /* Bayangan jatuh lembut */
+        0 15px 25px rgba(0, 0, 0, 0.1);
+
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+
+}
+
+.btnClass svg {
+    width: 20px;
+    height: 20px;
+    
+    /* UBAH DI SINI: Warna Putih */
+    color: #ffffff; 
+    
+    /* PENTING: Ganti drop-shadow jadi gelap agar kontras dengan kaca */
+    /* Sebelumnya shadow putih (engraved), sekarang shadow hitam soft (floating) */
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3)); 
+    
+    transition: transform 0.3s ease;
+}
+
+.btnClass:hover {
+    background: rgba(255, 255, 255, 0.3);
+    box-shadow:
+        inset 0 4px 8px rgba(255, 255, 255, 1),
+        inset 0 -4px 10px rgba(0, 0, 0, 0.05),
+        0 0 0 1px rgba(255, 255, 255, 0.6),
+        0 20px 35px rgba(0, 0, 0, 0.15);
+    transform: translateY(-2px) scale(1.05);
+}
+
+.btnClass:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.4);
+}
+
+
+@media (max-width: 768px) {
+    .btnClass{
+        width: 35px;
+        height: 35px;
+    }
+
+    .btnClass svg {
+        width: 14px;
+        height: 14px;
+    }
+}

@@ -2,7 +2,7 @@
 
 import { useEffect } from 'react';
 import styles from './PhotoModal.module.css';
-import { API_BASE_URL } from '../../config/api'; // [PENTING]
+import { SERVER_ROOT } from '../../config/api'; // [PENTING]
 
 type PhotoModalProps = {
     imageFilename: string | null;
@@ -19,7 +19,6 @@ type PhotoModalProps = {
 const PhotoModal = ({ imageFilename, onClose }: PhotoModalProps) => {
     
     // Helper: Root URL Server
-    const serverRoot = API_BASE_URL.replace('/api', '');
 
     // Logic: Jika tidak ada foto dipilih, jangan render apapun
     if (!imageFilename) return null;
@@ -49,7 +48,7 @@ const PhotoModal = ({ imageFilename, onClose }: PhotoModalProps) => {
                 
                 {/* [UPDATE] Gunakan URL Server yang benar */}
                 <img 
-                    src={`${serverRoot}/uploads/albums/gallery/${imageFilename}`} 
+                    src={`${SERVER_ROOT}/uploads/albums/gallery/${imageFilename}`} 
                     alt="Full preview" 
                     className={styles.image}
                     onError={(e) => (e.currentTarget.src = 'https://placehold.co/800x600?text=Image+Not+Found')}

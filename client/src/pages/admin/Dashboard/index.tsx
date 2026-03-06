@@ -56,7 +56,7 @@ const Dashboard = () => {
     );
 
     return (
-        <div style={{ color: '#e2e8f0' }}>
+        <div style={{ color: '#e2e8f0', padding: '30px' }}>
             
             {/* === BAGIAN 1: WELCOME BANNER (Kode Lama Dipercantik) === */}
             <div style={{ 

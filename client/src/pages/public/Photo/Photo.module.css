@@ -5,6 +5,8 @@
     background-color: transparent; /* Sesuai request, mengikuti parent */
     min-height: 100vh;
     width: 100%;
+    font-family: 'Roboto', sans-serif;
+
 }
 
 .contentWrapper {

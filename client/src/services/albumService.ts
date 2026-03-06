@@ -1,7 +1,7 @@
 // client/src/services/albumService.ts
 
 import { API_BASE_URL } from '../config/api';
-import type { Album } from '../types/album.types';
+import type { Album,PublicAlbumsResponse } from '../types/album.types';
 
 // [TAMBAHAN 1] Helper untuk Auth Header (Wajib untuk Admin)
 const getAuthHeaders = () => {
@@ -15,14 +15,14 @@ const getAuthHeaders = () => {
 // BAGIAN 1: PUBLIC SERVICE (Untuk Pengunjung)
 // ==========================================
 
-export const getPublicAlbums = async (): Promise<Album[]> => {
-    const response = await fetch(`${API_BASE_URL}/albums/public`);
+
+export const getPublicAlbums = async (page: number = 1): Promise<PublicAlbumsResponse> => {
+    // Tambahkan query ?page=
+    const response = await fetch(`${API_BASE_URL}/albums/public?page=${page}`);
     if (!response.ok) throw new Error('Gagal mengambil data album public');
     
-    // [TAMBAHAN 2] Unwrapping data
-    // Backend return { message: 'Success', data: [...] }
-    const result = await response.json(); 
-    return result.data; 
+    // Langsung return seluruh hasil (karena kita butuh .data dan .pagination di frontend)
+    return await response.json(); 
 };
 
 export const getPublicAlbumBySlug = async (slug: string): Promise<Album> => {

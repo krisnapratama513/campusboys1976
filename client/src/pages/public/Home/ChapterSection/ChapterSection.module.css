@@ -1,0 +1,30 @@
+.container {
+    text-align: center;
+    font-family: 'Roboto', sans-serif;
+    padding: 60px 0;
+    color: #ccc;
+    background-color: rgb(15, 25, 35);
+}
+
+.sectionTitle {
+    font-family: 'Oswald', sans-serif;
+    font-size: 3rem;
+    margin-bottom: 40px;
+    color: #ccc;
+    /* Ubah menjadi flexbox untuk menyejajarkan garis dan teks */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px; /* Mengatur jarak antara teks dan garis */
+}
+
+/* Terapkan garis pada sisi kiri (before) dan kanan (after) */
+.sectionTitle::before,
+.sectionTitle::after {
+    content: '';
+    display: block;
+    width: 90px;
+    height: 6px;
+    background-color: rgb(32, 201, 151);
+    transform: translateY(4px);
+}

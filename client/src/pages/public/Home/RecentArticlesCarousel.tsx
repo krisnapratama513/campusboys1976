@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import type { ApiArticleCard } from '../../../types/article.types';
 import { getRecentArticlesCard } from '../../../services/articleService';
 import ArticleCard from '../../../components/ArticleCard/ArticleCard';
-import ButtonCarousel from '../../../components/ButtonCarousel/ButtonCarousel';
+import GlassControlBtn from '../../../components/GlassControlBtn/GlassControlBtn';
 
 // [PENTING] Import Config untuk akses URL Server
 import { SERVER_ROOT } from '../../../config/api';
@@ -31,7 +31,8 @@ const h2: CSSProperties = {
 const slidesWrapper: CSSProperties = {
     position: 'relative',
     overflow: 'hidden',
-    width: '100%'
+    width: '100%',
+    minHeight: '350px'
 };
 
 const carouselNavigation: CSSProperties = {
@@ -174,7 +175,7 @@ function RecentArticlesCarousel() {
                 {/* Header Section */}
                 <div style={header}>
                     <h2 style={h2}>RECENT ARTICLES</h2>
-                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/articles">
+                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/article">
                         GO TO ARTICLE PAGE
                     </Link>
                 </div>
@@ -201,8 +202,9 @@ function RecentArticlesCarousel() {
 
                 {/* Navigation Buttons */}
                 <div style={carouselNavigation}>
-                    <ButtonCarousel direction="left" onClick={handlePrevious} />
-                    <ButtonCarousel direction="right" onClick={handleNext} />
+                    <GlassControlBtn varian="left" onClick={handlePrevious} />
+
+                    <GlassControlBtn varian="right" onClick={handleNext} />
                 </div>
 
             </main>

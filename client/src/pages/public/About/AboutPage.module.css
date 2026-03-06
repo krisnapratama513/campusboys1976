@@ -15,7 +15,9 @@
     --secondary-text-color: #a0a0a0;
 
     /* Style Dasar Halaman */
-    font-family: 'Lora', serif;
+    /* font-family: 'Lora', serif; */
+    font-family: 'Roboto', sans-serif;
+
     line-height: 1.8;
     font-size: 18px;
     overflow-x: hidden;

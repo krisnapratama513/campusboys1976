@@ -4,12 +4,14 @@
 .container {
     display: flex;
     flex-direction: column;
-    height: 100vh; /* Viewport Height Full */
+    height: 100vh;
+    /* Viewport Height Full */
     width: 100vw;
     background-color: #0f172a;
     color: #e2e8f0;
     font-family: 'Inter', sans-serif;
-    overflow: hidden; /* Mencegah scroll double di body utama */
+    overflow: hidden;
+    /* Mencegah scroll double di body utama */
 }
 
 /* 2. HEADER: Fixed Height */
@@ -21,7 +23,8 @@
     justify-content: space-between;
     padding: 0 24px;
     border-bottom: 1px solid #334155;
-    flex-shrink: 0; /* Header tidak boleh mengecil */
+    flex-shrink: 0;
+    /* Header tidak boleh mengecil */
     z-index: 10;
 }
 
@@ -48,9 +51,12 @@
 /* 3. BODY WRAPPER: Menampung Sidebar & Content */
 .body {
     display: flex;
-    flex: 1; /* Mengisi sisa ruang setelah header */
-    height: calc(100vh - 64px); /* PENTING: Tinggi fix agar scroll anak bekerja */
-    overflow: hidden; /* Mencegah scrollbar muncul di wrapper ini */
+    flex: 1;
+    /* Mengisi sisa ruang setelah header */
+    height: calc(100vh - 64px);
+    /* PENTING: Tinggi fix agar scroll anak bekerja */
+    overflow: hidden;
+    /* Mencegah scrollbar muncul di wrapper ini */
 }
 
 /* 4. SIDEBAR: Scroll Independen */
@@ -61,23 +67,34 @@
     display: flex;
     flex-direction: column;
     padding: 20px 0;
-    
+
     /* Scroll Logic */
-    overflow-y: auto; 
-    height: 100%; /* Full height dari .body */
+    overflow-y: auto;
+    height: 100%;
+    /* Full height dari .body */
     flex-shrink: 0;
 }
 
 /* 5. CONTENT AREA: Scroll Independen (FIX DISINI) */
 .content {
-    flex: 1; /* Ambil sisa lebar */
-    background-color: #0f172a;
+    flex: 1;
+    /* Ambil sisa lebar */
+    /* background-color: #0f172a; */
+    /* background: linear-gradient(135deg,
+            rgb(125, 211, 252) 0%,
+            rgb(56, 189, 248) 50%,
+            rgb(14, 165, 233) 100%);
+    backdrop-filter: blur(10px); */
+    background-attachment: fixed;
+
     padding: 30px;
-    
+
     /* Scroll Logic */
-    overflow-y: auto; /* Scroll vertikal jika konten panjang */
-    height: 100%; /* Full height dari .body */
-    
+    overflow-y: auto;
+    /* Scroll vertikal jika konten panjang */
+    height: 100%;
+    /* Full height dari .body */
+
     /* Smooth Scroll */
     scroll-behavior: smooth;
 }
@@ -136,7 +153,8 @@
 }
 
 .submenu {
-    background-color: #020617; /* Lebih gelap untuk submenu */
+    background-color: #020617;
+    /* Lebih gelap untuk submenu */
 }
 
 .subLink {
@@ -151,7 +169,8 @@
     color: white;
 }
 
-.subLink.active { /* Jika pakai NavLink, class active otomatis ditambahkan */
+.subLink.active {
+    /* Jika pakai NavLink, class active otomatis ditambahkan */
     color: #38bdf8;
 }
 

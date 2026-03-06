@@ -1,0 +1,90 @@
+.paginationContainer {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin-top: 40px;
+}
+
+/* Base style untuk semua tombol kotak */
+.pageButton, .navButton {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    border: 1px solid #d1d5db; /* border abu-abu */
+    color: #111827; /* teks hitam */
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-family: inherit;
+    padding: 0;
+}
+
+.pageButton:hover:not(.active),
+.navButton:hover:not(:disabled) {
+    background-color: #f9fafb;
+    border-color: #9ca3af;
+}
+
+/* State Aktif (Halaman Saat Ini) - Mengikuti warna ungu di gambar */
+.active {
+    background-color: #ede9fe; /* Ungu pudar */
+    border-color: #8b5cf6; /* Border ungu */
+    color: #7c3aed; /* Teks ungu */
+    cursor: default; /* Tidak bisa diklik karena sedang aktif */
+}
+
+/* State Disabled (Panah saat mentok) */
+.navButton:disabled {
+    border-color: #f3f4f6; /* Border sangat pudar */
+    color: #d1d5db; /* Icon abu-abu muda */
+    cursor: not-allowed;
+    background-color: #ffffff;
+}
+
+.dots {
+    display: flex;
+    justify-content: center;
+    align-items: end; /* Membuat titik-titik posisinya agak di bawah sejajar teks */
+    width: 30px;
+    height: 40px;
+    color: #6b7280; /* Warna abu-abu */
+    font-weight: 600;
+    padding-bottom: 8px; 
+    user-select: none;
+}
+
+
+/* =========================================
+   RESPONSIVE LAYOUT UNTUK MOBILE
+   ========================================= */
+@media screen and (max-width: 600px) {
+    .paginationContainer {
+        gap: 4px; /* Jarak antar tombol dikurangi */
+        margin-top: 24px;
+    }
+
+    .pageButton, .navButton {
+        width: 32px;  /* Tombol diperkecil dari 40px ke 32px */
+        height: 32px; 
+        font-size: 13px; /* Ukuran teks sedikit diperkecil */
+        border-radius: 4px; /* Lengkungan ujung tombol disesuaikan */
+    }
+
+    .dots {
+        width: 20px; /* Jarak titik-titik dipersempit */
+        height: 32px;
+        padding-bottom: 6px;
+    }
+
+    /* Memperkecil ukuran icon panah (SVG) di dalam tombol nav */
+    .navButton svg {
+        width: 16px;
+        height: 16px;
+    }
+}

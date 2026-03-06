@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllAuthors, deleteAuthor, type Author } from '../../../services/authorService';
+import { ButtonLink } from '../components/ButtonLink/ButtonLink';
 
 /**
  * Halaman Admin: Daftar Author.
@@ -29,7 +30,7 @@ const AuthorList = () => {
             setIsLoading(false);
         }
     };
-    
+
     /**
      * Handle Delete Author
      * Menampilkan konfirmasi dan alert hasil operasi.
@@ -54,20 +55,7 @@ const AuthorList = () => {
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
                 <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>Manajemen Authors</h2>
 
-                <Link
-                    to="/dashboard/authors/create"
-                    style={{
-                        backgroundColor: '#38bdf8',
-                        color: '#0f172a',
-                        padding: '10px 20px',
-                        borderRadius: '6px',
-                        textDecoration: 'none',
-                        fontWeight: 'bold',
-                        fontSize: '0.9rem'
-                    }}
-                >
-                    + Tambah Author
-                </Link>
+                <ButtonLink to="/dashboard/authors/create" children="+ Tambah Author" />
             </div>
 
             {/* --- TABLE --- */}

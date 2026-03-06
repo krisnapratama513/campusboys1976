@@ -9,8 +9,8 @@ import type { Album, AlbumPhoto } from '../types/album.types'; // Pastikan file 
 // ==========================================
 
 // Hanya ambil yang status = 'publish'
-export const fetchAllPublishedAlbums = async () => {
-    const [rows] = await pool.execute<Album[]>(
+export const fetchAllPublishedAlbums = async (limit: number, offset: number) => {
+    const [rows] = await pool.query<any>(
         `SELECT
             id,
             title,
@@ -20,9 +20,17 @@ export const fetchAllPublishedAlbums = async () => {
             date
         FROM album
         WHERE status = 'publish'
-        ORDER BY date DESC`
+        ORDER BY date DESC
+        LIMIT ? OFFSET ?`,
+        [limit, offset]
     );
-    return rows;
+    // return rows;
+    const [countResult] = await pool.execute<RowDataPacket[]>(
+        `SELECT COUNT(id) as total FROM album WHERE status = 'publish'`
+    );
+    const totalItems = countResult[0]?.total || 0;
+
+    return { albums: rows, totalItems };
 };
 
 // Detail untuk pengunjung (hanya publish)

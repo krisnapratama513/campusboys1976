@@ -23,3 +23,17 @@ export interface Album {
     // Photos optional, karena di List View (Card) kita tidak muat foto gallery
     photos?: AlbumPhoto[]; 
 }
+
+// Tambahkan di paling bawah file
+export interface PaginationMeta {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+}
+
+export interface PublicAlbumsResponse {
+    message: string;
+    data: Album[];
+    pagination: PaginationMeta;
+}

@@ -2,9 +2,11 @@
 
 import Hero from "./Hero/Hero";
 import AboutSection from "./AboutSection/AboutSection";
-import InfiniteCarouselChapters from "./InfiniteCarouselChapters";
-import InfiniteCarouselMagazine from "./InfiniteCarouselMagazine";
+// import InfiniteCarouselChapters from "./InfiniteCarouselChapters";
+// import InfiniteCarouselMagazine from "./InfiniteCarouselMagazine";
 import RecentArticlesCarousel from "./RecentArticlesCarousel";
+import FanzineSection from "./FanzineSection/FanzineSection";
+import ChapterSection from "./ChapterSection/ChapterSection";
 
 const HomePage = () => {
 
@@ -16,12 +18,13 @@ const HomePage = () => {
                 <AboutSection />
             </main>
             <RecentArticlesCarousel />
-            <main style={{ paddingTop: '30px', paddingBottom: '30px' }}>
-                <InfiniteCarouselMagazine />
-                <InfiniteCarouselChapters />
-            </main>
-            {/* <div style={{ height: "300px", width: "100px", backgroundColor: "crimson" }}>
-            </div> */}
+            <FanzineSection />
+            <ChapterSection />
+
+            {/* <main style={{ paddingTop: '30px', paddingBottom: '30px', backgroundColor: 'crimson' }}> */}
+                {/* <InfiniteCarouselMagazine /> */}
+                {/* <InfiniteCarouselChapters /> */}
+            {/* </main> */}
         </>
     )
 }
