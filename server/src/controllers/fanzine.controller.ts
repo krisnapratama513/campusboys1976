@@ -22,13 +22,44 @@ if (!fs.existsSync(pdfDir)) fs.mkdirSync(pdfDir, { recursive: true });
 if (!fs.existsSync(coverDir)) fs.mkdirSync(coverDir, { recursive: true });
 
 
-// --- PUBLIC: GET LIST ---
+
 export const getAllFanzines = async (req: Request, res: Response) => {
     try {
-        const fanzines = await fanzineService.getAllFanzines();
-        res.json({ message: 'Berhasil ambil data fanzines', data: fanzines });
+        // Tangkap query ?page=, default ke 1
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 8; // Anda bisa sesuaikan limit ini (misal 8 item per halaman)
+        const offset = (page - 1) * limit;
+
+        // Panggil service dengan parameter limit dan offset
+        const { fanzines, totalItems } = await fanzineService.getAllFanzines(limit, offset);
+        
+        // Hitung total halaman
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Kirim response dengan format yang konsisten
+        res.json({ 
+            message: 'Berhasil ambil data fanzines', 
+            data: fanzines,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        });
     } catch (error: any) {
-        res.status(500).json({ message: 'Server Error', error: error.message })
+        console.error("Error getAllFanzines:", error);
+        res.status(500).json({ message: 'Server Error', error: error.message });
+    }
+};
+
+// --- PUBLIC: GET RECENT FOR CAROUSEL ---
+export const getRecentCarousel = async (req: Request, res: Response) => {
+    try {
+        const data = await fanzineService.getRecentFanzinesCarousel();
+        res.json({ data }); // Format array langsung
+    } catch (error: any) {
+        res.status(500).json({ message: 'Server Error', error: error.message });
     }
 };
 

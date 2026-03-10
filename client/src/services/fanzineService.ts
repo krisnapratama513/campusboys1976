@@ -9,7 +9,7 @@
  * - Admin: Create, Update, Delete (Wajib Token)
  */
 
-import type { FanzineType } from "../types/fanzine.types";
+import type { FanzineType, PublicFanzinesResponse } from "../types/fanzine.types";
 import { API_BASE_URL } from "../config/api";
 
 // Helper: Header Auth
@@ -21,13 +21,21 @@ const getAuthHeaders = () => {
 };
 
 // --- PUBLIC ---
-
-export const getAllFanzine = async (): Promise<FanzineType[]> => {
-    const response = await fetch(`${API_BASE_URL}/fanzines`);
+export const getAllFanzine = async (page: number = 1): Promise<PublicFanzinesResponse> => {
+    // Tambahkan query ?page= ke URL
+    const response = await fetch(`${API_BASE_URL}/fanzines?page=${page}`);
     if(!response.ok) throw new Error('Gagal mengambil data getAllFanzine');
     
+    // Langsung return semua datanya (termasuk .data dan .pagination)
+    return await response.json(); 
+};
+
+export const getRecentFanzines = async (): Promise<FanzineType[]> => {
+    const response = await fetch(`${API_BASE_URL}/fanzines/recent`);
+    if(!response.ok) throw new Error('Gagal mengambil data recent');
+    
     const result = await response.json();
-    return result.data; 
+    return result.data; // Return array langsung
 };
 
 export const getFanzineBySlug = async (slug: string): Promise<FanzineType> => {

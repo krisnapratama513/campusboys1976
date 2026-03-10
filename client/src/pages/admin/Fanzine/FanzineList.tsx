@@ -6,31 +6,49 @@ import { getAllFanzine, deleteFanzine } from '../../../services/fanzineService';
 import type { FanzineType } from '../../../types/fanzine.types';
 import { SERVER_ROOT } from '../../../config/api';
 
+// [TAMBAHAN] Import Pagination
+import Pagination from '../../../components/Pagination';
+
 const FanzineList = () => {
     const [fanzines, setFanzines] = useState<FanzineType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
+    // [TAMBAHAN] State untuk Pagination
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
-    const fetchData = () => {
+    // [UPDATE] Fungsi fetchData menerima parameter current page
+    const fetchData = (currentPage: number) => {
         setIsLoading(true);
-        getAllFanzine()
-            .then(data => setFanzines(data))
+        getAllFanzine(currentPage)
+            .then(res => {
+                // Perhatikan: sekarang kita mengambil data dari res.data
+                setFanzines(res.data);
+                setTotalPages(res.pagination.totalPages);
+            })
             .catch(err => console.error(err))
             .finally(() => setIsLoading(false));
     };
 
+    // [UPDATE] Panggil fetchData saat komponen dimount ATAU saat 'page' berubah
     useEffect(() => {
-        fetchData();
-    }, []);
+        fetchData(page);
+    }, [page]);
 
     const handleDelete = async (id: number, title: string) => {
         if (!window.confirm(`Hapus fanzine "${title}" beserta filenya?`)) return;
         try {
             await deleteFanzine(id);
             alert("Fanzine berhasil dihapus!");
-            fetchData();
-        } catch (error: any) {
-            alert(error.message);
+            fetchData(page);
+        } catch (error) { // Hapus : any
+            // Cek apakah error benar-benar sebuah objek Error
+            if (error instanceof Error) {
+                alert(error.message);
+            } else {
+                // Jika error berupa text atau lainnya
+                alert(String(error)); 
+            }
         }
     };
 
@@ -90,6 +108,15 @@ const FanzineList = () => {
                     </tbody>
                 </table>
             </div>
+
+            {/* [TAMBAHAN] Render Pagination di bawah tabel jika data ada */}
+            {!isLoading && fanzines.length > 0 && (
+                <Pagination 
+                    currentPage={page} 
+                    totalPages={totalPages} 
+                    onPageChange={(newPage) => setPage(newPage)} 
+                />
+            )}
         </div>
     );
 };

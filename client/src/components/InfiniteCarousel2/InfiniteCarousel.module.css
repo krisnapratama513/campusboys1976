@@ -165,7 +165,7 @@
     }
 
     .item img {
-        height: 90px;
+        height: 200px;
         border-width: 4px;
     }
 
@@ -190,7 +190,7 @@
     }
 
     .item img {
-        height: 75px;
+        height: 160px;
         border-width: 3px;
     }
 
@@ -217,7 +217,7 @@
     }
 
     .item img {
-        height: 60px;
+        height: 120px;
         /* Lebih kecil lagi */
         border-width: 2px;
     }

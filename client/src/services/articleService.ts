@@ -8,7 +8,7 @@
  * Memisahkan endpoint Public (Tanpa Token) dan Admin (Wajib Token).
  */
 
-import type { ApiArticleCard, FullArticleDetail } from '../types/article.types';
+import type { ApiArticleCard, FullArticleDetail, PublicArticlesResponse } from '../types/article.types';
 import { API_BASE_URL } from '../config/api';
 
 /**
@@ -35,14 +35,16 @@ export const getRecentArticlesCard = async (): Promise<ApiArticleCard[]> => {
 };
 
 /**
- * Mengambil SEMUA artikel publik (Arsip Blog).
- * Endpoint server: /articles/all
+ * Mengambil SEMUA artikel publik (Arsip Blog) dengan Pagination.
+ * Endpoint server: /articles/all?page=x
  */
-export const getAllArticlesCard = async (): Promise<ApiArticleCard[]> => {
-    // PERBAIKAN: Tambahkan '/all' sesuai route server
-    const response = await fetch(`${API_BASE_URL}/articles/all`);
+export const getAllArticlesCard = async (page: number = 1): Promise<PublicArticlesResponse> => {
+    // PERBAIKAN: Tambahkan parameter query ?page=
+    const response = await fetch(`${API_BASE_URL}/articles/all?page=${page}`);
     if (!response.ok) throw new Error('Gagal mengambil semua artikel');
-    return response.json();
+    
+    // Return langsung seluruh JSON (termasuk .data dan .pagination)
+    return await response.json();
 };
 
 /**

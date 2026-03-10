@@ -60,3 +60,18 @@ export type FullArticleDetail = {
     
     created_at: string;
 };
+
+// [TAMBAHAN] Tipe untuk Metadata Pagination
+export interface PaginationMeta {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+}
+
+// [TAMBAHAN] Tipe untuk Response getAllArticlesCard dengan Pagination
+export interface PublicArticlesResponse {
+    message: string;
+    data: ApiArticleCard[];
+    pagination: PaginationMeta;
+}

@@ -8,8 +8,9 @@
  */
 
 import { pool } from '../config/database';
-import type { ResultSetHeader } from 'mysql2';
+import { RowDataPacket, type ResultSetHeader } from 'mysql2';
 import type { Fanzine, FanzineInput } from '../types/fanzine.types';
+import { count } from 'console';
 
 /**
  * Langkah 1 Create: Insert Data Awal (Title, Date, Author).
@@ -63,18 +64,42 @@ export const updateFanzineInfo = async (id: number, data: FanzineInput) => {
 
 /**
  * Get All Fanzines (Join Author).
+ * pagination
  */
-export const getAllFanzines = async (): Promise<Fanzine[]> => {
-    const [rows] = await pool.execute<Fanzine[]>(
+export const getAllFanzines = async (limit: number, offset: number) => {
+    // 1. Gunakan pool.query untuk menghindari error Prepared Statement pada LIMIT
+    const [rows] = await pool.query<Fanzine[]>(
         `SELECT 
             f.id, f.title, f.date, f.slug, f.imgFilename, f.pdfFilename,
             a.name AS author_name
         FROM fanzines AS f
         JOIN authors AS a ON f.author_id = a.id
-        ORDER BY f.date DESC` // Urutkan berdasarkan tanggal terbit fanzine
+        ORDER BY f.date DESC
+        LIMIT ? OFFSET ?`, 
+        [limit, offset]
+    );
+
+    // 2. Hitung total fanzines
+    const [countResult] = await pool.query<RowDataPacket[]>(
+        `SELECT COUNT(id) as total FROM fanzines`
+    );
+
+    const totalItems = countResult[0]?.total || 0;
+    
+    // 3. Return object yang berisi data dan total item
+    return { fanzines: rows, totalItems };
+};
+
+/** Ambil 8 terbaru untuk Carousel Home */
+export const getRecentFanzinesCarousel = async () => {
+    const [rows] = await pool.query(
+        `SELECT id, slug, imgFilename, title 
+         FROM fanzines 
+         ORDER BY date DESC 
+         LIMIT 8`
     );
     return rows;
-}
+};
 
 /**
  * Get By ID.

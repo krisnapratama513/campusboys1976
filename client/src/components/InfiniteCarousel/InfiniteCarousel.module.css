@@ -12,7 +12,6 @@
     overflow: hidden;
     position: relative;
     padding: 1.5rem 0;
-    background-color: lightslategray;
     background-color: black;
     background-color: rgb(15, 25, 35);
 }
@@ -41,11 +40,14 @@
 .container::before {
     left: 0;
     background: linear-gradient(to right, #0F0F0F 0%, transparent 100%);
+    /* Ubah #0F0F0F dan transparent menjadi rgba dari warna background */
+    background: linear-gradient(to right, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%);
 }
 
 .container::after {
     right: 0;
     background: linear-gradient(to left, #0F0F0F 0%, transparent 100%);
+    background: linear-gradient(to left, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%);
 }
 
 /*

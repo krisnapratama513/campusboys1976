@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react";
 import InfiniteCarousel2 from "../../../components/InfiniteCarousel2/InfiniteCarousel2";
-import { getAllFanzine } from "../../../services/fanzineService";
+import { getRecentFanzines } from "../../../services/fanzineService";
 import type { FanzineType } from "../../../types/fanzine.types";
 
 // [PENTING] Import Config untuk menyusun URL gambar dari server
@@ -16,12 +16,12 @@ const InfiniteCarouselMagazine = () => {
     const [fanzines, setFanzines] = useState<FanzineType[]>([]);
 
     useEffect(() => {
-        getAllFanzine()
+        getRecentFanzines()
             .then(data => {
-                setFanzines(data);
+                setFanzines(data); // Langsung set array
             })
             .catch(err => {
-                console.error("[InfiniteCarousel] Error loading fanzines:", err);
+                console.error("[InfiniteCarousel] Error:", err);
             });
     }, []);
 

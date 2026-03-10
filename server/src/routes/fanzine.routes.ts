@@ -14,7 +14,7 @@ import path from "path";
 import fs from "fs";
 
 import { 
-    createFanzine, getAllFanzines, 
+    createFanzine, getAllFanzines, getRecentCarousel,
     updateFanzine, getFanzineById, getFanzineBySlug, deleteFanzine
 } from "../controllers/fanzine.controller";
 
@@ -41,6 +41,7 @@ const router = Router();
 
 // --- PUBLIC ROUTES ---
 router.get('/', getAllFanzines);
+router.get('/recent', getRecentCarousel);
 router.get('/:slug', getFanzineBySlug); // Detail Public by Slug
 
 // --- PROTECTED ROUTES (EDITOR & SUPERADMIN) ---

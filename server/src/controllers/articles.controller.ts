@@ -46,8 +46,27 @@ export const getRecentArticlesCard = async (req: Request, res: Response) => {
 
 export const getAllArticlesCard = async (req: Request, res: Response) => {
     try {
-        const articles = await articleService.fetchAllArticlesCard();
-        res.json(articles);
+        // Tangkap query ?page= dari URL, default ke 1
+        const page = parseInt(req.query.page as string) || 1;
+        const limit = 9;
+        const offset = (page - 1) * limit;
+
+        // Panggil service dengan parameter pagination
+        const { articles, totalItems } = await articleService.fetchAllArticlesCard(limit, offset);
+        
+        const totalPages = Math.ceil(totalItems / limit);
+
+        // Format response disamakan dengan Album agar di Frontend konsisten
+        res.json({
+            message: 'Success',
+            data: articles,
+            pagination: {
+                currentPage: page,
+                totalPages: totalPages,
+                totalItems: totalItems,
+                limit: limit
+            }
+        });
     } catch (error) {
         console.error("[Articles] getAll Error:", error);
         res.status(500).json({ message: "Gagal mengambil data all articles" });

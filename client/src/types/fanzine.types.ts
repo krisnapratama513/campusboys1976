@@ -30,3 +30,17 @@ export type FanzineType = {
     author_name: string;
     author_id: number;
 };
+
+// [TAMBAHAN] Tipe Pagination
+export interface PaginationMeta {
+    currentPage: number;
+    totalPages: number;
+    totalItems: number;
+    limit: number;
+}
+
+export interface PublicFanzinesResponse {
+    message: string;
+    data: FanzineType[];
+    pagination: PaginationMeta;
+}

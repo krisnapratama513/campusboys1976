@@ -8,6 +8,7 @@ import MediaHeroSection from '../../../components/MediaHeroSection';
 import FanzineCard from '../../../components/FanzineCard';
 import { getAllFanzine } from '../../../services/fanzineService';
 import type { FanzineType } from '../../../types/fanzine.types';
+import Pagination from '../../../components/Pagination';
 
 /**
  * Halaman Public: Fanzine Gallery.
@@ -17,18 +18,23 @@ import type { FanzineType } from '../../../types/fanzine.types';
 const FanzinePage = () => {
     const [fanzines, setFanzines] = useState<FanzineType[]>([]);
     const [isLoading, setIsLoading] = useState(true);
+    const [page, setPage] = useState(1);
+    const [totalPages, setTotalPages] = useState(1);
 
     useEffect(() => {
-        getAllFanzine()
-            .then(data => {
-                setFanzines(data);
+        setIsLoading(true); // Pastikan loading aktif saat ganti halaman
+
+        getAllFanzine(page)
+            .then(res => {
+                setFanzines(res.data);
+                setTotalPages(res.pagination.totalPages); // Set total halaman
                 setIsLoading(false);
             })
             .catch(err => {
                 console.error("[FanzinePage] Error:", err);
                 setIsLoading(false);
             });
-    }, []);
+    }, [page]);
 
     const formatDate = (dateString: string | Date) => {
         const date = new Date(dateString);
@@ -40,6 +46,7 @@ const FanzinePage = () => {
     };
 
     return (
+        <>
         <div className={styles.fanzineContainerPage}>
             <MediaHeroSection title='Fanzine Collection' />
             
@@ -65,7 +72,16 @@ const FanzinePage = () => {
                     ))}
                 </div>
             )}
+            <div style={{ paddingBottom: '40px' }}>
+                <Pagination 
+                    currentPage={page} 
+                    totalPages={totalPages} 
+                    onPageChange={(newPage) => setPage(newPage)} 
+                />
+            </div>
         </div>
+        
+        </>
     );
 };
 

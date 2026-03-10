@@ -46,15 +46,23 @@ export const fetchRecentArticlesCard = async () => {
  * Mengambil semua artikel publik (Status 'publish').
  * Digunakan untuk halaman arsip blog.
  */
-export const fetchAllArticlesCard = async () => {
-    const [rows] = await pool.execute<RowDataPacket[]>(
+export const fetchAllArticlesCard = async (limit: number, offset: number) => {
+    const [rows] = await pool.query<RowDataPacket[]>(
         `SELECT a.id, a.slug, a.img, a.title, a.created_at, a.description, b.name AS author_name 
          FROM articles AS a
          JOIN authors AS b ON a.id_author = b.id
          WHERE a.status = 'publish' 
-         ORDER BY a.id DESC`
+         ORDER BY a.id DESC
+         LIMIT ? OFFSET ?`,
+        [limit, offset]
     );
-    return rows;
+    const [countResult] = await pool.query<RowDataPacket[]>(
+        `SELECT COUNT(id) as total FROM articles WHERE status = 'publish'`
+    );
+    
+    const totalItems = countResult[0]?.total || 0;
+
+    return { articles: rows, totalItems };
 };
 
 /**
