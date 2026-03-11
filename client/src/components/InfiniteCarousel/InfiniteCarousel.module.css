@@ -12,8 +12,6 @@
     overflow: hidden;
     position: relative;
     padding: 1.5rem 0;
-    background-color: black;
-    background-color: rgb(15, 25, 35);
 }
 
 /*
@@ -39,15 +37,10 @@
 
 .container::before {
     left: 0;
-    background: linear-gradient(to right, #0F0F0F 0%, transparent 100%);
-    /* Ubah #0F0F0F dan transparent menjadi rgba dari warna background */
-    background: linear-gradient(to right, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%);
 }
 
 .container::after {
     right: 0;
-    background: linear-gradient(to left, #0F0F0F 0%, transparent 100%);
-    background: linear-gradient(to left, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%);
 }
 
 /*
@@ -73,12 +66,46 @@
 
 .item img {
     width: auto;
-    height: 120px;
+    /* height: 120px; */
     background-color: black;
-    border: 5px solid white;
+    border: 3px solid white;
     object-fit: contain;
     transition: filter 0.3s ease, transform 0.3s ease;
 }
+
+/* ========================================
+ * Varian TEMA (Background & Efek Fade)
+ * ======================================== */
+
+/* Tema Navy (Carousel Pertama) */
+.themeNavy {
+    background-color: rgb(15, 25, 35);
+}
+.themeNavy::before { 
+    background: linear-gradient(to right, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%); 
+}
+.themeNavy::after { 
+    background: linear-gradient(to left, rgba(15, 25, 35, 1) 0%, rgba(15, 25, 35, 0) 100%); 
+}
+
+/* Tema Hitam (Carousel Kedua) */
+.themeBlack {
+    background-color: black;
+}
+.themeBlack::before { 
+    background: linear-gradient(to right, #0F0F0F 0%, transparent 100%); 
+}
+.themeBlack::after { 
+    background: linear-gradient(to left, #0F0F0F 0%, transparent 100%); 
+}
+
+/* ========================================
+ * 3. Varian UKURAN (Tinggi Gambar)
+ * ======================================== */
+
+.sizeSmall .item img { height: 120px;}
+.sizeLarge .item img { height: 250px;}
+
 
 /*
  * ========================================
@@ -167,9 +194,14 @@
         padding: 0 1.25rem;
     }
 
-    .item img {
+    /* Targetkan masing-masing size secara spesifik */
+    .sizeSmall .item img {
         height: 90px;
         border-width: 4px;
+    }
+    .sizeLarge .item img {
+        height: 200px;
+        border-width: 3px;
     }
 
     .container::before,
@@ -192,9 +224,13 @@
         padding: 0 1rem;
     }
 
-    .item img {
+    .sizeSmall .item img {
         height: 75px;
         border-width: 3px;
+    }
+    .sizeLarge .item img {
+        height: 160px;
+        border-width: 2px;
     }
 
     .container::before,
@@ -219,10 +255,13 @@
         /* Lebih sedikit padding */
     }
 
-    .item img {
+    .sizeSmall .item img {
         height: 60px;
-        /* Lebih kecil lagi */
         border-width: 2px;
+    }
+    .sizeLarge .item img {
+        height: 120px;
+        border-width: 1px;
     }
 
     .container::before,

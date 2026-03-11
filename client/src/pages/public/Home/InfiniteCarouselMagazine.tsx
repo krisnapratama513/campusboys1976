@@ -1,7 +1,8 @@
 // client/src/pages/Home/InfiniteCarouselMagazine.tsx
 
 import { useState, useEffect, useMemo } from "react";
-import InfiniteCarousel2 from "../../../components/InfiniteCarousel2/InfiniteCarousel2";
+// import InfiniteCarousel from "../../../components/InfiniteCarousel/InfiniteCarousel";
+import InfiniteCarousel from "../../../components/InfiniteCarousel/InfiniteCarousel";
 import { getRecentFanzines } from "../../../services/fanzineService";
 import type { FanzineType } from "../../../types/fanzine.types";
 
@@ -40,7 +41,12 @@ const InfiniteCarouselMagazine = () => {
     if (fanzines.length === 0) return null;
 
     return (
-        <InfiniteCarousel2 images={carouselImages} direction="left" />
+        <InfiniteCarousel 
+            images={carouselImages} 
+            direction="left" 
+            size="large"
+            theme="black"
+        />
     );
 };
 

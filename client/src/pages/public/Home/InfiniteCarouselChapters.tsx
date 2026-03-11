@@ -71,7 +71,7 @@ const InfiniteCarouselChapters = () => {
     if (loading || carouselImages.length === 0) return null;
 
     return (
-        <InfiniteCarousel images={carouselImages} />
+        <InfiniteCarousel images={carouselImages} theme='navy'/>
     );
 }
 

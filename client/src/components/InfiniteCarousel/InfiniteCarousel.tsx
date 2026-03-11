@@ -15,6 +15,8 @@ type Image = {
 interface InfiniteCarouselProps {
     images: Image[];
     direction?: 'left' | 'right';
+    size?: 'small' | 'large'; 
+    theme?: 'black' | 'navy';
 }
 
 /**
@@ -23,7 +25,9 @@ interface InfiniteCarouselProps {
  */
 const InfiniteCarousel: React.FC<InfiniteCarouselProps> = ({
     images,
-    direction = 'right' // Default ke kanan jika tidak ada prop yang diberikan
+    direction = 'right', // Default ke kanan jika tidak ada prop yang diberikan
+    size = 'small',
+    theme = 'black'
 }) => {
     // Refs digunakan untuk mengakses elemen DOM secara langsung untuk pengukuran
     const containerRef = useRef<HTMLDivElement>(null);
@@ -75,12 +79,13 @@ const InfiniteCarousel: React.FC<InfiniteCarouselProps> = ({
 
     // Terapkan kelas CSS yang benar berdasarkan prop 'direction'
     // Ini memetakan prop 'direction' ke kelas CSS Module yang sesuai.
-    const directionClass =
-        direction === 'right' ? styles.scrollRight : styles.scrollLeft;
+    const directionClass = direction === 'right' ? styles.scrollRight : styles.scrollLeft;
+    const sizeClass = size === 'large' ? styles.sizeLarge : styles.sizeSmall;
+    const themeClass = theme === 'black' ? styles.themeBlack : styles.themeNavy;
 
     return (
         <div
-            className={styles.container}
+            className={`${styles.container} ${themeClass} ${sizeClass}`}
             ref={containerRef}
         >
             <div
