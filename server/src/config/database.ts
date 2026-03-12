@@ -12,5 +12,7 @@ export const pool = mysql.createPool({
     waitForConnections: true,
     connectionLimit: 10,
     queueLimit: 0,
+    enableKeepAlive: true,    // Mencegah server cPanel memutus koneksi yang sedang diam (idle)
+    keepAliveInitialDelay: 0,
     timezone: 'UTC'
 });

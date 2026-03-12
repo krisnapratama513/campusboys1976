@@ -1,12 +1,12 @@
 // client/src/pages/HomePage/index.tsx
 
-import Hero from "./Hero/Hero";
+import './index.css';
+
+import Hero from "./components/Hero/Hero";
 import AboutSection from "./AboutSection/AboutSection";
-// import InfiniteCarouselChapters from "./InfiniteCarouselChapters";
-// import InfiniteCarouselMagazine from "./InfiniteCarouselMagazine";
 import RecentArticlesCarousel from "./RecentArticlesCarousel";
-import FanzineSection from "./FanzineSection/FanzineSection";
-import ChapterSection from "./ChapterSection/ChapterSection";
+import FanzineSection from "./components/FanzineSection";
+import ChapterSection from "./components/ChapterSection";
 
 const HomePage = () => {
 
@@ -14,17 +14,12 @@ const HomePage = () => {
     return (
         <>
             <Hero></Hero>
-            <main>
+            <div className="content-wrapper">
                 <AboutSection />
-            </main>
+            </div>
             <RecentArticlesCarousel />
             <FanzineSection />
             <ChapterSection />
-
-            {/* <main style={{ paddingTop: '30px', paddingBottom: '30px', backgroundColor: 'crimson' }}> */}
-                {/* <InfiniteCarouselMagazine /> */}
-                {/* <InfiniteCarouselChapters /> */}
-            {/* </main> */}
         </>
     )
 }

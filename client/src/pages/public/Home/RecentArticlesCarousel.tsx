@@ -6,6 +6,8 @@ import type { ApiArticleCard } from '../../../types/article.types';
 import { getRecentArticlesCard } from '../../../services/articleService';
 import ArticleCard from '../../../components/ArticleCard/ArticleCard';
 import GlassControlBtn from '../../../components/GlassControlBtn/GlassControlBtn';
+// nanti digunakan
+import { FaArrowRight } from 'react-icons/fa6';
 
 // [PENTING] Import Config untuk akses URL Server
 import { SERVER_ROOT } from '../../../config/api';
@@ -14,7 +16,7 @@ import { SERVER_ROOT } from '../../../config/api';
 // Menggunakan CSS-in-JS untuk style yang terisolasi
 const header: CSSProperties = {
     display: 'flex',
-    alignItems: 'baseline',
+    alignItems: 'flex-end',
     justifyContent: 'space-between',
     margin: '10px 0',
     color: 'rgb(236, 232, 225)',
@@ -24,8 +26,11 @@ const h2: CSSProperties = {
     fontFamily: "'Capture It', sans-serif",
     fontSize: '1.75rem',
     letterSpacing: '1.2px',
-    marginBottom: '-5px',
-    textShadow: '1px 1px 0px rgba(0, 0, 0, 0.4)'
+    // marginBottom: '-5px',
+    textShadow: '1px 1px 0px rgba(0, 0, 0, 0.4)',
+    backgroundColor:'blue',
+    maxWidth:'50%'
+
 };
 
 const slidesWrapper: CSSProperties = {
@@ -158,7 +163,7 @@ function RecentArticlesCarousel() {
                 <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
                     <div style={header}><h2 style={h2}>RECENT ARTICLES</h2></div>
                     <div style={{ color: 'white', textAlign: 'center', marginTop: '50px' }}>
-                        Memuat artikel...
+                        Loading articles...
                     </div>
                 </main>
             </article>
@@ -170,13 +175,14 @@ function RecentArticlesCarousel() {
 
     return (
         <article style={{ backgroundColor: 'rgb(15, 25, 35)', fontFamily: 'Roboto, sans-serif' }}>
-            <main className="container" style={{ paddingTop: '50px', paddingBottom: '50px' }}>
+            <main className="container" style={{ paddingTop: '100px', paddingBottom: '100px' }}>
 
                 {/* Header Section */}
                 <div style={header}>
-                    <h2 style={h2}>RECENT ARTICLES</h2>
-                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/article">
-                        GO TO ARTICLE PAGE
+                    <h2 style={h2} >RECENT ARTICLES</h2>
+                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)', backgroundColor:'crimson' }} to="/article">
+                        GO TO ARTICLE PAGE 
+                        <FaArrowRight/>
                     </Link>
                 </div>
 

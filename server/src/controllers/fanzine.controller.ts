@@ -27,7 +27,7 @@ export const getAllFanzines = async (req: Request, res: Response) => {
     try {
         // Tangkap query ?page=, default ke 1
         const page = parseInt(req.query.page as string) || 1;
-        const limit = 8; // Anda bisa sesuaikan limit ini (misal 8 item per halaman)
+        const limit = 9; 
         const offset = (page - 1) * limit;
 
         // Panggil service dengan parameter limit dan offset

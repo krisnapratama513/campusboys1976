@@ -1,7 +1,7 @@
 .hero {
     height: 100vh;
     /* background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../../../../assets/background/hero_home.jpg'); */
-    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../../../../assets/background/home.png');
+    background-image: linear-gradient(rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.7)), url('../../../../../assets/background/home.png');
     background-size: cover;
     background-position: center;
     display: flex;
