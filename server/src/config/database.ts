@@ -16,3 +16,27 @@ export const pool = mysql.createPool({
     keepAliveInitialDelay: 0,
     timezone: 'UTC'
 });
+
+const originalQuery = pool.query.bind(pool);
+const originalExecute = pool.execute.bind(pool);
+
+const applyRetry = async (operation: Function, sql: any, values?: any) => {
+    const isSelect = typeof sql === 'string' && sql.trim().toUpperCase().startsWith('SELECT');
+    const maxRetries = isSelect ? 3 : 1; 
+    
+    let attempt = 0;
+    while (attempt < maxRetries) {
+        try {
+            return await operation(sql, values);
+        } catch (error) {
+            attempt++;
+            if (attempt >= maxRetries) throw error; 
+            
+            console.warn(`⚠️ Koneksi terputus. Retry ${attempt}/${maxRetries} otomatis...`);
+            await new Promise(res => setTimeout(res, 1000));
+        }
+    }
+};
+
+pool.query = (sql: any, values?: any) => applyRetry(originalQuery, sql, values) as any;
+pool.execute = (sql: any, values?: any) => applyRetry(originalExecute, sql, values) as any;
