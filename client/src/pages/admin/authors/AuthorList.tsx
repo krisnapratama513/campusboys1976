@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAllAuthors, deleteAuthor, type Author } from '../../../services/authorService';
 import { ButtonLink } from '../components/ButtonLink/ButtonLink';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Daftar Author.
@@ -43,9 +44,8 @@ const AuthorList = () => {
             await deleteAuthor(id);
             alert("Author berhasil dihapus!");
             fetchData(); // Refresh list
-        } catch (error: any) {
-            // Error message dari backend akan muncul disini (misal: "Tidak bisa dihapus karena punya artikel")
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal" + getErrorMessage(error));
         }
     };
 

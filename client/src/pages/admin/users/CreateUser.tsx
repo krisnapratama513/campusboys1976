@@ -5,6 +5,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { createMember } from '../../../services/userService';
 import { getChapters } from '../../../services/chapterService'; 
 import type { Chapter } from '../../../types/chapter.types';
+import { getErrorMessage } from '../../../utils/errorHandler';
+import type { UserRole } from '../../../types/user.types';
 
 /**
  * Halaman Admin: Buat User Baru.
@@ -22,7 +24,7 @@ const CreateUser = () => {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
-        role: 'member',
+        role: 'member' as UserRole,
         chapter_id: '',
         generation: 8 // Default Value
     });
@@ -74,7 +76,7 @@ const CreateUser = () => {
             await createMember({
                 username: formData.username,
                 password: formData.password,
-                role: formData.role as any,
+                role: formData.role,
                 chapter_id: Number(formData.chapter_id),
                 generation: Number(formData.generation)
             });
@@ -82,9 +84,9 @@ const CreateUser = () => {
             alert("Member berhasil ditambahkan!");
             navigate('/dashboard/users');
 
-        } catch (error: any) {
+        } catch (error) {
             // Tampilkan error dari backend (misal: "Username sudah digunakan")
-            alert(error.message);
+            alert("Gagal : " + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

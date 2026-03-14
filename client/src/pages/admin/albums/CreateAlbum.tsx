@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createAlbum } from '../../../services/albumService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 const CreateAlbum = () => {
     const navigate = useNavigate();
@@ -97,8 +98,8 @@ const CreateAlbum = () => {
             alert("Album berhasil dibuat!");
             navigate('/dashboard/albums');
 
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert(`Gagal ${getErrorMessage(error)}`);
         } finally {
             setIsLoading(false);
         }

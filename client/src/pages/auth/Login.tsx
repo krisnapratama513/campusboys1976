@@ -4,6 +4,7 @@ import styles from './Login.module.css'; // Menggunakan CSS Anda
 
 // Best Practice: Import URL API dari config agar mudah dikelola
 import { API_BASE_URL } from '../../config/api';
+import { getErrorMessage } from '../../utils/errorHandler';
 
 const Login = () => {
     // Hooks: Standar React untuk navigasi
@@ -52,9 +53,9 @@ const Login = () => {
             // C. Redirect ke Dashboard
             navigate('/dashboard');
 
-        } catch (error: any) {
+        } catch (error) {
             console.error("Login Error:", error);
-            setErrorMessage(error.message || "Terjadi kesalahan koneksi.");
+            setErrorMessage(getErrorMessage(error) || "Terjadi kesalahan koneksi.");
         } finally {
             setIsLoading(false); 
         }

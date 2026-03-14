@@ -5,6 +5,7 @@ import type { Album, AlbumPhoto } from '../../../types/album.types';
 
 // [1] IMPORT CONFIG API
 import { SERVER_ROOT } from '../../../config/api';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 const EditAlbum = () => {
     const { id } = useParams();
@@ -101,8 +102,8 @@ const EditAlbum = () => {
         try {
             await deleteAlbumPhoto(photoId);
             setExistingPhotos(prev => prev.filter(p => p.id !== photoId));
-        } catch (error: any) {
-            alert("Gagal menghapus foto: " + error.message);
+        } catch (error) {
+            alert("Gagal menghapus foto: " + getErrorMessage(error));
         }
     };
 
@@ -129,8 +130,8 @@ const EditAlbum = () => {
             alert("Album berhasil diupdate!");
             navigate('/dashboard/albums');
 
-        } catch (error: any) {
-            alert("Gagal update: " + error.message);
+        } catch (error) {
+            alert("Gagal update: " + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

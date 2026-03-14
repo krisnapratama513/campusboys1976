@@ -11,6 +11,7 @@ import { SERVER_ROOT } from '../../../config/api'; // Import Config
 import EditProfileModal from '../../../components/Modals/EditProfileModal';
 import ChangeUsernameModal from '../../../components/Modals/ChangeUsernameModal';
 import ChangePasswordModal from '../../../components/Modals/ChangePasswordModal'; 
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Profil Saya (Self Service).
@@ -41,8 +42,8 @@ const MyProfile = () => {
                 // Panggil Service (Otomatis pakai Auth Header)
                 const data = await getMemberDetail(user.id);
                 setProfile(data);
-            } catch (error: any) {
-                console.error("Gagal load profile:", error);
+            } catch (error) {
+                alert("Gagal load profile:" + getErrorMessage(error));
                 // Opsional: Redirect ke login jika token expired
             } finally {
                 setIsLoading(false);

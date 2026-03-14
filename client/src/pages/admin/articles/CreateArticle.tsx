@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createArticle } from '../../../services/articleService';
-import { getAllAuthors } from '../../../services/authorService';
+import { getAllAuthors,type Author } from '../../../services/authorService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 // --- 1. IMPORT REACT QUILL NEW ---
 import ReactQuill from 'react-quill-new';
@@ -33,7 +34,7 @@ const CreateArticle = () => {
     const [preview, setPreview] = useState<string>('');
 
     // State Data Pendukung
-    const [authors, setAuthors] = useState<any[]>([]);
+    const [authors, setAuthors] = useState<Author[]>([]);
     const [isLoading, setIsLoading] = useState(false);
 
     /**
@@ -103,8 +104,9 @@ const CreateArticle = () => {
             await createArticle(formData);
             alert("Artikel berhasil dibuat!");
             navigate('/dashboard/articles');
-        } catch (error: any) {
-            alert(error.message || "Gagal membuat artikel");
+        } catch (error) {
+            alert(`Gagal menghapus: ${getErrorMessage(error)}`);
+            
         } finally {
             setIsLoading(false);
         }

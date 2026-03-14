@@ -5,6 +5,7 @@ import { Link } from 'react-router-dom';
 import { getAdminAlbums, deleteAlbum } from '../../../services/albumService';
 import type { Album } from '../../../types/album.types';
 import { SERVER_ROOT } from '../../../config/api'; // [1] Import Config
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 // Helper format tanggal
 const formatDate = (dateString: string) => {
@@ -36,8 +37,8 @@ const AlbumList = () => {
             await deleteAlbum(id);
             alert("Album berhasil dihapus");
             fetchData();
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal : " + getErrorMessage(error));
         }
     };
 

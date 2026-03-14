@@ -8,6 +8,7 @@ import type { Member, MemberDetail } from '../../../types/user.types';
 // Components
 import UserDetailModal from '../../../components/Modals/UserDetailModal';
 import EditMemberModal from '../../../components/Modals/EditMemberModal';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Direktori User.
@@ -67,8 +68,8 @@ const UserList = () => {
         try {
             await deleteMember(id);
             fetchData();
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("GAGAL : " + getErrorMessage(error) );
         }
     };
 
@@ -82,8 +83,8 @@ const UserList = () => {
         try {
             const detail = await getMemberDetail(id);
             setSelectedMember(detail);
-        } catch (error: any) {
-            alert("Gagal memuat detail: " + error.message);
+        } catch (error) {
+            alert("Gagal memuat detail: " + getErrorMessage(error));
             setIsDetailOpen(false);
         } finally {
             setIsDetailLoading(false);
@@ -99,8 +100,8 @@ const UserList = () => {
             const detail = await getMemberDetail(id);
             setMemberToEdit(detail);
             setIsEditOpen(true);
-        } catch (error: any) {
-            alert("Gagal memuat data edit: " + error.message);
+        } catch (error) {
+            alert("Gagal memuat data edit: " + getErrorMessage(error));
         }
     };
 

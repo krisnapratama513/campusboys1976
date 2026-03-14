@@ -1,7 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getFanzineById, updateFanzine } from '../../../services/fanzineService';
-import { getAllAuthors } from '../../../services/authorService';
+import { getAllAuthors, type Author } from '../../../services/authorService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 const EditFanzine = () => {
     const { id } = useParams();
@@ -20,7 +21,7 @@ const EditFanzine = () => {
     const [oldCover, setOldCover] = useState('');
     const [oldPdf, setOldPdf] = useState('');
 
-    const [authors, setAuthors] = useState<any[]>([]);
+    const [authors, setAuthors] = useState<Author[]>([]);
 
     useEffect(() => {
         const loadData = async () => {
@@ -69,8 +70,8 @@ const EditFanzine = () => {
             await updateFanzine(id!, formData);
             alert("Fanzine berhasil diupdate!");
             navigate('/dashboard/fanzines');
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert(`Gagal : ${getErrorMessage(error)}`);
         } finally {
             setIsLoading(false);
         }

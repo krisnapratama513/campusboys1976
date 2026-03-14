@@ -3,6 +3,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createVideo } from '../../../services/videoService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Tambah Video.
@@ -51,8 +52,8 @@ const CreateVideo = () => {
             });
             alert("Video berhasil ditambahkan!");
             navigate('/dashboard/videos');
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal : " + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

@@ -4,6 +4,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getChapterById, updateChapter } from '../../../services/chapterService';
 import { SERVER_ROOT } from '../../../config/api'; // Import Config URL
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Edit Chapter.
@@ -87,8 +88,8 @@ const EditChapter = () => {
             await updateChapter(id!, formData);
             alert("Chapter berhasil diperbarui!");
             navigate('/dashboard/chapters');
-        } catch (error: any) {
-            alert(error.message || "Gagal mengupdate chapter");
+        } catch (error) {
+            alert("Gagal mengupdate chapter" + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

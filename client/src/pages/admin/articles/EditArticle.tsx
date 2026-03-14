@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getArticleById, updateArticle } from '../../../services/articleService';
-import { getAllAuthors } from '../../../services/authorService';
+import { getAllAuthors, type Author } from '../../../services/authorService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 // Import Config untuk akses URL Server (Preview Gambar)
 import { SERVER_ROOT } from '../../../config/api';
@@ -47,7 +48,7 @@ const EditArticle = () => {
     const [oldImage, setOldImage] = useState(''); // Nama File Lama (dari Server)
 
     // Data Pendukung
-    const [authors, setAuthors] = useState<any[]>([]);
+    const [authors, setAuthors] = useState<Author[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
     /**
@@ -153,8 +154,8 @@ const EditArticle = () => {
             alert("Artikel berhasil diperbarui!");
             navigate('/dashboard/articles');
 
-        } catch (error: any) {
-            alert(error.message || "Gagal update artikel"); 
+        } catch (error) {
+            alert(`Gagal : ${getErrorMessage(error)}`); 
         } finally {
             setIsLoading(false);
         }

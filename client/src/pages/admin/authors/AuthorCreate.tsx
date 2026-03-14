@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createAuthor } from '../../../services/authorService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Tambah Author Baru.
@@ -28,9 +29,9 @@ const AuthorCreate = () => {
 
             // Jika sukses, redirect
             navigate('/dashboard/authors');
-        } catch (error: any) {
+        } catch (error) {
             // Tampilkan pesan error dari backend (misal: "Nama author sudah terdaftar")
-            alert(error.message);
+            alert("Gagal" + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

@@ -6,6 +6,7 @@ import { getChapters, deleteChapter } from '../../../services/chapterService';
 import { SERVER_ROOT } from '../../../config/api'; // Import Config URL
 import type { Chapter } from '../../../types/chapter.types';
 import { ButtonLink } from '../components/ButtonLink/ButtonLink';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Daftar Manajemen Chapters.
@@ -46,8 +47,8 @@ const ChapterList = () => {
         try {
             await deleteChapter(id);
             fetchData(); // Refresh tabel setelah hapus
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal" + getErrorMessage(error));
         }
     };
 

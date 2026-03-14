@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminVideos, deleteVideo } from '../../../services/videoService';
 import type { Video } from '../../../types/video.types';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Manajemen Video (YouTube Gallery).
@@ -31,8 +32,8 @@ const VideoList = () => {
             await deleteVideo(id);
             alert("Video berhasil dihapus");
             fetchData();
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("Video Gagal dihapus" + getErrorMessage(error));
         }
     };
 

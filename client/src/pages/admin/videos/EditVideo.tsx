@@ -3,6 +3,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getVideoById, updateVideo } from '../../../services/videoService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Edit Video.
@@ -75,8 +76,8 @@ const EditVideo = () => {
             });
             alert("Video berhasil diperbarui!");
             navigate('/dashboard/videos');
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal : " + getErrorMessage(error));
             setIsLoading(false);
         }
     };

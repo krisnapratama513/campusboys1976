@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams, Link } from 'react-router-dom';
 import { getAuthorById, updateAuthor } from '../../../services/authorService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Edit Author.
@@ -51,9 +52,8 @@ const AuthorEdit = () => {
 
             // Redirect sukses
             navigate('/dashboard/authors');
-        } catch (error: any) {
-            // Tampilkan error (misal: "Gagal update! Nama author tersebut sudah digunakan")
-            alert(error.message);
+        } catch (error) {
+            alert("Gagal" + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

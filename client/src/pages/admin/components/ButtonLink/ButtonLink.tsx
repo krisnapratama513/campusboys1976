@@ -8,11 +8,10 @@ interface ButtonLinkProps extends LinkProps {
     icon?: React.ReactNode;
 }
 
-export const ButtonLink = ({ children, icon, className = '', ...props }: ButtonLinkProps) => {
+export const ButtonLink = ({ children, icon, ...props }: ButtonLinkProps) => {
     return (
         <Link
             {...props}
-            // Hapus className='' jika tidak dipakai, atau biarkan untuk tambahan utility class
             className={styles.button}
         >
             {/* Jika ada icon, render di sini */}

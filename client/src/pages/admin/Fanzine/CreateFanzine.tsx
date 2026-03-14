@@ -3,7 +3,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createFanzine } from '../../../services/fanzineService';
-import { getAllAuthors } from '../../../services/authorService'; // Load Authors
+import { getAllAuthors, type Author } from '../../../services/authorService'; // Load Authors
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 const CreateFanzine = () => {
     const navigate = useNavigate();
@@ -17,7 +18,7 @@ const CreateFanzine = () => {
     const [pdfFile, setPdfFile] = useState<File | null>(null);
 
     // Data
-    const [authors, setAuthors] = useState<any[]>([]);
+    const [authors, setAuthors] = useState<Author[]>([]);
 
     useEffect(() => {
         getAllAuthors().then(setAuthors).catch(console.error);
@@ -44,8 +45,8 @@ const CreateFanzine = () => {
             await createFanzine(formData);
             alert("Fanzine berhasil dipublish!");
             navigate('/dashboard/fanzines');
-        } catch (error: any) {
-            alert(error.message);
+        } catch (error) {
+            alert(`Gagal : ${getErrorMessage(error)}`);
         } finally {
             setIsLoading(false);
         }

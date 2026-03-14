@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { createChapter } from '../../../services/chapterService';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Form Tambah Chapter Baru.
@@ -69,8 +70,8 @@ const CreateChapter = () => {
             await createChapter(formData);
             alert("Chapter berhasil ditambahkan!");
             navigate('/dashboard/chapters');
-        } catch (error: any) {
-            alert(error.message || "Gagal membuat chapter");
+        } catch (error) {
+            alert("Gagal membuat chapter" + getErrorMessage(error));
         } finally {
             setIsLoading(false);
         }

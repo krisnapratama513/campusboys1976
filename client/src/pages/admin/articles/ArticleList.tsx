@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { getAdminArticles, deleteArticle } from '../../../services/articleService';
 import type { FullArticleDetail } from '../../../types/article.types';
+import { getErrorMessage } from '../../../utils/errorHandler';
 
 /**
  * Halaman Admin: Manajemen Daftar Artikel.
@@ -56,8 +57,8 @@ const ArticleList = () => {
             await deleteArticle(id, confirmPass);
             alert("Artikel berhasil dihapus!");
             fetchData(); // Refresh tabel
-        } catch (error: any) {
-            alert(`Gagal menghapus: ${error.message}`);
+        } catch (error) {
+            alert(`Gagal menghapus: ${getErrorMessage(error)}`);
         }
     };
 
