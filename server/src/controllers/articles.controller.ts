@@ -38,9 +38,12 @@ export const getRecentArticlesCard = async (req: Request, res: Response) => {
     try {
         const articles = await articleService.fetchRecentArticlesCard();
         res.json(articles);
-    } catch (error) {
+    } catch (error: any) {
         console.error("[Articles] getRecent Error:", error);
-        res.status(500).json({ message: "Gagal mengambil data recent articles" });
+        res.status(500).json({ 
+            message: "Gagal mengambil data recent articles",
+            detail_error: error.message || error.toString() 
+        });
     }
 };
 

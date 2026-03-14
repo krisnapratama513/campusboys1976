@@ -23,12 +23,11 @@ const header: CSSProperties = {
 };
 
 const h2: CSSProperties = {
-    fontFamily: "'Capture It', sans-serif",
+    fontFamily: "'Oswald', sans-serif",
     fontSize: '1.75rem',
     letterSpacing: '1.2px',
     // marginBottom: '-5px',
     textShadow: '1px 1px 0px rgba(0, 0, 0, 0.4)',
-    backgroundColor:'blue',
     maxWidth:'50%'
 
 };
@@ -180,7 +179,7 @@ function RecentArticlesCarousel() {
                 {/* Header Section */}
                 <div style={header}>
                     <h2 style={h2} >RECENT ARTICLES</h2>
-                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)', backgroundColor:'crimson' }} to="/article">
+                    <Link style={{ textDecoration: 'none', color: 'rgb(236, 232, 225)' }} to="/article">
                         GO TO ARTICLE PAGE 
                         <FaArrowRight/>
                     </Link>

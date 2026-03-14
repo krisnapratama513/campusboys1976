@@ -56,7 +56,7 @@ const MediaHeroSection: React.FC<MediaHeroSectionProps> = ({ title }) => {
 
         .heroPageTitle {
             color: white;
-            font-family: 'Capture It', sans-serif;
+            font-family: 'Oswald', sans-serif;
             font-size: 42px;
         }
 

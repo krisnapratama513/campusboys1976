@@ -36,7 +36,7 @@ const ArticlePage = () => {
 
     return (
         <div className={styles.pageWrapper}>
-            <MediaHeroSection title='Article' />
+            <MediaHeroSection title='Articles' />
 
             <main className={styles.gridContainer}>
                 {/* [TAMBAHAN] Tampilkan pesan loading */}

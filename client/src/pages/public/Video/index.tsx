@@ -55,7 +55,7 @@ const VideoPage = () => {
 
     return (
         <div className={styles.container}>
-            <MediaHeroSection title="Our Video" />
+            <MediaHeroSection title="Videos" />
 
             <div className={styles.videoGridContainer}>
                 {videos.map(video => (

@@ -38,6 +38,7 @@
     background-color: hsl(228, 16%, 12%);
     padding: 15px;
     color: hsl(228, 8%, 70%);
+    margin-bottom: 20px;
 }
 
 .recentArticle {
@@ -134,6 +135,9 @@
     .articleDetailPageContainer {
         flex-direction: column;
         width: 90%;
+    }
+    .articleContainer{
+        margin-top: 0;
     }
 
     .articleContainer,
