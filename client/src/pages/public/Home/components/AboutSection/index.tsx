@@ -1,42 +1,17 @@
-// import type { CSSProperties } from 'react';
-import { useEffect, useRef } from 'react';
+// client/src/pages/public/Home/components/AboutSection/index.tsx
+
+// import { useEffect, useRef } from 'react';
 import styles from './AboutSection.module.css';
+import ContentWrapper from '../ContentWrapper';
+import { useScrollAnimation } from '../../../../../hooks/useScrollAnimation';
 
 function AboutSection() {
-    const sectionRef = useRef(null);
+    const sectionRef = useScrollAnimation(styles.visible);
 
-    useEffect(() => {
-    // Tentukan threshold berdasarkan ukuran layar
-    const getThreshold = () => {
-        if (window.innerWidth <= 480) return 0.05;
-        if (window.innerWidth <= 768) return 0.1;
-        return 0.2;
-    };
-
-    const observer = new IntersectionObserver(
-        (entries) => {
-            entries.forEach((entry) => {
-                if (entry.isIntersecting) {
-                    entry.target.classList.add(styles.visible);
-                }
-            });
-        },
-        { threshold: getThreshold() }
-    );
-
-    if (sectionRef.current) {
-        observer.observe(sectionRef.current);
-    }
-
-    return () => {
-        if (sectionRef.current) {
-            observer.unobserve(sectionRef.current);
-        }
-    };
-}, []);
 
     return (
         <section className={styles.container} ref={sectionRef}>
+            <ContentWrapper>
 
             <h2 className={styles.sectionTitle}>
                 About us
@@ -56,12 +31,9 @@ function AboutSection() {
             <a href="/about" className={styles.link}>
                 Read More &rarr;
             </a>
+            </ContentWrapper>
         </section>
     );
 }
 
 export default AboutSection;
-
-
-
-

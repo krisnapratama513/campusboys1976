@@ -4,8 +4,7 @@
     padding: 100px 0;
     color: #ccc;
     transition: opacity 0.8s ease;
-    /* background-color: crimson; */
-    /* Tambahkan ini - hidden dulu */
+    /*hidden dulu */
     opacity: 0;
 }
 

@@ -1,7 +1,7 @@
-/* client/scr/pages/public/Home/FanzineSection/FanzineSection.tsx */
+/* client/scr/pages/public/Home/components/FanzineSection.tsx */
 
-import InfiniteCarouselMagazine from '../InfiniteCarouselMagazine';
-import SectionWrapper from './SectionWrapper/SectionWrapper';
+import InfiniteCarouselMagazine from './InfiniteCarouselMagazine';
+import SectionWrapper from './SectionWrapper';
 
 const FanzineSection = () => {
     return(

@@ -1,10 +1,8 @@
 // client/src/pages/HomePage/index.tsx
 
-import './index.css';
-
-import Hero from "./components/Hero/Hero";
-import AboutSection from "./AboutSection/AboutSection";
-import RecentArticlesCarousel from "./RecentArticlesCarousel";
+import HeroSection from "./components/HeroSection";
+import AboutSection from "./components/AboutSection";
+import RecentArticlesCarousel from "./components/RecentArticlesCarousel";
 import FanzineSection from "./components/FanzineSection";
 import ChapterSection from "./components/ChapterSection";
 
@@ -13,10 +11,8 @@ const HomePage = () => {
 
     return (
         <>
-            <Hero></Hero>
-            <div className="content-wrapper">
-                <AboutSection />
-            </div>
+            <HeroSection />
+            <AboutSection />
             <RecentArticlesCarousel />
             <FanzineSection />
             <ChapterSection />

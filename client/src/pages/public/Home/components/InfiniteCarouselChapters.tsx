@@ -1,14 +1,14 @@
 // client/src/Pages/Home/InfiniteCarouselChapters.tsx
 
 import { useState, useEffect, useMemo } from 'react';
-import InfiniteCarousel from '../../../components/InfiniteCarousel/InfiniteCarousel';
+import InfiniteCarousel from '../../../../components/InfiniteCarousel/InfiniteCarousel';
 
 // Import Config untuk mendapatkan alamat Server
-import { SERVER_ROOT } from '../../../config/api';
+import { SERVER_ROOT } from '../../../../config/api';
 
 // Import Type dan Service
-import type { ChapterImage } from '../../../types/chapter.types';
-import { getChapterImages } from '../../../services/chapterService';
+import type { ChapterImage } from '../../../../types/chapter.types';
+import { getChapterImages } from '../../../../services/chapterService';
 
 /**
  * Komponen Carousel Chapter (Infinite Loop).

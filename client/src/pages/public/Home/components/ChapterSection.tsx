@@ -1,7 +1,7 @@
-/* client/scr/pages/public/Home/ChapterSection/ChapterSection.tsx */
+/* client/scr/pages/public/Home/components/ChapterSection.tsx */
 
-import InfiniteCarouselChapters from '../InfiniteCarouselChapters';
-import SectionWrapper from './SectionWrapper/SectionWrapper';
+import InfiniteCarouselChapters from './InfiniteCarouselChapters';
+import SectionWrapper from './SectionWrapper';
 
 const ChapterSection = () => {
     return(

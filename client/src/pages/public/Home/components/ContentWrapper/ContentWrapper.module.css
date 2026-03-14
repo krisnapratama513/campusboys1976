@@ -1,0 +1,13 @@
+/* client/src/pages/public/Home/components/ContentWrapper/ContentWrapper.module.css */
+
+.contentWrapper{
+    width: 80%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+@media (max-width: 768px) {
+    .contentWrapper{
+        width: 90%;
+    }
+}

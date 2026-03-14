@@ -10,12 +10,6 @@
     background-color: rgb(15, 25, 35);
 }
 
-.contentWrapper {
-    width: 80%;
-    max-width: 1200px;
-    margin: auto;
-}
-
 .sectionTitle {
     font-family: 'Oswald', sans-serif;
     font-size: 3rem;
@@ -61,9 +55,6 @@
     .sectionTitle { font-size: 2.2rem; margin-bottom: 35px; }
     .center-lines::before, .center-lines::after { width: 70px; height: 5px; }
     .bottom-line::after { width: 70px; height: 5px; }
-    .contentWrapper{
-        width: 90%;
-    }
 }
 @media (max-width: 480px) {
     .sectionTitle { font-size: 1.8rem; margin-bottom: 30px; }

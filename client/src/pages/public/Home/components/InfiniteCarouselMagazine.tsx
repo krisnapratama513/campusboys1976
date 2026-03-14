@@ -1,13 +1,12 @@
 // client/src/pages/Home/InfiniteCarouselMagazine.tsx
 
 import { useState, useEffect, useMemo } from "react";
-// import InfiniteCarousel from "../../../components/InfiniteCarousel/InfiniteCarousel";
-import InfiniteCarousel from "../../../components/InfiniteCarousel/InfiniteCarousel";
-import { getRecentFanzines } from "../../../services/fanzineService";
-import type { FanzineType } from "../../../types/fanzine.types";
+import InfiniteCarousel from "../../../../components/InfiniteCarousel/InfiniteCarousel";
+import { getRecentFanzines } from "../../../../services/fanzineService";
+import type { FanzineType } from "../../../../types/fanzine.types";
 
 // [PENTING] Import Config untuk menyusun URL gambar dari server
-import { SERVER_ROOT } from "../../../config/api";
+import { SERVER_ROOT } from "../../../../config/api";
 
 /**
  * Komponen Carousel Majalah (Fanzine) di Halaman Home.

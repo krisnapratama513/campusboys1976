@@ -2,15 +2,15 @@
 
 import { useState, useEffect, type CSSProperties } from 'react';
 import { Link } from 'react-router-dom';
-import type { ApiArticleCard } from '../../../types/article.types';
-import { getRecentArticlesCard } from '../../../services/articleService';
-import ArticleCard from '../../../components/ArticleCard/ArticleCard';
-import GlassControlBtn from '../../../components/GlassControlBtn/GlassControlBtn';
+import type { ApiArticleCard } from '../../../../types/article.types';
+import { getRecentArticlesCard } from '../../../../services/articleService';
+import ArticleCard from '../../../../components/ArticleCard/ArticleCard';
+import GlassControlBtn from '../../../../components/GlassControlBtn/GlassControlBtn';
 // nanti digunakan
 import { FaArrowRight } from 'react-icons/fa6';
 
 // [PENTING] Import Config untuk akses URL Server
-import { SERVER_ROOT } from '../../../config/api';
+import { SERVER_ROOT } from '../../../../config/api';
 
 // --- STYLE DEFINITIONS ---
 // Menggunakan CSS-in-JS untuk style yang terisolasi

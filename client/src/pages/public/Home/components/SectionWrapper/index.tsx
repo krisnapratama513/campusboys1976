@@ -1,5 +1,7 @@
-/* client/scr/pages/public/Home/components/SectionWrapper/SectionWrapper.tsx */
+// client/src/pages/public/Home/components/SectionWrapper/index.tsx
+
 import styles from './SectionWrapper.module.css';
+import ContentWrapper from '../ContentWrapper';
 
 interface SectionWrapperProps {
     title: string;
@@ -19,9 +21,9 @@ const SectionWrapper = ({
             <h2 className={`${styles.sectionTitle} ${styles[titleVariant]}`}>
                 {title}
             </h2>
-            <div className={styles.contentWrapper}>
+            <ContentWrapper>
                 {children}
-            </div>
+            </ContentWrapper>
         </section>
     );
 };
