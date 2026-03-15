@@ -14,18 +14,14 @@
     --primary-text-color: var(--text-color);
     --secondary-text-color: #a0a0a0;
 
-    /* Style Dasar Halaman */
-    /* font-family: 'Lora', serif; */
     font-family: 'Roboto', sans-serif;
-
     line-height: 1.8;
     font-size: 18px;
     overflow-x: hidden;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-
     background-color: var(--dark-bg);
     color: var(--primary-text-color);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 /* ======================================= */
@@ -34,7 +30,7 @@
 /* Mengatur h1-h3 hanya di dalam wrapper ini */
 .aboutPageWrapper h2,
 .aboutPageWrapper h3 {
-    font-family: 'Oswald', sans-serif;
+    font-family: 'Montserrat', sans-serif;
     color: var(--heading-color);
     text-transform: uppercase;
     letter-spacing: 1.5px;
@@ -70,10 +66,8 @@
 }
 
 .philosophy h2 {
-    font-family: 'Montserrat', sans-serif;
     font-size: 2rem;
     margin-bottom: 20px;
-    color: #fff;
 }
 
 .philosophy p {
@@ -94,11 +88,9 @@
 }
 
 .chaptersSection h2 {
-    font-family: 'Montserrat', sans-serif;
     text-align: center;
     font-size: 2.5rem;
     margin-bottom: 80px;
-    color: #fff;
 }
 
 .chapterItem {
@@ -168,7 +160,6 @@
 }
 
 .chapterContent h3 {
-    font-family: 'Montserrat', sans-serif;
     color: var(--primary-color);
     font-size: 2rem;
     margin-bottom: 15px;
@@ -180,20 +171,7 @@
     line-height: 1.8;
 }
 
-/* ======================================= */
-/* 7. ANIMASI SCROLL (INTERSECTION OBSERVER) */
-/* ======================================= */
-.reveal {
-    position: relative;
-    transform: translateY(100px);
-    opacity: 0;
-    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
-}
 
-.reveal.active {
-    transform: translateY(0);
-    opacity: 1;
-}
 
 /* ======================================= */
 /* 8. RESPONSIF (MEDIA QUERY) */

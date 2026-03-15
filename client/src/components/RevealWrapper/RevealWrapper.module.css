@@ -1,0 +1,13 @@
+/* Styling dasar untuk status sebelum masuk viewport */
+.revealBase {
+    position: relative;
+    transform: translateY(100px);
+    opacity: 0;
+    transition: transform 1s cubic-bezier(0.19, 1, 0.22, 1), opacity 0.8s ease;
+}
+
+/* Styling saat elemen masuk viewport */
+.revealBase.active {
+    transform: translateY(0);
+    opacity: 1;
+}

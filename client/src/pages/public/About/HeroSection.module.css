@@ -3,14 +3,17 @@
 .header {
     /* Variabel lokal agar mandiri */
     --primary-color: #027a56; 
-    
+
+    padding: 160px 0;
+    margin-top: 60px;
+    border-bottom: 3px solid var(--primary-color);
     text-align: center;
+
+    /* backgorund */
     background-image: linear-gradient(rgba(0, 0, 0, 0.65), rgba(0, 0, 0, 0.65)),
         url('../../../assets/background/about.png');
     background-size: cover;
     background-position: center;
-    padding: 160px 0;
-    border-bottom: 3px solid var(--primary-color);
     
     /* Animasi Container */
     opacity: 0;
@@ -18,12 +21,11 @@
 }
 
 .title {
-    font-family: 'Montserrat', sans-serif;
     font-family: 'Oswald', sans-serif;
     font-size: 3.5rem;
     font-weight: 900;
     letter-spacing: 3px;
-    color: #027a56;
+    color: var(--primary-color);
     text-transform: uppercase;
     text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
     margin: 0;
