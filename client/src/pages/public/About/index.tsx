@@ -3,6 +3,7 @@
 import styles from './AboutPage.module.css';
 import HeroSection from './HeroSection';
 import StatusView from '../../../components/StatusView';
+import { SafeImage } from '../../../components/SafeImage';
 import { RevealWrapper } from '../../../components/RevealWrapper';
 
 import { SERVER_ROOT } from '../../../config/api';
@@ -54,13 +55,9 @@ const AboutPage = () => {
                                 className={styles.chapterItem}
                             >
                                 <div className={styles.chapterLogo}>
-                                    <img 
+                                    <SafeImage 
                                         src={`${SERVER_ROOT}/uploads/chapters/${chapter.img}`} 
                                         alt={`Logo ${chapter.name}`} 
-                                        onError={(e) => {
-                                            e.currentTarget.onerror = null;
-                                            e.currentTarget.src = 'https://placehold.co/100?text=No+Img';
-                                        }}
                                     />
                                 </div>
                                 <div className={styles.chapterContent} data-chapter={chapter.id}>

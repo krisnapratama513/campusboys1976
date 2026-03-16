@@ -28,8 +28,10 @@ const getAuthHeaders = () => {
  * Endpoint bersifat publik (tidak perlu login).
  * @returns Promise berisi array Chapter
  */
-export const getChapters = async (): Promise<Chapter[]> => {
-    const res = await fetch(`${API_BASE_URL}/chapters`);
+export const getChapters = async ({ signal }: { signal?: AbortSignal } = {}): Promise<Chapter[]> => {
+    // Inject signal ke dalam konfigurasi fetch
+    const res = await fetch(`${API_BASE_URL}/chapters`, { signal });
+    
     if (!res.ok) throw new Error('Gagal mengambil data chapter');
     return res.json();
 };
@@ -39,8 +41,8 @@ export const getChapters = async (): Promise<Chapter[]> => {
  * Biasanya digunakan untuk galeri atau dropdown agar hemat bandwidth.
  * @returns Promise berisi array ChapterImage
  */
-export const getChapterImages = async (): Promise<ChapterImage[]> => {
-    const res = await fetch(`${API_BASE_URL}/chapters/images`);
+export const getChapterImages = async ({ signal }: { signal?: AbortSignal } = {}): Promise<ChapterImage[]> => {
+    const res = await fetch(`${API_BASE_URL}/chapters/images`, {signal});
     if (!res.ok) throw new Error('Gagal mengambil gambar chapter');
     return res.json();
 };

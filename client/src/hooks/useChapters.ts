@@ -1,38 +1,37 @@
 // client/src/hooks/useChapters.ts
-
 import { useState, useEffect, useCallback } from 'react';
 import { getChapters } from '../services/chapterService';
 import type { Chapter } from '../types/chapter.types';
 
-/**
- * Custom Hook: Mengelola state dan fetching data Chapter.
- * Memusatkan logika pemanggilan API agar komponen UI tetap bersih (DRY).
- * * @returns {Object} Berisi state `chapters`, status `loading`, pesan `error`, 
- * dan fungsi `refetch` untuk memuat ulang data secara manual.
- */
 export const useChapters = () => {
     const [chapters, setChapters] = useState<Chapter[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
 
-    /**
-     * Memanggil API dan mengupdate state.
-     * Dibungkus dengan useCallback agar referensi fungsi tetap stabil 
-     * di memori antar render, mencegah re-render komponen yang tidak perlu (Performance Optimization).
-     */
-    const fetchChapters = useCallback(() => {
+    useEffect(() => {
+        const controller = new AbortController();
+        
         setLoading(true);
         setError(null);
-        getChapters()
+
+        // Pastikan getChapters menerima parameter signal
+        getChapters({ signal: controller.signal })
             .then(setChapters)
-            .catch((err) => setError(err.message || "Gagal memuat data chapter."))
+            .catch((err) => {
+                // Abaikan error jika request dibatalkan karena komponen unmount
+                if (err.name === 'AbortError') return; 
+                setError(err.message || "Gagal memuat data chapter.");
+            })
             .finally(() => setLoading(false));
+
+        // Cleanup: Mencegah memory leak dan race condition
+        return () => controller.abort(); 
     }, []);
 
-    // Eksekusi fetching saat hook pertama kali digunakan (Mount)
-    useEffect(() => {
-        fetchChapters();
-    }, [fetchChapters]);
+    // Optimasi: Hapus item dari UI secara instan (Optimistic Update)
+    const removeChapterLocal = useCallback((id: number) => {
+        setChapters((prev) => prev.filter(chapter => chapter.id !== id));
+    }, []);
 
-    return { chapters, loading, error, refetch: fetchChapters };
+    return { chapters, loading, error, removeChapterLocal };
 };

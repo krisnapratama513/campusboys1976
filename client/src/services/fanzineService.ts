@@ -30,8 +30,8 @@ export const getAllFanzine = async (page: number = 1): Promise<PublicFanzinesRes
     return await response.json(); 
 };
 
-export const getRecentFanzines = async (): Promise<FanzineType[]> => {
-    const response = await fetch(`${API_BASE_URL}/fanzines/recent`);
+export const getRecentFanzines = async ({signal} : {signal?: AbortSignal} = {}): Promise<FanzineType[]> => {
+    const response = await fetch(`${API_BASE_URL}/fanzines/recent`, {signal});
     if(!response.ok) throw new Error('Gagal mengambil data recent');
     
     const result = await response.json();
