@@ -1,4 +1,4 @@
-// src/components/SafeImage.tsx
+// client/src/components/SafeImage.tsx
 import { useState, useEffect, type ImgHTMLAttributes } from 'react';
 
 // Extend dari ImgHTMLAttributes agar mewarisi semua prop bawaan <img>
