@@ -16,9 +16,12 @@ const getAuthHeaders = () => {
 // ==========================================
 
 
-export const getPublicAlbums = async (page: number = 1): Promise<PublicAlbumsResponse> => {
+export const getPublicAlbums = async (
+        page: number = 1,
+        { signal }: { signal?: AbortSignal } = {}
+    ): Promise<PublicAlbumsResponse> => {
     // Tambahkan query ?page=
-    const response = await fetch(`${API_BASE_URL}/albums/public?page=${page}`);
+    const response = await fetch(`${API_BASE_URL}/albums/public?page=${page}`, {signal});
     if (!response.ok) throw new Error('Gagal mengambil data album public');
     
     // Langsung return seluruh hasil (karena kita butuh .data dan .pagination di frontend)
