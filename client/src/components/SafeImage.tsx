@@ -1,14 +1,13 @@
 // src/components/SafeImage.tsx
-import { useState, useEffect, type CSSProperties } from 'react';
+import { useState, useEffect, type ImgHTMLAttributes } from 'react';
 
-interface SafeImageProps {
+// Extend dari ImgHTMLAttributes agar mewarisi semua prop bawaan <img>
+interface SafeImageProps extends ImgHTMLAttributes<HTMLImageElement> {
     src: string;
     alt: string;
-    className?: string;
-    style?: CSSProperties; // Tambahkan ini
 }
 
-export const SafeImage = ({ src, alt, className, style }: SafeImageProps) => {
+export const SafeImage = ({ src, alt, className, style, ...rest }: SafeImageProps) => {
     const [imgSrc, setImgSrc] = useState(src);
     const [hasError, setHasError] = useState(false);
 
@@ -24,6 +23,7 @@ export const SafeImage = ({ src, alt, className, style }: SafeImageProps) => {
             alt={alt} 
             className={className}
             style={style}
+            {...rest} // Lempar sisa prop (seperti loading="lazy") ke sini
             onError={() => {
                 if (!hasError) {
                     setHasError(true);
