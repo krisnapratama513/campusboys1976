@@ -17,12 +17,17 @@ const FanzinDetailPage = () => {
     const { fanzine, isLoading } = useFanzineBySlug(slug);
 
     if (isLoading) return (
-        <div className={styles.pageWrapper}>
-            <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '5rem 0', gap: 2 }}>
-                <CircularProgress size={50} />
-                <span style={{ color: '#94a3b8' }}>Memuat Fanzine...</span>
-            </Box>
-        </div>
+        <Box sx={{ 
+            display: 'flex', 
+            flexDirection: 'column', 
+            alignItems: 'center', 
+            justifyContent: 'center', 
+            minHeight: '100vh', // Mengambil seluruh tinggi layar
+            gap: 2 
+        }}>
+            <CircularProgress size={50} />
+            <span style={{ color: '#94a3b8' }}>Memuat Fanzine...</span>
+        </Box>
     );
 
     if (!fanzine) return (
