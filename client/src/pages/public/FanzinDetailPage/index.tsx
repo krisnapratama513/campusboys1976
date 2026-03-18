@@ -44,7 +44,6 @@ const FanzinDetailPage = () => {
         <div className={styles.pageWrapper}>
             <div className={styles.contentContainer}>
                 <div className={styles.header}>
-                    <Link to="/fanzine" className={styles.backLink}>&larr; Kembali</Link>
                     <h1 className={styles.title}>{fanzine.title}</h1>
                     <p className={styles.meta}>
                         Diterbitkan {formatDate(fanzine.date)} | Oleh <strong>{fanzine.author_name}</strong>
