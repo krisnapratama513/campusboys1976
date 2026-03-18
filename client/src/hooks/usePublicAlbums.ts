@@ -18,12 +18,13 @@ export const usePublicAlbums = (page: number) => {
             .then(res => {
                 setAlbums(res.data);
                 setTotalPages(res.pagination.totalPages);
+                setLoading(false);
             })
             .catch(err => {
                 if (err.name === 'AbortError') return;
                 setError("Gagal memuat album.");
+                setLoading(false);
             })
-            .finally(() => setLoading(false));
 
         return () => controller.abort();
     }, [page]); // Re-fetch aman saat 'page' berubah

@@ -20,12 +20,17 @@ export const usePublicAlbumBySlug = (slug: string | undefined) => {
         setError(null);
 
         getPublicAlbumBySlug(slug, { signal: controller.signal })
-            .then(data => setAlbum(data))
+            .then(
+                data => {
+                    setAlbum(data);
+                    setLoading(false);
+                }
+            )
             .catch(err => {
                 if (err.name === 'AbortError') return;
                 setError('Gagal memuat detail album.');
+                setLoading(false);
             })
-            .finally(() => setLoading(false));
 
         return () => controller.abort();
     }, [slug]);

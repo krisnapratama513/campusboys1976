@@ -16,13 +16,16 @@ export const useChapters = () => {
 
         // Pastikan getChapters menerima parameter signal
         getChapters({ signal: controller.signal })
-            .then(setChapters)
+            .then((data) => {
+                setChapters(data);
+                setLoading(false);
+            })
             .catch((err) => {
                 // Abaikan error jika request dibatalkan karena komponen unmount
                 if (err.name === 'AbortError') return; 
                 setError(err.message || "Gagal memuat data chapter.");
+                setLoading(false);
             })
-            .finally(() => setLoading(false));
 
         // Cleanup: Mencegah memory leak dan race condition
         return () => controller.abort(); 

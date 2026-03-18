@@ -21,9 +21,9 @@ const getAuthHeaders = () => {
 };
 
 // --- PUBLIC ---
-export const getAllFanzine = async (page: number = 1): Promise<PublicFanzinesResponse> => {
+export const getAllFanzine = async (page: number = 1,{ signal }: { signal?: AbortSignal } = {}): Promise<PublicFanzinesResponse> => {
     // Tambahkan query ?page= ke URL
-    const response = await fetch(`${API_BASE_URL}/fanzines?page=${page}`);
+    const response = await fetch(`${API_BASE_URL}/fanzines?page=${page}`, {signal});
     if(!response.ok) throw new Error('Gagal mengambil data getAllFanzine');
     
     // Langsung return semua datanya (termasuk .data dan .pagination)

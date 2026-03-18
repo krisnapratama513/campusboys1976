@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getChapterImages } from '../services/chapterService';
-import { SERVER_ROOT } from '../config/api';
+import { getChapterImages } from '@/services/chapterService';
+import { SERVER_ROOT } from '@/config/api';
 
 export const useChapterImages = () => {
     // State langsung menyimpan format yang dibutuhkan Carousel
@@ -21,12 +21,13 @@ export const useChapterImages = () => {
                     alt: `Chapter Logo ${chapter.id}`
                 }));
                 setImages(formattedImages);
+                setLoading(false);
             })
             .catch((err) => {
                 if (err.name === 'AbortError') return;
                 setError(err.message || "Gagal memuat gambar chapter.");
+                setLoading(false)
             })
-            .finally(() => setLoading(false));
 
         return () => controller.abort();
     }, []);

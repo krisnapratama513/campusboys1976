@@ -21,12 +21,13 @@ export const useRecentFanzines = () => {
                     alt: `Cover Fanzine ${fanzine.id}`
                 }));
                 setImages(formattedImages);
+                setLoading(false);
             })
             .catch((err) => {
                 if (err.name === 'AbortError') return;
                 setError(err.message || "Gagal memuat recent fanzine.");
+                setLoading(false)
             })
-            .finally(()=> setLoading(false));
 
         return () => controller.abort();
     }, []);
