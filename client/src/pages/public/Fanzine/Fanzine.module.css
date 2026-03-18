@@ -1,6 +1,7 @@
 .fanzineContainerPage{
     padding-bottom:40px ;
     background-color: hsl(228,12%,8%);
+    color: #fff;
 }
 .fanzineContainer {
     width: 80%;
