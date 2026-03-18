@@ -20,6 +20,7 @@ export const getPublicAlbums = async (
         page: number = 1,
         { signal }: { signal?: AbortSignal } = {}
     ): Promise<PublicAlbumsResponse> => {
+        
     // Tambahkan query ?page=
     const response = await fetch(`${API_BASE_URL}/albums/public?page=${page}`, {signal});
     if (!response.ok) throw new Error('Gagal mengambil data album public');
@@ -28,8 +29,12 @@ export const getPublicAlbums = async (
     return await response.json(); 
 };
 
-export const getPublicAlbumBySlug = async (slug: string): Promise<Album> => {
-    const response = await fetch(`${API_BASE_URL}/albums/public/${slug}`);
+export const getPublicAlbumBySlug = async (
+        slug: string,
+        { signal }: { signal?: AbortSignal } = {}
+    ): Promise<Album> => {
+
+    const response = await fetch(`${API_BASE_URL}/albums/public/${slug}`, {signal});
     if (!response.ok) throw new Error('Gagal mengambil detail album public');
     
     const result = await response.json();

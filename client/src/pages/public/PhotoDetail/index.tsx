@@ -1,58 +1,31 @@
 // client/src/pages/public/PhotoDetail/index.tsx
 
 import styles from './PhotoDetail.module.css';
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
 
-// Types & Services
-import type { Album } from '../../../types/album.types';
-import { getPublicAlbumBySlug } from '../../../services/albumService';
-
 // Config & Components
-import { SERVER_ROOT } from '../../../config/api'; // [PENTING]
-import PhotoModal from '../../../components/PhotoModal';
+import { SERVER_ROOT } from '@/config/api';
+import PhotoModal from '@/components/PhotoModal';
+import StatusView from '@/components/StatusView';
+import { SafeImage } from '@/components/SafeImage';
+import { usePublicAlbumBySlug } from '@/hooks/usePublicAlbumBySlug';
 
-/**
- * Halaman Public: Detail Album.
- * Menampilkan grid foto dari album tertentu.
- * Mengambil gambar dari server uploads dan menangani logika Modal Zoom.
- * * @component
- */
+
+const formatDate = (dateString: string) => {
+    const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
+    return new Date(dateString).toLocaleDateString('id-ID', options);
+};
+
 const PhotoDetail = () => {
     // Ambil slug dari URL
     const { slug } = useParams<{ slug: string }>();
-    
-    const [album, setAlbum] = useState<Album | null>(null);
-    const [loading, setLoading] = useState(true);
-    
-    // State untuk Modal (menyimpan filename foto yang sedang di-zoom)
+    const { album, loading, error } = usePublicAlbumBySlug(slug);
     const [selectedPhoto, setSelectedPhoto] = useState<string | null>(null);
 
-    /**
-     * Effect: Load Detail Album by Slug
-     */
-    useEffect(() => {
-        if (slug) {
-            getPublicAlbumBySlug(slug)
-                .then(data => {
-                    setAlbum(data);
-                    setLoading(false);
-                })
-                .catch(err => {
-                    console.error("Gagal load detail album:", err);
-                    setLoading(false);
-                });
-        }
-    }, [slug]);
 
-    // Format Tanggal (Indonesia)
-    const formatDate = (dateString: string) => {
-        const options: Intl.DateTimeFormatOptions = { day: 'numeric', month: 'long', year: 'numeric' };
-        return new Date(dateString).toLocaleDateString('id-ID', options);
-    };
-
-    // --- RENDER LOADING ---
-    if (loading) return <div className={styles.centerText}>Memuat foto...</div>;
+    if (loading) return <StatusView message="Memuat detail album..." />;
+    if (error) return <StatusView message={error} isError />;
     
     // --- RENDER 404 ---
     if (!album) return (
@@ -63,6 +36,8 @@ const PhotoDetail = () => {
             </div>
         </div>
     );
+
+    const photos = album.photos || [];
 
     return (
         <>
@@ -85,12 +60,12 @@ const PhotoDetail = () => {
 
                 {/* Grid Foto Gallery */}
                 <div className={styles.photoGrid}>
-                    {(album.photos || []).length === 0 ? (
+                    {photos.length === 0  ? (
                         <p style={{color:'#94a3b8', fontStyle:'italic', width:'100%', textAlign:'center'}}>
                             Belum ada foto di album ini.
                         </p>
                     ) : (
-                        (album.photos || []).map((photo) => (
+                        photos.map((photo) => (
                             <div 
                                 key={photo.id} 
                                 className={styles.photoItem}
@@ -98,13 +73,11 @@ const PhotoDetail = () => {
                                 style={{cursor: 'pointer'}}
                                 title="Klik untuk memperbesar"
                             >
-                                {/* [UPDATE] Gunakan URL Server */}
-                                <img 
+                                <SafeImage
                                     src={`${SERVER_ROOT}/uploads/albums/gallery/${photo.image_filename}`} 
                                     alt={`Dokumentasi ${album.title}`} 
                                     className={styles.image}
                                     loading="lazy"
-                                    onError={(e) => (e.currentTarget.src = 'https://placehold.co/400x400?text=Error')}
                                 />
                             </div>
                         ))
