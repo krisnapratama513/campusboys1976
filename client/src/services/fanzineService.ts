@@ -38,8 +38,8 @@ export const getRecentFanzines = async ({signal} : {signal?: AbortSignal} = {}):
     return result.data; // Return array langsung
 };
 
-export const getFanzineBySlug = async (slug: string): Promise<FanzineType> => {
-    const response = await fetch(`${API_BASE_URL}/fanzines/${slug}`);
+export const getFanzineBySlug = async (slug: string, { signal }: { signal?: AbortSignal } = {}): Promise<FanzineType> => {
+    const response = await fetch(`${API_BASE_URL}/fanzines/${slug}`, {signal});
     if(!response.ok) throw new Error('Gagal mengambil detail fanzine');
 
     const result = await response.json();
