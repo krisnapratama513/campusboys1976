@@ -1,22 +1,23 @@
-import React, { useRef, useEffect } from 'react';
+// client/src/components/FlipbookViewer/FlipbookViewer.tsx
+import React, { useRef, useEffect, useState, useCallback } from 'react';
 import { Document, pdfjs } from 'react-pdf';
 import screenfull from 'screenfull';
-
-// Import CSS Wajib react-pdf
+import pdfWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
-// Import Bagian-bagian yang sudah kita buat
+import { useFlipbookState } from './hooks/useFlipbookState';
+import { useAutoFit } from './hooks/useAutoFit'; 
+import type { FlipbookHandle } from './types';
+
 import FlipbookBook from './components/FlipbookBook';
 import ControlBar from './components/ControlBar';
-import { useFlipbookState } from './hooks/useFlipbookState';
-
-// UPDATE: Menggunakan 'import type' sesuai request
-import type { FlipbookHandle } from './types';
+import { ErrorFallback, LoadingFallback } from './components/ViewerFallbacks';
 import styles from './FlipbookViewer.module.css';
 
-// 1. SETUP WORKER
-pdfjs.GlobalWorkerOptions.workerSrc = `//unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
+if (typeof window !== 'undefined') {
+    pdfjs.GlobalWorkerOptions.workerSrc = pdfWorkerUrl;
+}
 
 interface FlipbookViewerProps {
     pdfUrl: string;
@@ -24,140 +25,74 @@ interface FlipbookViewerProps {
 }
 
 const FlipbookViewer: React.FC<FlipbookViewerProps> = ({ pdfUrl, className }) => {
-    // Ref container utama (untuk target Fullscreen)
     const containerRef = useRef<HTMLDivElement>(null);
-
-    // Ref ke komponen Buku (untuk trigger Next/Prev secara imperatif)
     const bookRef = useRef<FlipbookHandle>(null);
+    const [progress, setProgress] = useState(0);
 
-    // Ref untuk menyimpan nilai scale optimal (Auto-Fit value)
-    const optimalScaleRef = useRef<number>(1);
-
-    // Panggil Custom Hook logic kita
     const {
+        isMobile,
         pdfDetails,
         viewerState,
-        setViewerState,
         onDocumentLoadSuccess,
         handleZoom,
-        handlePageUpdate
+        handlePageUpdate,
+        handleNavigation,
+        setFullscreen, 
+        handleAutoFit, 
+        resetZoom      
     } = useFlipbookState();
 
-    /**
-     * 2. LOGIKA FULLSCREEN
-     */
-    const toggleFullscreen = () => {
+    // PERBAIKAN: Gunakan pemanggilan object params sesuai interface useAutoFit
+    const optimalScaleRef = useAutoFit({
+        containerRef,
+        pdfDetails,
+        onScaleCalculated: handleAutoFit
+    });
+
+    const toggleFullscreen = useCallback(() => {
         if (screenfull.isEnabled && containerRef.current) {
             screenfull.toggle(containerRef.current);
         }
-    };
+    }, []);
 
-    // Sync state fullscreen
     useEffect(() => {
-        if (screenfull.isEnabled) {
-            const onChange = () => {
-                setViewerState(prev => ({
-                    ...prev,
-                    isFullscreen: screenfull.isFullscreen
-                }));
-            };
-            screenfull.on('change', onChange);
-            return () => screenfull.off('change', onChange);
-        }
-    }, [setViewerState]);
+        if (!screenfull.isEnabled) return;
+        
+        const onChange = () => setFullscreen(screenfull.isFullscreen);
+        screenfull.on('change', onChange);
+        
+        return () => { screenfull.off('change', onChange); }; 
+    }, [setFullscreen]);
 
-    /**
-     * 3. HANDLER NAVIGASI (SMART MOBILE NAVIGATION)
-     * Mengatur logika tombol Next/Prev.
-     * Desktop: Langsung Flip.
-     * Mobile: Geser (Pan) dulu antar halaman kiri/kanan, baru Flip.
-     */
-    const handleToolbarPageChange = (direction: 'next' | 'prev') => {
-        // Cek apakah layar mobile (< 768px)
-        const isMobile = window.innerWidth < 768;
+    const handleToolbarPageChange = useCallback((direction: 'next' | 'prev') => {
+        handleNavigation(direction, bookRef);
+    }, [handleNavigation]);
 
-        if (isMobile) {
-            // --- LOGIKA MOBILE ---
-            if (direction === 'next') {
-                // Case 1: Sedang di Cover -> Flip ke Halaman 1 (View Left)
-                if (viewerState.currentPage === 0) {
-                    bookRef.current?.next();
-                }
-                // Case 2: Sedang di Halaman Kiri -> Geser View ke Kanan
-                else if (viewerState.mobileView === 'left') {
-                    setViewerState(prev => ({ ...prev, mobileView: 'right' }));
-                }
-                // Case 3: Sedang di Halaman Kanan -> Flip ke Halaman berikutnya (View Left)
-                else {
-                    bookRef.current?.next();
-                }
-            } else {
-                // --- LOGIKA PREV ---
-                // Case 1: Sedang di Halaman Kanan -> Geser View balik ke Kiri
-                if (viewerState.mobileView === 'right') {
-                    setViewerState(prev => ({ ...prev, mobileView: 'left' }));
-                }
-                // Case 2: Sedang di Halaman Kiri -> Flip balik ke halaman sebelumnya
-                else {
-                    bookRef.current?.prev();
-                }
-            }
-        } else {
-            // --- LOGIKA DESKTOP (Standard) ---
-            if (direction === 'next') bookRef.current?.next();
-            else bookRef.current?.prev();
-        }
-    };
-
-    /**
-     * 4. FITUR AUTO-FIT SCALE
-     */
-    useEffect(() => {
-        if (pdfDetails && containerRef.current) {
-            const containerWidth = containerRef.current.clientWidth;
-            const containerHeight = containerRef.current.clientHeight || window.innerHeight * 0.8;
-            const PADDING_FACTOR = 0.95;
-
-            const isMobile = window.innerWidth < 768;
-            const totalBookWidth = pdfDetails.width * (isMobile ? 1 : 2);
-            const totalBookHeight = pdfDetails.height;
-
-            const scaleX = (containerWidth * PADDING_FACTOR) / totalBookWidth;
-            const scaleY = (containerHeight * PADDING_FACTOR) / totalBookHeight;
-            const optimalScale = Math.min(scaleX, scaleY);
-            const finalScale = Math.min(optimalScale, 1);
-
-            optimalScaleRef.current = finalScale;
-
-            setViewerState(prev => ({
-                ...prev,
-                zoomScale: finalScale
-            }));
-        }
-    }, [pdfDetails, setViewerState]);
-
-    const handleToolbarZoom = (action: 'in' | 'out' | 'reset') => {
+    const handleToolbarZoom = useCallback((action: 'in' | 'out' | 'reset') => {
         if (action === 'reset') {
-            setViewerState(prev => ({
-                ...prev,
-                zoomScale: optimalScaleRef.current
-            }));
+            resetZoom(optimalScaleRef.current);
         } else {
             handleZoom(action);
         }
-    };
+    }, [handleZoom, resetZoom, optimalScaleRef]);
+
+    const handleLoadProgress = useCallback(({ loaded, total }: { loaded: number; total: number }) => {
+        if (!total) return;
+        setProgress(Math.round((loaded / total) * 100));
+    }, []);
 
     return (
         <div
             ref={containerRef}
-            className={`${styles.container} ${className || ''} ${viewerState.isFullscreen ? 'bg-gray-900 fixed inset-0 z-[9999]' : ''}`}
+            className={`${styles.container} ${className || ''} ${viewerState.isFullscreen ? styles.fullscreen : ''}`}
         >
             <Document
                 file={pdfUrl}
                 onLoadSuccess={onDocumentLoadSuccess}
-                loading={<div className={styles.loadingContainer}>Memuat Majalah...</div>}
-                error={<div className="text-red-400 font-bold p-10">Gagal memuat PDF. Pastikan URL benar.</div>}
-                className="flex justify-center items-center w-full h-full"
+                onLoadProgress={handleLoadProgress}
+                loading={<LoadingFallback progress={progress} />}
+                error={<ErrorFallback />}
+                className={styles.documentWrapper} 
             >
                 {pdfDetails && (
                     <>
@@ -169,8 +104,11 @@ const FlipbookViewer: React.FC<FlipbookViewerProps> = ({ pdfUrl, className }) =>
                         />
 
                         <ControlBar
-                            viewerState={viewerState}
+                            currentPage={viewerState.currentPage}
+                            isFullscreen={viewerState.isFullscreen}
                             totalPages={pdfDetails.numPages}
+                            isMobile={isMobile}
+                            mobileView={viewerState.mobileView}
                             onPageChange={handleToolbarPageChange}
                             onZoom={handleToolbarZoom}
                             onToggleFullscreen={toggleFullscreen}

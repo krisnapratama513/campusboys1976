@@ -1,0 +1,30 @@
+/* client/ */
+.bookWrapper {
+    box-sizing: content-box;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start; 
+    position: relative;
+    z-index: 10;
+    background-color: greenyellow;
+}
+
+.transformWrapper {
+    transform-origin: top center;
+    transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+
+.flipBookContainer {
+    margin: 0 auto;
+}
+
+/* Update: Responsif */
+@media (max-width: 640px) {
+    .transformWrapper {
+        /* Perbaikan: targetkan wrapper yang memiliki efek transform */
+        transform-origin: top center;
+    }
+}

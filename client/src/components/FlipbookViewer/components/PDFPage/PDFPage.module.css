@@ -1,0 +1,14 @@
+.pageBase{
+    background-color: transparent !important;
+    display: flex;
+    /* Untuk alignment konten page */
+    box-shadow: none;
+}
+
+.pdfCanvas{
+    box-shadow: 2px 0px 8px rgba(0, 0, 0, 0.4);
+    background-color: white;
+}
+
+.alignLeft { justify-content: flex-start; }
+.alignRight { justify-content: flex-end; }

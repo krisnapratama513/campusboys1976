@@ -65,6 +65,18 @@ app.use('/uploads', (req, res, next) => {
     next();
 }, express.static(path.join(__dirname, '../uploads')));
 
+// GANTI BLOK /uploads ANDA MENJADI INI:
+
+app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
+    setHeaders: (res, path, stat) => {
+        // Mengizinkan semua domain membaca file statis ini (Localhost maupun Production)
+        res.set('Access-Control-Allow-Origin', '*');
+        
+        // Header ekstra yang sering diwajibkan oleh PDF.js dan Chrome modern
+        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
+    }
+}));
+
 /**
  * ------------------------------------------------------------------------------
  * HEALTH CHECK DATABASE

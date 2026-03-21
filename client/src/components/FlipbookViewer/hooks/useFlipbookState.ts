@@ -1,38 +1,55 @@
-import { useState, useCallback } from 'react';
-import type { PDFDetails, ViewerState } from '../types';
+// client/src/components/FlipbookViewer/hooks/useFlipbookState.ts
+import { useState, useCallback, useRef, useEffect } from 'react';
+import type { PDFDetails, ViewerState, FlipbookHandle } from '../types';
+import type { PDFDocumentProxy } from 'pdfjs-dist';
+import useMediaQuery from '@mui/material/useMediaQuery';
+
+const ZOOM = { STEP: 0.2, MAX: 3, MIN: 0.4 };
 
 export const useFlipbookState = () => {
+    const isMobile = useMediaQuery('(max-width:768px)');
     const [pdfDetails, setPdfDetails] = useState<PDFDetails | null>(null);
-
-    // State tunggal untuk UI agar lebih rapi daripada banyak useState terpisah
     const [viewerState, setViewerState] = useState<ViewerState>({
         currentPage: 0,
         zoomScale: 1,
         isFullscreen: false,
-        mobileView: 'center', // Default awal (Cover)
+        mobileView: 'center', 
+        isManualZoom: false,
     });
 
-    // Handler saat PDF berhasil dimuat oleh react-pdf
-    const onDocumentLoadSuccess = useCallback((pdf: any) => {
-        // Kita ambil dimensi halaman pertama sebagai referensi rasio aspek
-        pdf.getPage(1).then((page: any) => {
-            setPdfDetails({
-                numPages: pdf.numPages,
-                width: page.view[2],
-                height: page.view[3],
-            });
-        });
+    const stateRef = useRef(viewerState);
+    stateRef.current = viewerState;
+
+    const isMounted = useRef(true);
+    useEffect(() => {
+        isMounted.current = true; // Tambahkan ini agar aman di Strict Mode
+        return () => { isMounted.current = false; };
     }, []);
 
-    // Handler Zoom (In, Out, Reset)
-    const handleZoom = useCallback((action: 'in' | 'out' | 'reset') => {
+    const onDocumentLoadSuccess = useCallback(async (pdf: PDFDocumentProxy) => {
+        try {
+            const page = await pdf.getPage(1);
+            const viewport = page.getViewport({ scale: 1 }); // Ganti jadi ini
+            
+            if (isMounted.current) {
+                setPdfDetails({
+                    numPages: pdf.numPages,
+                    width: viewport.width,   // Gunakan viewport
+                    height: viewport.height, // Gunakan viewport
+                });
+            }
+        } catch (error) {
+            console.error("Gagal merender:", error);
+        }
+    }, []);
+
+    const handleZoom = useCallback((action: 'in' | 'out') => {
         setViewerState(prev => {
             let newScale = prev.zoomScale;
-            if (action === 'in') newScale = Math.min(prev.zoomScale + 0.2, 3); // Max zoom 3x
-            if (action === 'out') newScale = Math.max(prev.zoomScale - 0.2, 0.6); // Min zoom 0.6x
-            if (action === 'reset') newScale = 1;
-
-            return { ...prev, zoomScale: newScale };
+            if (action === 'in') newScale = Math.min(prev.zoomScale + ZOOM.STEP, ZOOM.MAX); 
+            if (action === 'out') newScale = Math.max(prev.zoomScale - ZOOM.STEP, ZOOM.MIN); 
+            
+            return { ...prev, zoomScale: newScale, isManualZoom: true }; 
         });
     }, []);
 
@@ -40,19 +57,60 @@ export const useFlipbookState = () => {
         setViewerState(prev => ({
             ...prev,
             currentPage: pageIndex,
-            // PENTING: Setiap kali kertas terbalik (flip), 
-            // kembalikan view mobile ke sisi Kiri (awal baca)
-            // Kecuali jika balik ke Cover (0), maka 'center'
             mobileView: pageIndex === 0 ? 'center' : 'left'
         }));
     }, []);
 
+    const handleNavigation = useCallback((
+        direction: 'next' | 'prev', 
+        bookRef: React.RefObject<FlipbookHandle | null>
+    ) => {
+        const book = bookRef.current;
+        if (!book) return;
+
+        const current = stateRef.current; 
+
+        if (!isMobile) {
+            if (direction === 'next') book.next();
+            else book.prev();
+            return;
+        }
+
+        if (direction === 'next') {
+            if (current.currentPage === 0) book.next();
+            else if (current.mobileView === 'left') setViewerState(prev => ({ ...prev, mobileView: 'right' }));
+            else book.next();
+        } else {
+            if (current.mobileView === 'right') setViewerState(prev => ({ ...prev, mobileView: 'left' }));
+            else book.prev();
+        }
+    }, [isMobile]); 
+
+    const setFullscreen = useCallback((isFullscreen: boolean) => {
+        setViewerState(prev => ({ ...prev, isFullscreen }));
+    }, []);
+
+    const resetZoom = useCallback((optimalScale: number) => {
+        setViewerState(prev => ({ ...prev, zoomScale: optimalScale, isManualZoom: false }));
+    }, []);
+
+    const handleAutoFit = useCallback((calculatedScale: number) => {
+        setViewerState(prev => {
+            if (prev.isManualZoom) return prev; 
+            return { ...prev, zoomScale: calculatedScale };
+        });
+    }, []);
+
     return {
+        isMobile,
         pdfDetails,
         viewerState,
-        setViewerState, // Exposed jika butuh update manual lain
         onDocumentLoadSuccess,
         handleZoom,
-        handlePageUpdate
+        handlePageUpdate,
+        handleNavigation,
+        setFullscreen,
+        resetZoom,
+        handleAutoFit
     };
 };

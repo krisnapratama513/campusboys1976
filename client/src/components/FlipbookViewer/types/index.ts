@@ -1,21 +1,18 @@
 // client/src/components/FlipbookViewer/types/index.ts
-
 export interface PDFDetails {
-    numPages: number;
-    width: number;
-    height: number;
+    readonly numPages: number;
+    readonly width: number;
+    readonly height: number;
 }
 
 export interface ViewerState {
-  currentPage: number;
-  zoomScale: number;
-  isFullscreen: boolean;
-  // TAMBAHAN: Melacak sisi mana yang sedang dilihat di HP
-  // 'center' = Cover, 'left' = Halaman Kiri (Genap), 'right' = Halaman Kanan (Ganjil)
-  mobileView: 'center' | 'left' | 'right'; 
+    readonly currentPage: number;
+    readonly zoomScale: number;
+    readonly isFullscreen: boolean;
+    readonly mobileView: 'center' | 'left' | 'right'; 
+    readonly isManualZoom: boolean;
 }
 
-// Interface untuk Ref agar bisa diakses parent
 export interface FlipbookHandle {
     next: () => void;
     prev: () => void;
