@@ -4,7 +4,7 @@ import type { PDFDetails, ViewerState, FlipbookHandle } from '../types';
 import type { PDFDocumentProxy } from 'pdfjs-dist';
 import useMediaQuery from '@mui/material/useMediaQuery';
 
-const ZOOM = { STEP: 0.2, MAX: 3, MIN: 0.4 };
+const ZOOM = { STEP: 0.2, MAX: 1.2, MIN: 0.4 };
 
 export const useFlipbookState = () => {
     const isMobile = useMediaQuery('(max-width:768px)');
