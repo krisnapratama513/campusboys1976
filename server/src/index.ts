@@ -42,12 +42,11 @@ const PORT = process.env.PORT || 8000;
  */
 // KONFIGURASI CORS YANG LEBIH KUAT
 // Izinkan secara eksplisit domain frontend
+const allowedOrigins = process.env.FRONTEND_URL 
+    ? process.env.FRONTEND_URL.split(',') 
+    : [];
 app.use(cors({
-    origin: [
-        'http://localhost:5173',           // Untuk dev local
-        'https://campusboys1976.com',      // Domain Frontend
-        'https://www.campusboys1976.com'   // Domain dengan www
-    ],
+    origin: allowedOrigins,
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'], // Izinkan method ini
     allowedHeaders: ['Content-Type', 'Authorization'],    // Izinkan header ini
     credentials: true // Izinkan cookies/session (penting agar tidak dianggap spam)
@@ -55,27 +54,11 @@ app.use(cors({
 app.use(express.json());         // Parser untuk payload JSON
 app.use(express.urlencoded({ extended: true })); // Parser untuk form-data
 
-// [PENTING] Melayani file statis (Gambar Profil, Cover, dll)
-// Endpoint: /uploads/namafile.jpg
-// Browser bisa mengakses: http://localhost:8000/uploads/profiles/user-1.jpg
-// app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
 app.use('/uploads', (req, res, next) => {
-    res.header("Access-Control-Allow-Origin", "https://campusboys1976.com");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
     next();
 }, express.static(path.join(__dirname, '../uploads')));
-
-// GANTI BLOK /uploads ANDA MENJADI INI:
-
-app.use('/uploads', express.static(path.join(__dirname, '../uploads'), {
-    setHeaders: (res, path, stat) => {
-        // Mengizinkan semua domain membaca file statis ini (Localhost maupun Production)
-        res.set('Access-Control-Allow-Origin', '*');
-        
-        // Header ekstra yang sering diwajibkan oleh PDF.js dan Chrome modern
-        res.set('Cross-Origin-Resource-Policy', 'cross-origin');
-    }
-}));
 
 /**
  * ------------------------------------------------------------------------------
